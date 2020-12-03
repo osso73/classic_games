@@ -1,0 +1,270 @@
+#:set COLOUR_IMAGE [1,1,1,1]
+#:set COLOUR_ACTIVE [0,0,1,1]
+#:set COLOUR_DISABLED [0,0,1,0]
+
+
+########################### MainScreen #####################################
+<MainScreen>:
+    obj_dibujo: pantalla_dibujo
+    obj_letras_falladas: pantalla_letras_falladas
+    obj_palabra: pantalla_palabra
+    obj_teclado: pantalla_teclado
+
+
+    id: main
+    orientation: 'vertical'
+    Menu:
+        size_hint_y: None
+        height: root.height / 10 * 0.5
+        padding: 5
+        spacing: 20
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        Button:
+            text: 'Nuevo'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_press: root.iniciar_juego()
+        Button:
+            text: 'Pista'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_press: root.dar_pista()
+        Button:
+            text: 'Teclado'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_press: root.cambiar_teclado()
+        Button:
+            text: 'Salir'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_release: 
+                root.thanks()
+                app.stop()
+    
+    BoxLayout:
+        orientation: 'horizontal'
+        Dibujo:
+            id: pantalla_dibujo
+            
+        LetrasFalladas:
+            id: pantalla_letras_falladas
+            width: root.width * 1 / 6
+
+    
+    PalabraLetras:
+        id: pantalla_palabra
+        height: root.height / 10
+        
+    Teclado:
+        id: pantalla_teclado
+        height: root.height / 10 * 2
+
+
+############################# Dibujo #######################################
+<Dibujo>:
+    canvas:
+        Color:
+            rgba: COLOUR_IMAGE
+        Rectangle:
+            size: self.size
+            pos: 0,0
+            source: 'textures/desierto.jpg'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[0]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 8/10, 20
+            pos: self.width * 1/10, self.height * 1/10
+            source: 'textures/madera.jpg'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[1]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: 20, self.height * 8/10
+            pos: self.width * 2/10, self.height * 1/10
+            source: 'textures/madera.jpg'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[2]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 5/10, 20
+            pos: self.width * 1/10, self.height * 9/10
+            source: 'textures/madera.jpg'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[3]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: 20, self.height * 1/10 + 20
+            pos: self.width * 6/10, self.height * 8/10
+            source: 'textures/cuerda.jpg'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[4]=='A' else COLOUR_DISABLED
+        Ellipse:
+            size: self.width * 1.5/10, self.height * 1.5/10
+            pos: self.width * 5.25/10+10, self.height * 7/10
+            source: 'textures/hombre/hombre-cara.png'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[5]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 2/10, self.height * 2.5/10
+            pos: self.width * 5/10+10, self.height * 4.5/10
+            source: 'textures/hombre/hombre-tronco.png'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[6]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 1/10, self.height * 2.5/10
+            pos: self.width * 7/10-5, self.height * 4.5/10 - 15
+            source: 'textures/hombre/hombre-brazo-derecho.png'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[7]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 1/10, self.height * 2.5/10
+            pos: self.width * 4/10+25, self.height * 4.5/10 - 15
+            source: 'textures/hombre/hombre-brazo-izquierdo.png'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[8]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 1/10, self.height * 2.5/10
+            pos: self.width * 5/10+10, self.height * 2/10+10
+            source: 'textures/hombre/hombre-pierna-izquierda.png'
+        Color:
+            rgba: COLOUR_IMAGE if self.status[9]=='A' else COLOUR_DISABLED
+        Rectangle:
+            size: self.width * 1/10, self.height * 2.5/10
+            pos: self.width * 6/10+10, self.height * 2/10+10
+            source: 'textures/hombre/hombre-pierna-derecha.png'
+            
+
+######################### LetrasFalladas ###################################
+<LetrasFalladas>:
+    orientation: 'vertical'
+    size_hint_x: None
+    padding: 0.1 * self.width, 0
+    canvas:
+        Color:
+            rgba: 1, 0, 0, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        text: root.fallo[0]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[1]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[2]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[3]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[4]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[5]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[6]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[7]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[8]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+    Label:
+        text: root.fallo[9]
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        font_name: 'fonts/lt-robotomono-bold'
+
+
+
+######################### PalabraLetras ###################################
+<PalabraLetras>:
+    size_hint_y: None
+    padding: 5
+    canvas:
+        Color:
+            rgba: 0, 1, 0, 0.5
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    
+    Label:
+        text: root.actual
+        font_size: 120
+        texture_size: self.size
+        size: self.texture_size
+        halign: 'left'
+        valign: 'middle'
+        font_name: 'fonts/lt-robotomono-bold'
+      
+        
+############################ Teclado ######################################
+<Teclado>:    
+    size_hint_y: None
+    rows: 3
+    padding: 10
+    spacing: 10
+
+
+<Tecla>:
+    on_press: if not self.disabled: self.sound.play()
+    on_release: self.pulsar()
+    canvas:
+        Color:
+            rgba: [1, 1, 1, 0.2] if self.disabled else COLOUR_IMAGE
+        Rectangle:
+            size: root.size
+            pos: root.pos 
+            source: 'textures/'+root.skin+'/' + root.filename + '.png'
+
+
+############################## Popup ########################################
+<PopupMsg>
+    padding: 20, 20
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+        

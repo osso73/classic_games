@@ -1,0 +1,86 @@
+<MainScreen>:
+    orientation: 'vertical'
+    BoxLayout:
+        id: menu
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: root.height / 10 * 0.8
+        padding: 5
+        spacing: 5
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        MenuButton:
+            text: 'Nuevo'
+            on_release: obj_tapete.start_game()
+        MenuButton:
+            text: root.tema_actual
+            on_release: root.cambiar_tema()
+        MenuLabel:
+            text: 'Parejas: ' + str(root.tamano)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: None
+            width: self.parent.height * 0.5
+            MenuButtonSmall:
+                text: '^'
+                on_release: root.tamano = root.tamano+1 if root.tamano<20 else 20
+            MenuButtonSmall:
+                text: 'v'
+                on_release: root.tamano = root.tamano-1 if root.tamano>2 else 2
+        MenuLabel:
+            text: 'Movimientos: ' + str(obj_tapete.movimientos)
+        MenuButtonSmall:
+            text: 'X'
+            on_release: 
+                root.bye()
+                app.stop()
+
+    Tapete:
+        id: obj_tapete
+        cols: self.columnas
+        padding: 5
+        spacing: 5
+
+
+<Carta>:
+    on_release: self.click()
+    canvas:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: root.pos
+            size: root.size
+            source: root.show
+
+############################## Popup ########################################
+<PopupMsg>
+    padding: 20, 20
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+
+
+########################## Menu elements ####################################
+<MenuButton>:
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+    padding: 20, 20
+
+<MenuButtonSmall>:
+    font_size: 120
+    texture_size: self.size
+    size_hint_x: None
+    width: self.parent.height * 0.5
+    padding: 50, 50
+
+<MenuLabel>:
+    font_size: 120
+    size: self.texture_size
+    texture_size: self.size
+    padding: 20, 20

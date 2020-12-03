@@ -1,0 +1,91 @@
+<MainScreen>:
+    orientation: 'vertical'
+    id: main
+    BoxLayout:
+        id: menu
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: root.height / 10 * 0.5
+        padding: 5
+        spacing: 5
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        MenuButton:
+            text: 'Nuevo'
+            on_release: puzzle.start_game()
+        MenuButton:
+            text: 'Nivel ' + str(root.nivel)
+            on_release: root.nivel = root.nivel % 3 + 1
+        MenuLabel:
+            text: 'Movimientos: ' + str(puzzle.movimientos)
+            size_hint_x: 3
+        MenuButtonSmall:
+            text: 'X'
+            on_release: 
+                root.bye()
+                app.stop()
+    
+    Puzzle:
+        id: puzzle
+        cols: 4
+        size_hint: None, None
+        size: self.ventana, self.ventana
+
+    MenuButton:
+        text: 'Tema:' + root.tema
+        size_hint_y: 0.2
+        on_release: root.cambiar_tema()
+    GridLayout:
+        cols: puzzle.tamano
+        Button
+        Button
+        Button
+        Button
+        Button
+        Button
+        Button
+        Button
+        Button
+    
+########################## Menu elements ####################################
+<MenuButton>:
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+    padding: 20, 20
+
+<MenuButtonSmall>:
+    font_size: 120
+    texture_size: self.size
+    size_hint_x: None
+    width: self.parent.height * 0.5
+    padding: 50, 50
+
+<MenuLabel>:
+    font_size: 120
+    size: self.texture_size
+    texture_size: self.size
+    padding: 20, 20
+
+<Ficha>:
+    canvas.before:
+        Color:
+            rgba: [1,1,1,1] if self.name else [0,0,0,0] 
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            source: f'images/temas/{app.root.tema}/{app.root.nivel+2}/{root.name}.jpg'
+
+
+############################## Popup ########################################
+<PopupMsg>
+    padding: 20, 20
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+
