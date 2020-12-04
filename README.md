@@ -6,7 +6,7 @@ This is a little project to develop some simple games in kivy, so I get to know 
 The list of games to be developed is inspired in project [GameStore](https://github.com/neo-mashiro/GameStore), and other ideas I collect from Internet or my own experience. These are the games that I plan for now:
 
 - [x] pong
-- [x] ahoracdo
+- [x] ahorcado
 - [x] memory
 - [ ] 2048
 - [ ] 15 puzzle

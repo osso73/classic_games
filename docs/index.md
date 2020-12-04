@@ -5,7 +5,7 @@ A series of classic games in Kivy. These pages contain information about each of
 This is the list of games currently available, and planned:
 
 - [x] pong
-- [x] ahoracdo
+- [x] ahorcado
 - [x] memory
 - [ ] 15 puzzle
 - [ ] 2048
