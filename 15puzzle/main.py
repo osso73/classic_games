@@ -18,6 +18,7 @@ from kivy.uix.button import Button
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
+from kivy.uix.image import Image
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -66,6 +67,8 @@ class Puzzle(RelativeLayout):
                                       size=(lado-SPACING, lado-SPACING),
                                       size_hint=(None, None), posicion=(j, i)))
                 n += 1
+        
+        self.parent.ids.muestra.load_theme()
 
     def find_empty(self):
         for child in self.children:
@@ -112,31 +115,14 @@ class Puzzle(RelativeLayout):
                     return True
                 else:
                     return False
-            
-"""
-If N is even, puzzle instance is solvable if 
-
-    the blank is on an even row counting from the bottom 
-    (second-last, fourth-last, etc.) and number of inversions is odd.
-    
-    the blank is on an odd row counting from the bottom (last, third-last, 
-    fifth-last, etc.) and number of inversions is even.
-
-"""            
-                
-                
-                
-        
-        
-
-class PopupMsg(Label):
-    pass
+                            
 
 class Ficha(Label):
     name = StringProperty()
     tamano = NumericProperty()
     lado = NumericProperty()
     posicion = ListProperty()
+    active = BooleanProperty(True)
     
     def __init__(self, **kwargs):
         super(Ficha, self).__init__(**kwargs)
@@ -147,7 +133,7 @@ class Ficha(Label):
                 (self.tamano-1-self.posicion[1])*self.lado + SPACING/2)
     
     def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos):
+        if self.collide_point(*touch.pos) and self.active:
             self.move()
     
     def move(self):
@@ -186,6 +172,30 @@ class MenuLabel(Label):
 
 class PopupMsg(Label):
     pass
+
+class Muestra(GridLayout):
+    ventana = NumericProperty(100)
+    
+    def __init__(self, **kwargs):
+        super(Muestra, self).__init__(**kwargs)
+        Clock.schedule_once(self.initialize_grid)
+    
+    def initialize_grid(self, *args):
+        self.ventana = min(self.parent.height, self.parent.width)
+
+    def load_theme(self):
+        app = App.get_running_app()
+        tamano = app.root.ids.puzzle.tamano
+        lado = int(self.ventana / tamano)
+        title = list(range(1, tamano**2 + 1))
+        n = 0
+        for i in range(tamano):
+            for j in range(tamano):
+                self.add_widget(Ficha(name=str(title[n]), lado=lado, 
+                                      tamano=tamano, active=False,
+                                      size=(lado-SPACING, lado-SPACING),
+                                      size_hint=(None, None), posicion=(j, i)))
+                n += 1
 
 
 class MainScreen(BoxLayout):

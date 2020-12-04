@@ -32,7 +32,7 @@
     
     Puzzle:
         id: puzzle
-        cols: 4
+        cols: 3
         size_hint: None, None
         size: self.ventana, self.ventana
 
@@ -40,17 +40,19 @@
         text: 'Tema:' + root.tema
         size_hint_y: 0.2
         on_release: root.cambiar_tema()
-    GridLayout:
-        cols: puzzle.tamano
-        Button
-        Button
-        Button
-        Button
-        Button
-        Button
-        Button
-        Button
-        Button
+    ScatterLayout:
+        canvas.before:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Muestra:
+            id: muestra
+            cols: puzzle.tamano
+            size_hint: None, None
+            size: self.ventana, self.ventana
+            
     
 ########################## Menu elements ####################################
 <MenuButton>:
