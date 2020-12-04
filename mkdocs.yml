@@ -1,6 +1,9 @@
 site_name: classic_games
-repo_name: https://github.com/osso73/classic_games
-# theme: readthedocs
+repo_url: https://github.com/osso73/classic_games
+site_url: https://osso73.github.io/classic_games/
+site_author: osso73
+theme: readthedocs
+
 nav:
   - Home: index.md
   - Getting started: getting-started.md

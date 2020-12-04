@@ -152,7 +152,7 @@ class MainScreen(BoxLayout):
         # sound['ambience'] = SoundLoader.load('audio/ambience.ogg')
         sound['ok'] = SoundLoader.load('audio/ok.ogg')
         sound['start'] = SoundLoader.load('audio/start.ogg')
-        sound['move'] = SoundLoader.load('audio/move.ogg')
+        sound['turn'] = SoundLoader.load('audio/turn.ogg')
         sound['end_game'] = SoundLoader.load('audio/end_game.ogg')
         
         return sound
