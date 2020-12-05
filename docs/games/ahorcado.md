@@ -9,6 +9,7 @@ This is the game _hanged_, or _ahorcado_ in Spanish. It is pretty simple: given 
 
 If you guess all letters, you win. If the gallows is finished before gessing all letters, you loose and you are hanged.
 
+The words are in Spanish, taken from a Spanish book (see below [Other resources](#other-resources) for further details how the list of words was created).
 
 ## Main screen
 
