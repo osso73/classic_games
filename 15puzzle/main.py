@@ -68,7 +68,7 @@ class Puzzle(RelativeLayout):
                                       size=(lado-SPACING, lado-SPACING),
                                       size_hint=(None, None), posicion=(j, i)))
                 n += 1
-        
+        self.parent.ids.muestra.load_tema()
 
     def find_empty(self):
         for child in self.children:
@@ -80,9 +80,23 @@ class Puzzle(RelativeLayout):
         for child in self.children:
             if not child.name:
                 continue
-            if int(child.name) != child.posicion[0] + child.posicion[1] * self.tamano + 1:
+            if int(child.name) != (child.posicion[0] + 
+                                   child.posicion[1] * self.tamano + 1):
                 return False        
         return True
+    
+    def end_of_game(self):
+        if self.check_win():
+            self.parent.play('end_game')
+            lado = int(self.ventana / self.tamano)
+            for child in self.children:
+                anim = Animation(size=(lado, lado))
+                anim.start(child)
+            p = Popup(title='Final', size_hint=(0.80, 0.20),
+                  content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
+            p.open()
+                
+
     
     def is_solvable(self, game):
         lado = math.sqrt(len(game))
@@ -145,14 +159,7 @@ class Ficha(Label):
                 empty.posicion, self.posicion = self.posicion, empty.posicion
                 self.parent.parent.play('move')
                 self.parent.movimientos += 1
-        
-        
-        if self.parent.check_win():
-            self.parent.parent.play('end_game')
-            p = Popup(title='Final', size_hint=(0.80, 0.20),
-                  content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
-            p.open()
-
+        self.parent.end_of_game()
     
     def on_posicion(self, *args):
         anim = Animation(pos=self.calcular_posicion(), duration=MOVE_DURATION)
@@ -177,7 +184,7 @@ class FichaMuestra(Label):
     name = StringProperty()
 
 class Muestra(GridLayout):
-    tema = StringProperty('numeros')
+    tema = StringProperty('Números')
     
     def __init__(self, **kwargs):
         super(Muestra, self).__init__(**kwargs)

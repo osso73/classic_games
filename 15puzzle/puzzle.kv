@@ -40,15 +40,20 @@
         Muestra:
             id: muestra
             cols: puzzle.tamano
-            spacing: SPACING
+            spacing: 5
             size_hint: None, None
             size: self.parent.height, self.parent.height
             
-        MenuButton:
+        BoxLayout:
+            orientation: 'vertical'
             padding: 50, 50
-            text: 'Tema: ' + muestra.tema
-            on_release: muestra.cambiar_tema()
-            on_text: self.size = self.texture_size
+            Label:
+                text: 'Cambia el tema'
+            MenuButton:
+                padding: 50, 50
+                text: muestra.tema
+                on_release: muestra.cambiar_tema()
+            Label:
 
             
     
