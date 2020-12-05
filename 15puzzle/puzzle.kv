@@ -32,26 +32,24 @@
     
     Puzzle:
         id: puzzle
-        cols: 3
         size_hint: None, None
         size: self.ventana, self.ventana
 
-    MenuButton:
-        text: 'Tema:' + root.tema
-        size_hint_y: 0.2
-        on_release: root.cambiar_tema()
-    ScatterLayout:
-        canvas.before:
-            Color:
-                rgba: 1,0,0,1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
         Muestra:
             id: muestra
             cols: puzzle.tamano
+            spacing: SPACING
             size_hint: None, None
-            size: self.ventana, self.ventana
+            size: self.parent.height, self.parent.height
+            
+        MenuButton:
+            padding: 50, 50
+            text: 'Tema: ' + muestra.tema
+            on_release: muestra.cambiar_tema()
+            on_text: self.size = self.texture_size
+
             
     
 ########################## Menu elements ####################################
@@ -81,8 +79,16 @@
         Rectangle:
             size: self.size
             pos: self.pos
-            source: f'images/temas/{app.root.tema}/{app.root.nivel+2}/{root.name}.jpg'
+            source: f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{root.name}.jpg'
 
+<FichaMuestra>:
+    canvas.before:
+        Color:
+            rgba: [1,1,1,1]
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            source: f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{root.name}.jpg'
 
 ############################## Popup ########################################
 <PopupMsg>

@@ -47,6 +47,7 @@ class Puzzle(RelativeLayout):
     
     def initialize_grid(self, *args):
         self.ventana = min(self.parent.height, self.parent.width)
+        self.tamano = 2 + self.parent.nivel
     
     def start_game(self):
         self.parent.play('start')
@@ -57,7 +58,7 @@ class Puzzle(RelativeLayout):
         lado = int(self.ventana / self.tamano)
         title = list(range(1, self.tamano**2))+['']
         shuffle(title)
-        while not self.solvable(title):
+        while not self.is_solvable(title):
             shuffle(title)
         n = 0
         for i in range(self.tamano):
@@ -68,7 +69,6 @@ class Puzzle(RelativeLayout):
                                       size_hint=(None, None), posicion=(j, i)))
                 n += 1
         
-        self.parent.ids.muestra.load_theme()
 
     def find_empty(self):
         for child in self.children:
@@ -84,7 +84,7 @@ class Puzzle(RelativeLayout):
                 return False        
         return True
     
-    def solvable(self, game):
+    def is_solvable(self, game):
         lado = math.sqrt(len(game))
         if int(lado) != lado:
             raise Exception('Game sequence not an exact square.')
@@ -173,34 +173,38 @@ class MenuLabel(Label):
 class PopupMsg(Label):
     pass
 
+class FichaMuestra(Label):
+    name = StringProperty()
+
 class Muestra(GridLayout):
-    ventana = NumericProperty(100)
+    tema = StringProperty('numeros')
     
     def __init__(self, **kwargs):
         super(Muestra, self).__init__(**kwargs)
-        Clock.schedule_once(self.initialize_grid)
     
     def initialize_grid(self, *args):
         self.ventana = min(self.parent.height, self.parent.width)
 
-    def load_theme(self):
+    def load_tema(self):
+        self.initialize_grid()
+        self.clear_widgets()
         app = App.get_running_app()
-        tamano = app.root.ids.puzzle.tamano
-        lado = int(self.ventana / tamano)
-        title = list(range(1, tamano**2 + 1))
-        n = 0
-        for i in range(tamano):
-            for j in range(tamano):
-                self.add_widget(Ficha(name=str(title[n]), lado=lado, 
-                                      tamano=tamano, active=False,
-                                      size=(lado-SPACING, lado-SPACING),
-                                      size_hint=(None, None), posicion=(j, i)))
-                n += 1
+        tamano = app.root.nivel + 2
+        self.cols = tamano
+        for n in list(range(1, tamano**2 + 1)):
+            self.add_widget(FichaMuestra(name=str(n)))
+
+
+    def cambiar_tema(self):
+        temas = os.listdir(TEMAS)
+        ind = temas.index(self.tema)
+        new_ind = (ind + 1) % len(temas)
+        self.tema = temas[new_ind]
+        self.load_tema()
 
 
 class MainScreen(BoxLayout):
     nivel = NumericProperty(1)
-    tema = StringProperty('numeros')
     
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
@@ -226,14 +230,6 @@ class MainScreen(BoxLayout):
         self.play('bye')
         sleep(1.5)
     
-    def cambiar_tema(self):
-        temas = os.listdir(TEMAS)
-        ind = temas.index(self.tema)
-        new_ind = (ind + 1) % len(temas)
-        self.tema = temas[new_ind]
-        
-
-
 
 
 class PuzzleApp(App):    
