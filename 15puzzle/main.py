@@ -94,7 +94,7 @@ class Puzzle(RelativeLayout):
                 anim.start(child)
             p = Popup(title='Final', size_hint=(0.80, 0.20),
                   content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
-            p.open()
+            Clock.schedule_once(p.open, 2)
                 
 
     
