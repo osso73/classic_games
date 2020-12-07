@@ -25,7 +25,7 @@ It is divided in several areas:
 
 - _main square_: this is where you have the tiles that you need to move, to complete the picture. They are randomly sorted at the beginning.
 
-- _bottom_: here is where you choose the theme. You can see an example of the current theme image complete on the left. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). By clicking the button on the right, you can switch to another theme. Several themes are provided, the buttom will cycle through them.
+- _bottom_: here is where you choose the theme and level. You can see an example of the current theme image complete below. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). The buttons allow you to change the level and the theme. Several themes are provided, the buttom will cycle through them.
 
 
 ## Buttons in toolbar
@@ -34,11 +34,15 @@ The buttons give you access to the following functions:
 
   - **Nuevo**: to start a new game. It will reset the score of movimientos, and start a new board with tiles randomly ordered, using the current theme and level.
 
-  - **Nivel n**: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.
-
   - **Movimientos**: this is just a level (e.g. no button), it shows the current number of moves you made. This is the score, the higher the worse. The goal is to achieve a complete image with the minimum number of moves.
 
   - **X**: exit the app.
+
+On the bottom toolbar, you find 2 buttons:
+
+- **Nivel n**: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.
+
+- **Theme**: this is to change the theem. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.
 
 
 ## Solvable puzzles
