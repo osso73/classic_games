@@ -1,6 +1,7 @@
 site_name: classic_games
-repo_url: https://github.com/osso73/classic_games
+repo_url: https://github.com/osso73/classic_games/
 site_url: https://osso73.github.io/classic_games/
+edit_uri: blob/main/docs
 site_author: osso73
 theme: readthedocs
 

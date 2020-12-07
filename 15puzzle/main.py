@@ -90,7 +90,10 @@ class Puzzle(RelativeLayout):
             self.parent.play('end_game')
             lado = int(self.ventana / self.tamano)
             for child in self.children:
-                anim = Animation(size=(lado, lado))
+                if not child.name:
+                    child.name=str(self.tamano**2)
+                    child.size=(0,0)
+                anim = Animation(size=(lado, lado), duration=0.5)
                 anim.start(child)
             p = Popup(title='Final', size_hint=(0.80, 0.20),
                   content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
@@ -136,18 +139,23 @@ class Ficha(Label):
     tamano = NumericProperty()
     lado = NumericProperty()
     posicion = ListProperty()
-    active = BooleanProperty(True)
+    filename = StringProperty()
     
     def __init__(self, **kwargs):
         super(Ficha, self).__init__(**kwargs)
         self.pos = self.calcular_posicion()
+        app = App.get_running_app()
+        if self.name:
+            self.filename = f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{self.name}.jpg'
+        else:
+            self.filename = f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{(app.root.nivel+2)**2}.jpg'
     
     def calcular_posicion(self):
         return (self.posicion[0]*self.lado + SPACING/2, 
                 (self.tamano-1-self.posicion[1])*self.lado + SPACING/2)
     
     def on_touch_down(self, touch):
-        if self.collide_point(*touch.pos) and self.active:
+        if self.collide_point(*touch.pos):
             self.move()
     
     def move(self):
@@ -183,16 +191,18 @@ class PopupMsg(Label):
 class FichaMuestra(Label):
     name = StringProperty()
 
+
 class Muestra(GridLayout):
-    tema = StringProperty('Números')
+    tema = StringProperty('numeros')
     
     def __init__(self, **kwargs):
         super(Muestra, self).__init__(**kwargs)
+        Clock.schedule_once(self.load_tema)
     
     def initialize_grid(self, *args):
         self.ventana = min(self.parent.height, self.parent.width)
 
-    def load_tema(self):
+    def load_tema(self, *args):
         self.initialize_grid()
         self.clear_widgets()
         app = App.get_running_app()

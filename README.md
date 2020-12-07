@@ -8,8 +8,8 @@ The list of games to be developed is inspired in project [GameStore](https://git
 - [x] pong
 - [x] ahorcado
 - [x] memory
+- [x] 15 puzzle
 - [ ] 2048
-- [ ] 15 puzzle
 - [ ] asteroids
 - [ ] buscaminas
 - [ ] snake
@@ -17,7 +17,7 @@ The list of games to be developed is inspired in project [GameStore](https://git
 
 The ones ticked are already developed standalone. This is work in progress.
 
-## Running the games
+## Usage
 
 In order to run these games you need to install [kivy](https://kivy.org/#home) library. Check here: [Getting started--Installation](https://kivy.org/doc/stable/gettingstarted/installation.html) for instructions how to install it.
 
@@ -27,7 +27,13 @@ Then you can execute each of the games by going into their folder, and running:
 python main.py
 ```
 
-If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `game.spec` file that I use to compile it for android. You can adjust the parameters there.
+If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `buildozer.spec` file that I use to compile it for android. You can adjust the parameters from there to your liking.
+
+
+## Contribution
+
+I started this project to practice with kivy, and also to build some games for my daughter. So I'm not expecting to have a collaboration on this project. Having said that, feel free to open issues to improve the games, or improve the code. If you would like to contribute, drop me a mail.
+
 
 
 ## License

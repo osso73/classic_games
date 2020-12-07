@@ -18,9 +18,6 @@
         MenuButton:
             text: 'Nuevo'
             on_release: puzzle.start_game()
-        MenuButton:
-            text: 'Nivel ' + str(root.nivel)
-            on_release: root.nivel = root.nivel % 3 + 1
         MenuLabel:
             text: 'Movimientos: ' + str(puzzle.movimientos)
             size_hint_x: 3
@@ -37,24 +34,40 @@
 
     BoxLayout:
         orientation: 'horizontal'
+        spacing: 20
+        size_hint_y: None
+        height: root.height / 10 * 0.5
+        canvas:
+            Color:
+                rgba: 0,0,1,0.2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        MenuLabel:
+            text: 'Configuración:'
+        MenuButton:
+            text: 'Nivel ' + str(root.nivel)
+            on_release: root.nivel = root.nivel % 3 + 1
+        MenuButton:
+            text: muestra.tema
+            on_release: muestra.cambiar_tema()
+        
+    BoxLayout:
+        orientation: 'horizontal'
+        canvas:
+            Color:
+                rgba: 0,0,1,0.2
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
         Muestra:
             id: muestra
             cols: puzzle.tamano
             spacing: 5
             size_hint: None, None
             size: self.parent.height, self.parent.height
-            
-        BoxLayout:
-            orientation: 'vertical'
-            padding: 50, 50
-            Label:
-                text: 'Cambia el tema'
-            MenuButton:
-                padding: 50, 50
-                text: muestra.tema
-                on_release: muestra.cambiar_tema()
-            Label:
-
+        Label:
             
     
 ########################## Menu elements ####################################
@@ -84,7 +97,7 @@
         Rectangle:
             size: self.size
             pos: self.pos
-            source: f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{root.name}.jpg'
+            source: root.filename
 
 <FichaMuestra>:
     canvas.before:
