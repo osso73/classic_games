@@ -1,7 +1,5 @@
 # 15 puzzle
 
-_this is still under development_
-
 ## Rules of the game
 
 This is the classic game where you have 15 tiles in a 4x4 grid, and you need to put them in the right order by using the empty tile to move the others. The image below shows an example of such a puzzle (almost solved):
@@ -42,7 +40,7 @@ On the bottom toolbar, you find 2 buttons:
 
 - **Nivel n**: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.
 
-- **Theme**: this is to change the theem. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.
+- **Theme**: this is to change the theme. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.
 
 
 ## Solvable puzzles

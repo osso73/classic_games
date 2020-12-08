@@ -17,8 +17,6 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.popup import Popup
-from kivy.uix.image import Image
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -95,9 +93,6 @@ class Puzzle(RelativeLayout):
                     child.size=(0,0)
                 anim = Animation(size=(lado, lado), duration=0.5)
                 anim.start(child)
-            p = Popup(title='Final', size_hint=(0.80, 0.20),
-                  content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
-            Clock.schedule_once(p.open, 2)
                 
 
     
@@ -183,9 +178,6 @@ class MenuButtonSmall(Button):
     pass
 
 class MenuLabel(Label):
-    pass
-
-class PopupMsg(Label):
     pass
 
 class FichaMuestra(Label):
