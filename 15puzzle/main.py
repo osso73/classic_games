@@ -17,8 +17,6 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.popup import Popup
-from kivy.uix.image import Image
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -39,7 +37,7 @@ class Puzzle(RelativeLayout):
     ventana = NumericProperty(100)
     empty = ObjectProperty()
     movimientos = NumericProperty(0)
-    tamano = NumericProperty()
+    tamano = NumericProperty(3)
     
     def __init__(self, **kwargs):
         super(Puzzle, self).__init__(**kwargs)
@@ -47,12 +45,12 @@ class Puzzle(RelativeLayout):
     
     def initialize_grid(self, *args):
         self.ventana = min(self.parent.height, self.parent.width)
-        self.tamano = 2 + self.parent.nivel
     
     def start_game(self):
         self.parent.play('start')
         self.clear_widgets()
-        self.tamano = 2 + self.parent.nivel
+        app = App.get_running_app()
+        self.tamano = app.root.ids.muestra.tamano
         self.movimientos = 0
 
         lado = int(self.ventana / self.tamano)
@@ -74,7 +72,7 @@ class Puzzle(RelativeLayout):
         for child in self.children:
             if not child.name:
                 return child       
-        raise Exception('Empty square not found!')
+        return False
 
     def check_win(self):
         for child in self.children:
@@ -95,9 +93,6 @@ class Puzzle(RelativeLayout):
                     child.size=(0,0)
                 anim = Animation(size=(lado, lado), duration=0.5)
                 anim.start(child)
-            p = Popup(title='Final', size_hint=(0.80, 0.20),
-                  content=PopupMsg(text='!Muy bien!\nTodas las piezas están correctas.'))
-            Clock.schedule_once(p.open, 2)
                 
 
     
@@ -132,6 +127,45 @@ class Puzzle(RelativeLayout):
                     return True
                 else:
                     return False
+
+
+class Muestra(GridLayout):
+    tema = StringProperty('numeros')
+    tamano = NumericProperty(3)
+    
+    def __init__(self, **kwargs):
+        super(Muestra, self).__init__(**kwargs)
+        Clock.schedule_once(self.load_tema)
+    
+    def initialize_grid(self, *args):
+        self.ventana = min(self.parent.height, self.parent.width)
+
+    def load_tema(self, *args):
+        self.initialize_grid()
+        self.clear_widgets()
+        app = App.get_running_app()
+        tamano = app.root.ids.muestra.tamano
+        self.cols = tamano
+        for n in list(range(1, tamano**2 + 1)):
+            self.add_widget(FichaMuestra(name=str(n)))
+
+    def cambiar_tema(self):
+        temas = os.listdir(TEMAS)
+        ind = temas.index(self.tema)
+        new_ind = (ind + 1) % len(temas)
+        self.tema = temas[new_ind]
+    
+    def cambiar_tamano(self):
+        nivel = self.tamano - 2
+        nivel = nivel % 3 + 1
+        self.tamano = nivel + 2
+
+    
+    def on_tema(self, *args):
+        self.load_tema()
+    
+    def on_tamano(self, *args):
+        self.load_tema()
                             
 
 class Ficha(Label):
@@ -145,10 +179,12 @@ class Ficha(Label):
         super(Ficha, self).__init__(**kwargs)
         self.pos = self.calcular_posicion()
         app = App.get_running_app()
+        tema = app.root.ids.muestra.tema
+        tamano = app.root.ids.muestra.tamano
         if self.name:
-            self.filename = f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{self.name}.jpg'
+            self.filename = f'images/temas/{tema}/{tamano}/{self.name}.jpg'
         else:
-            self.filename = f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{(app.root.nivel+2)**2}.jpg'
+            self.filename = f'images/temas/{tema}/{tamano}/{tamano**2}.jpg'
     
     def calcular_posicion(self):
         return (self.posicion[0]*self.lado + SPACING/2, 
@@ -160,20 +196,23 @@ class Ficha(Label):
     
     def move(self):
         empty = self.parent.find_empty()
-        ex, ey = empty.posicion
-        px, py = self.posicion
-        if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
-            (ey==py and ex==px+1) or (ey==py and ex==px-1):
-                empty.posicion, self.posicion = self.posicion, empty.posicion
-                self.parent.parent.play('move')
-                self.parent.movimientos += 1
-        self.parent.end_of_game()
+        if empty:
+            ex, ey = empty.posicion
+            px, py = self.posicion
+            if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
+                (ey==py and ex==px+1) or (ey==py and ex==px-1):
+                    empty.posicion, self.posicion = self.posicion, empty.posicion
+                    self.parent.parent.play('move')
+                    self.parent.movimientos += 1
+            self.parent.end_of_game()
     
     def on_posicion(self, *args):
         anim = Animation(pos=self.calcular_posicion(), duration=MOVE_DURATION)
         anim.start(self)
 
                     
+class FichaMuestra(Label):
+    name = StringProperty()
 
 
 class MenuButton(Button):
@@ -185,44 +224,8 @@ class MenuButtonSmall(Button):
 class MenuLabel(Label):
     pass
 
-class PopupMsg(Label):
-    pass
 
-class FichaMuestra(Label):
-    name = StringProperty()
-
-
-class Muestra(GridLayout):
-    tema = StringProperty('numeros')
-    
-    def __init__(self, **kwargs):
-        super(Muestra, self).__init__(**kwargs)
-        Clock.schedule_once(self.load_tema)
-    
-    def initialize_grid(self, *args):
-        self.ventana = min(self.parent.height, self.parent.width)
-
-    def load_tema(self, *args):
-        self.initialize_grid()
-        self.clear_widgets()
-        app = App.get_running_app()
-        tamano = app.root.nivel + 2
-        self.cols = tamano
-        for n in list(range(1, tamano**2 + 1)):
-            self.add_widget(FichaMuestra(name=str(n)))
-
-
-    def cambiar_tema(self):
-        temas = os.listdir(TEMAS)
-        ind = temas.index(self.tema)
-        new_ind = (ind + 1) % len(temas)
-        self.tema = temas[new_ind]
-        self.load_tema()
-
-
-class MainScreen(BoxLayout):
-    nivel = NumericProperty(1)
-    
+class MainScreen(BoxLayout):    
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.sounds = self.load_sounds()
@@ -258,6 +261,6 @@ class PuzzleApp(App):
 
 if __name__ == '__main__':
     # Window.size = (1080, 2340)
-    Window.size = (500, 1000)
+    Window.size = (375, 800)
     PuzzleApp().run()
 
