@@ -19,7 +19,7 @@
   <script>
     // Current page data
     var mkdocs_page_name = "15 puzzle";
-    var mkdocs_page_input_path = "games/15puzzle.md";
+    var mkdocs_page_input_path = "games\\15puzzle.md";
     var mkdocs_page_url = "/classic_games/games/15puzzle/";
   </script>
   
@@ -112,7 +112,7 @@
     <li>15 puzzle</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/osso73/classic_games/main/docs/games/15puzzle.md"
+        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/15puzzle.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -124,7 +124,6 @@
             <div class="section">
               
                 <h1 id="15-puzzle">15 puzzle</h1>
-<p><em>this is still under development</em></p>
 <h2 id="rules-of-the-game">Rules of the game</h2>
 <p>This is the classic game where you have 15 tiles in a 4x4 grid, and you need to put them in the right order by using the empty tile to move the others. The image below shows an example of such a puzzle (almost solved):</p>
 <p><img alt="example 15puzzle" src="../../img/15puzzle_example.png" /></p>
@@ -142,7 +141,7 @@
 <p><em>main square</em>: this is where you have the tiles that you need to move, to complete the picture. They are randomly sorted at the beginning.</p>
 </li>
 <li>
-<p><em>bottom</em>: here is where you choose the theme. You can see an example of the current theme image complete on the left. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). By clicking the button on the right, you can switch to another theme. Several themes are provided, the buttom will cycle through them.</p>
+<p><em>bottom</em>: here is where you choose the theme and level. You can see an example of the current theme image complete below. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). The buttons allow you to change the level and the theme. Several themes are provided, the buttom will cycle through them.</p>
 </li>
 </ul>
 <h2 id="buttons-in-toolbar">Buttons in toolbar</h2>
@@ -152,13 +151,19 @@
 <p><strong>Nuevo</strong>: to start a new game. It will reset the score of movimientos, and start a new board with tiles randomly ordered, using the current theme and level.</p>
 </li>
 <li>
-<p><strong>Nivel n</strong>: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.</p>
-</li>
-<li>
 <p><strong>Movimientos</strong>: this is just a level (e.g. no button), it shows the current number of moves you made. This is the score, the higher the worse. The goal is to achieve a complete image with the minimum number of moves.</p>
 </li>
 <li>
 <p><strong>X</strong>: exit the app.</p>
+</li>
+</ul>
+<p>On the bottom toolbar, you find 2 buttons:</p>
+<ul>
+<li>
+<p><strong>Nivel n</strong>: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.</p>
+</li>
+<li>
+<p><strong>Theme</strong>: this is to change the theme. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.</p>
 </li>
 </ul>
 <h2 id="solvable-puzzles">Solvable puzzles</h2>
