@@ -46,8 +46,8 @@
         MenuLabel:
             text: 'Configuración:'
         MenuButton:
-            text: 'Nivel ' + str(root.nivel)
-            on_release: root.nivel = root.nivel % 3 + 1
+            text: 'Nivel ' + str(muestra.tamano - 2)
+            on_release: muestra.cambiar_tamano()
         MenuButton:
             text: muestra.tema
             on_release: muestra.cambiar_tema()
@@ -63,7 +63,7 @@
         Label:
         Muestra:
             id: muestra
-            cols: puzzle.tamano
+            cols: self.tamano
             spacing: 5
             size_hint: None, None
             size: self.parent.height, self.parent.height
@@ -106,4 +106,4 @@
         Rectangle:
             size: self.size
             pos: self.pos
-            source: f'images/temas/{app.root.ids.muestra.tema}/{app.root.nivel+2}/{root.name}.jpg'
+            source: f'images/temas/{app.root.ids.muestra.tema}/{app.root.ids.muestra.tamano}/{root.name}.jpg'
