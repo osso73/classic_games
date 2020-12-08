@@ -72,7 +72,7 @@ class Puzzle(RelativeLayout):
         for child in self.children:
             if not child.name:
                 return child       
-        raise Exception('Empty square not found!')
+        return False
 
     def check_win(self):
         for child in self.children:
@@ -196,14 +196,15 @@ class Ficha(Label):
     
     def move(self):
         empty = self.parent.find_empty()
-        ex, ey = empty.posicion
-        px, py = self.posicion
-        if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
-            (ey==py and ex==px+1) or (ey==py and ex==px-1):
-                empty.posicion, self.posicion = self.posicion, empty.posicion
-                self.parent.parent.play('move')
-                self.parent.movimientos += 1
-        self.parent.end_of_game()
+        if empty:
+            ex, ey = empty.posicion
+            px, py = self.posicion
+            if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
+                (ey==py and ex==px+1) or (ey==py and ex==px-1):
+                    empty.posicion, self.posicion = self.posicion, empty.posicion
+                    self.parent.parent.play('move')
+                    self.parent.movimientos += 1
+            self.parent.end_of_game()
     
     def on_posicion(self, *args):
         anim = Animation(pos=self.calcular_posicion(), duration=MOVE_DURATION)
