@@ -13,4 +13,5 @@ nav:
       - games/ahorcado.md
       - games/memory.md
       - games/15puzzle.md
+      - games/2048.md
   - About: about.md

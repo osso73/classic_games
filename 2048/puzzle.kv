@@ -1,0 +1,92 @@
+#:set ICONS 'images/icons/'
+#:set TILES 'images/tiles/'
+
+#:set SPACING 20
+
+<MainScreen>:
+    orientation: 'vertical'
+    BoxLayout:
+        orientation: 'horizontal'
+        padding: 20, 20
+        spacing: 20
+        size_hint_y: 0.5
+        Label:
+            text: '2048'
+            size_hint_x: 0.5
+        GridLayout:
+            cols: 3
+            Label
+            ButtonJoystick:
+                text: '^'
+                icon: ICONS + 'up.png'
+                on_release: board.move('up')
+            Label
+            ButtonJoystick:
+                text: '<'
+                icon: ICONS + 'left.png'
+                on_release: board.move('left')
+            ButtonJoystick:
+                text: 'O'
+                icon: ICONS + 'joystic.png'
+            ButtonJoystick:
+                text: '>'
+                icon: ICONS + 'right.png'
+                on_release: board.move('right')
+            Label
+            ButtonJoystick:
+                text: 'v'
+                icon: ICONS + 'down.png'
+                on_release: board.move('down')
+            Label
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'New'
+                on_release: board.start_game()
+            Button:
+                text: 'Back'
+    
+    Board:
+        id: board
+        canvas:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                pos: 0,0
+                size: self.size
+    
+    Label:
+
+
+<Board>:
+    size: self.ventana, self.ventana
+    size_hint: None, None
+    canvas:
+        Color:
+            rgba: 1,0,0,1
+        Rectangle:
+            pos: 0,0
+            size: self.size
+   
+
+<ButtonJoystick>
+    canvas:
+        Color:
+            rgba: 0,1,0,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: self.icon
+
+<Tile>:
+    pos: self.calc_position()
+    size_hint: None, None
+    size: self.tamano - SPACING, self.tamano - SPACING
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: TILES + str(self.value)+'.png'
+    
