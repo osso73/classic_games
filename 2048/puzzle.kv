@@ -10,52 +10,49 @@
         padding: 20, 20
         spacing: 20
         size_hint_y: 0.5
-        Label:
-            text: '2048'
-            size_hint_x: 0.5
-        GridLayout:
-            cols: 3
-            Label
-            ButtonJoystick:
-                text: '^'
-                icon: ICONS + 'up.png'
-                on_release: board.move('up')
-            Label
-            ButtonJoystick:
-                text: '<'
-                icon: ICONS + 'left.png'
-                on_release: board.move('left')
-            ButtonJoystick:
-                text: 'O'
-                icon: ICONS + 'joystic.png'
-            ButtonJoystick:
-                text: '>'
-                icon: ICONS + 'right.png'
-                on_release: board.move('right')
-            Label
-            ButtonJoystick:
-                text: 'v'
-                icon: ICONS + 'down.png'
-                on_release: board.move('down')
-            Label
+        NewButton:
+            text: str(board.win_score)
+            on_release: board.change_win_score()
         BoxLayout:
             orientation: 'vertical'
-            Button:
+            NewButton:
                 text: 'New'
                 on_release: board.start_game()
-            Button:
+            NewButton:
                 text: 'Back'
+                on_release: board.back_button()
     
+    Message:
+        size_hint_y: 0.5
+        text: 'Score: ' + str(board.score)
     Board:
         id: board
-        canvas:
-            Color:
-                rgba: 1,0,0,1
-            Rectangle:
-                pos: 0,0
-                size: self.size
     
-    Label:
+    GridLayout:
+        cols: 3
+        Label
+        ButtonJoystick:
+            text: '^'
+            icon: ICONS + 'up.png'
+            on_release: board.move('up')
+        Label
+        ButtonJoystick:
+            text: '<'
+            icon: ICONS + 'left.png'
+            on_release: board.move('left')
+        ButtonJoystick:
+            text: 'O'
+            icon: ICONS + 'joystic.png'
+        ButtonJoystick:
+            text: '>'
+            icon: ICONS + 'right.png'
+            on_release: board.move('right')
+        Label
+        ButtonJoystick:
+            text: 'v'
+            icon: ICONS + 'down.png'
+            on_release: board.move('down')
+        Label
 
 
 <Board>:
@@ -63,7 +60,7 @@
     size_hint: None, None
     canvas:
         Color:
-            rgba: 1,0,0,1
+            rgba: 0.55, 0.5, 0.5, 1
         Rectangle:
             pos: 0,0
             size: self.size
@@ -89,4 +86,19 @@
             pos: self.pos
             size: self.size
             source: TILES + str(self.value)+'.png'
-    
+
+
+
+############################## Popup ########################################
+<Message>
+    padding: 20, 20
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+
+
+<NewButton>
+    font_size: 120
+    size: self.texture_size
+    texture_size: self.size
+    padding: 20, 20
