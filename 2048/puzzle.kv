@@ -28,30 +28,32 @@
     Board:
         id: board
     
-    GridLayout:
-        cols: 3
-        Label
-        ButtonJoystick:
-            text: '^'
-            icon: ICONS + 'up.png'
-            on_release: board.move('up')
-        Label
-        ButtonJoystick:
-            text: '<'
-            icon: ICONS + 'left.png'
-            on_release: board.move('left')
-        ButtonJoystick:
-            text: 'O'
-            icon: ICONS + 'joystic.png'
-        ButtonJoystick:
-            text: '>'
-            icon: ICONS + 'right.png'
-            on_release: board.move('right')
-        Label
-        ButtonJoystick:
-            text: 'v'
-            icon: ICONS + 'down.png'
-            on_release: board.move('down')
+    BoxLayout:
+        GridLayout:
+            cols: 3
+            Label
+            ButtonJoystick:
+                text: '^'
+                icon: ICONS + 'up.png'
+                on_release: board.move('up')
+            Label
+            ButtonJoystick:
+                text: '<'
+                icon: ICONS + 'left.png'
+                on_release: board.move('left')
+            ButtonJoystick:
+                text: 'O'
+                icon: ICONS + 'joystic.png'
+            ButtonJoystick:
+                text: '>'
+                icon: ICONS + 'right.png'
+                on_release: board.move('right')
+            Label
+            ButtonJoystick:
+                text: 'v'
+                icon: ICONS + 'down.png'
+                on_release: board.move('down')
+            Label
         Label
 
 

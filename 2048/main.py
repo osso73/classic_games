@@ -32,7 +32,7 @@ SPACING = 20
 TILES = 'images/tiles/'
 MOVE_TILE = 0.075
 MOVE_DURATION = MOVE_TILE + 0.05
-MINIMUM_SWIPE = 100
+MINIMUM_SWIPE = 50
 SCORES = [256, 512, 1024, 2048]
 
 
@@ -41,6 +41,7 @@ class Tile(Label):
     position = ListProperty()
     tamano = NumericProperty()
     merged = False
+    _previous = 0
     
     def calc_position(self):
         return (self.position[0]*(self.tamano) + SPACING/2, 
@@ -50,14 +51,19 @@ class Tile(Label):
         if self.value:  # don't move empty tiles (e.g. self.value=0)
             anim = Animation(pos=self.calc_position(), duration=MOVE_TILE)
             anim.start(self)
+            app = App.get_running_app()
+            app.root.play('move')
+
     
     def on_value(self, tile, value):
         self.merged = True
-        self.parent.score += value
-        x, y = self.size
-        anim = Animation(size=(0.8*x, 0.8*y), duration=0.1) + \
-            Animation(size=(x, y), duration=0.1)
-        anim.start(self)
+        if self._previous != 0:
+            self.parent.score += value
+            x, y = self.size
+            anim = Animation(size=(1.1*x, 1.1*y), duration=0.1) + \
+                Animation(size=(x, y), duration=0.1)
+            anim.start(self)
+        self._previous = self.value
 
     
 class Board(RelativeLayout):
@@ -67,6 +73,8 @@ class Board(RelativeLayout):
     swipe_x = swipe_y = 0
     active_game = False
     last_move = ListProperty()
+    _moving = False
+    _moved_tile = False
     
     def __init__(self, **kwargs):
         super(Board, self).__init__(**kwargs)
@@ -116,7 +124,6 @@ class Board(RelativeLayout):
         new_tile = choice(self.get_empty_tiles())
         new_tile.value = choice([2, 2, 2, 4, 4])
         new_tile.merged = False
-        self.score -= new_tile.value
         
     def get_empty_tiles(self):
         return [child for child in self.children if not child.value]
@@ -131,43 +138,49 @@ class Board(RelativeLayout):
         
         return full_tiles
     
-    def move(self, direction):
+    def move(self, direction, *args):
         if not self.active_game:
             return
-        app = App.get_running_app()
-        app.root.play('move')
-        self.save_last_move()
-        if direction == 'right':
-            for n, row in enumerate(range(2, -1, -1)):  # [2, 1, 0]
-                Clock.schedule_once(partial(self.move_row_line, 
-                                            direction, 
-                                            self.get_full_tiles(row=row)),
-                                    MOVE_DURATION*n)
-        elif direction == 'left':
-            for n, row in enumerate(range(1, 4, +1)):  # [1, 2, 3]
-                Clock.schedule_once(partial(self.move_row_line, 
-                                            direction, 
-                                            self.get_full_tiles(row=row)),
-                                    MOVE_DURATION*n)
-        elif direction == 'up':
-            for n, col in enumerate(range(2, -1, -1)):  # [2, 1, 0]
-                Clock.schedule_once(partial(self.move_row_line, 
-                                            direction, 
-                                            self.get_full_tiles(col=col)),
-                                    MOVE_DURATION*n)
+        
+        if self._moving:
+            Clock.schedule_once(partial(self.move, direction), 0.01)
         else:
-            for n, col in enumerate(range(1, 4, +1)):  # [1, 2, 3]
-                Clock.schedule_once(partial(self.move_row_line, 
-                                            direction, 
-                                            self.get_full_tiles(col=col)),
-                                    MOVE_DURATION*n)
-        Clock.schedule_once(self.end_of_move, MOVE_DURATION*3)
+            self._moving = True
+            self._moved_tile = False
+            self.save_last_move()
+            if direction == 'right':
+                for n, row in enumerate(range(2, -1, -1)):  # [2, 1, 0]
+                    Clock.schedule_once(partial(self.move_row_line, 
+                                                direction, 
+                                                self.get_full_tiles(row=row)),
+                                        MOVE_DURATION*n)
+            elif direction == 'left':
+                for n, row in enumerate(range(1, 4, +1)):  # [1, 2, 3]
+                    Clock.schedule_once(partial(self.move_row_line, 
+                                                direction, 
+                                                self.get_full_tiles(row=row)),
+                                        MOVE_DURATION*n)
+            elif direction == 'up':
+                for n, col in enumerate(range(2, -1, -1)):  # [2, 1, 0]
+                    Clock.schedule_once(partial(self.move_row_line, 
+                                                direction, 
+                                                self.get_full_tiles(col=col)),
+                                        MOVE_DURATION*n)
+            else:
+                for n, col in enumerate(range(1, 4, +1)):  # [1, 2, 3]
+                    Clock.schedule_once(partial(self.move_row_line, 
+                                                direction, 
+                                                self.get_full_tiles(col=col)),
+                                        MOVE_DURATION*n)
+            Clock.schedule_once(self.end_of_move, MOVE_DURATION*3)
     
     def end_of_move(self, *args):
-        self.add_tile()
-        for child in self.children:
-            child.merged = False
-        self.end_of_game()
+        if self._moved_tile:
+            self.add_tile()
+            for child in self.children:
+                child.merged = False
+            self.end_of_game()
+        self._moving = False
     
     def end_of_game(self):
         app = App.get_running_app()
@@ -185,7 +198,7 @@ class Board(RelativeLayout):
             return
         
         p = Popup(title='Final', size_hint=(0.75, 0.20),
-                  content=PopupMsg(text=msg))
+                  content=Message(text=msg))
         p.open()
         self.active_game = False
         
@@ -208,6 +221,7 @@ class Board(RelativeLayout):
     def end_of_move_tile(self, tile_to_remove, tile, *args):
         tile.value += tile_to_remove.value
         self.remove_widget(tile_to_remove)
+        self._moved_tile = True
         
     def check_final(self, direction, position, value):
         x, y = position
@@ -236,6 +250,7 @@ class Board(RelativeLayout):
         for child in self.children:
             if child.position == position:
                 return child
+
     def save_last_move(self):
         self.last_move = []
         for child in self.children:
