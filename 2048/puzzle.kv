@@ -5,6 +5,12 @@
 
 <MainScreen>:
     orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 250/255, 248/255, 239/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
         orientation: 'horizontal'
         padding: 20, 20
@@ -24,7 +30,9 @@
     
     Message:
         size_hint_y: 0.5
+        color: 119/255, 110/255, 101/255, 1
         text: 'Score: ' + str(board.score)
+    
     Board:
         id: board
     

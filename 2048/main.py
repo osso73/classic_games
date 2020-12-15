@@ -44,8 +44,8 @@ class Tile(Label):
     _previous = 0
     
     def calc_position(self):
-        return (self.position[0]*(self.tamano) + SPACING/2, 
-                (self.position[1])*(self.tamano) + SPACING/2)
+        return (self.position[0]*(self.tamano) + SPACING, 
+                (self.position[1])*(self.tamano) + SPACING)
     
     def on_position(self, *args):
         if self.value:  # don't move empty tiles (e.g. self.value=0)
@@ -114,7 +114,7 @@ class Board(RelativeLayout):
         self.clear_widgets()
         self.active_game = True
         self.score = 0
-        tamano = self.ventana / 4
+        tamano = (self.ventana - SPACING) / 4
         for i in range(4):
             for j in range(4):
                 self.add_widget(Tile(position=(i, j), tamano=tamano))        
@@ -189,9 +189,9 @@ class Board(RelativeLayout):
             msg = 'Has ganado!'
             app.root.play('end_win')
         
-        elif not self.get_empty_tiles():
+        elif not self.available_moves():
             # no empty tiles --> lose game
-            msg = 'Has perdido\nTodas las casillas están llenas!'
+            msg = 'Has perdido\nYa no puedes mover!'
             app.root.play('end_lose')
         
         else:
@@ -201,6 +201,19 @@ class Board(RelativeLayout):
                   content=Message(text=msg))
         p.open()
         self.active_game = False
+    
+    def available_moves(self):
+        for tile in self.children:
+            if not tile.value:
+                return True
+            i, j = tile.position
+            for p in [[i+1, j], [i-1, j], [i, j+1], [i, j-1]]:
+                t = self.get_tile(p)
+                if t and tile.value == t.value:
+                    return True
+        return False
+
+                
         
     def move_row_line(self, direction, row_line, *args):
         for tile in row_line:
