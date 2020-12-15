@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="osso73">
-  <link rel="canonical" href="https://osso73.github.io/classic_games/games/ahorcado/">
+  <link rel="canonical" href="https://osso73.github.io/classic_games/games/2048/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Ahorcado - classic_games</title>
+  <title>2048 - classic_games</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Ahorcado";
-    var mkdocs_page_input_path = "games\\ahorcado.md";
-    var mkdocs_page_url = "/classic_games/games/ahorcado/";
+    var mkdocs_page_name = "2048";
+    var mkdocs_page_input_path = "games\\2048.md";
+    var mkdocs_page_url = "/classic_games/games/2048/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -59,25 +59,23 @@
                 <ul class="current">
                     <li class="toctree-l1"><a class="reference internal" href="../pong/">Pong</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Ahorcado</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../ahorcado/">Ahorcado</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../15puzzle/">15 puzzle</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">2048</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#rules-of-the-game">Rules of the game</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#main-screen">Main screen</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#buttons-in-toolbar">Buttons in toolbar</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#other-resources">Other resources</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../15puzzle/">15 puzzle</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../2048/">2048</a>
                     </li>
                 </ul>
                 <ul>
@@ -109,10 +107,10 @@
         
       
     
-    <li>Ahorcado</li>
+    <li>2048</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/ahorcado.md"
+        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/2048.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -123,77 +121,45 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="ahorcado">Ahorcado</h1>
+                <h1 id="2048">2048</h1>
+<p><em>under development -- this page contains internal notes for the development of the game</em></p>
 <h2 id="rules-of-the-game">Rules of the game</h2>
-<p>This is the game <em>hanged</em>, or <em>ahorcado</em> in Spanish. It is pretty simple: given a word (where you can only see its length), you have to guess it by proposing letters:</p>
-<ul>
-<li>Every letter proposed that exists in the word will appear in its correct position.</li>
-<li>Every letter proposed that does not exist will contribute to building your gallows.</li>
-</ul>
-<p>If you guess all letters, you win. If the gallows is finished before gessing all letters, you loose and you are hanged.</p>
-<p>The words are in Spanish, taken from a Spanish book (see below <a href="#other-resources">Other resources</a> for further details how the list of words was created).</p>
+<p>2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The objective of the game is to slide numbered tiles on a grid to combine them to create a tile with the number 2048; however, one can continue to play the game after reaching the goal, creating tiles with larger numbers.</p>
+<p><em>(extracted from Wikipedia)</em></p>
+<p>Each turn you can move all tiles in one of the 4 directions: up, down, left or right. All tiles move in that direction as much as possible, until they find the edge of the board or another tile. In case they find another tile of the same value, the two tiles will merge and create a tile of double value. At each move, one new tile appears at any point of the board. The goal of the game is to have one tile of 2048 value.</p>
 <h2 id="main-screen">Main screen</h2>
 <p>This is the main screen of the game.</p>
-<p><img alt="screenshot" src="../../img/ahorcado_screen.jpg" /></p>
+<p><img alt="screenshot" src="../../img/2048_screen.jpg" /></p>
 <p>It is divided in several areas:</p>
 <ul>
+<li><em>top row</em>: it shows some buttons, with the folloing functions:</li>
+<li>2048: clicking this button you can change the score required to win. It will alternate between 256, 512, 1024 and 2048. When a tile has this score, you win the game.</li>
+<li>new: this button will start a new game, and reset the score</li>
 <li>
-<p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions</p>
+<p>back: this button enables you to go back one move. Only one move is allowed.</p>
 </li>
 <li>
-<p><em>desert picture</em>: this is where your gallows will start to build</p>
+<p><em>score</em>: this line shows the score. The score is calculated by the value of merged cells: every time a cell merges, its value is added to the score.</p>
 </li>
 <li>
-<p><em>red strip</em>: the missed letters will show up here</p>
+<p><em>main board</em>: this is where you have the tiles that you need to move. You move all tiles in the same direction, either by swipping or by using the joystick below.</p>
 </li>
 <li>
-<p><em>green strip</em>: this will show the word being guessed. The letters that have not been guessed yet are shown as '-'.</p>
-</li>
-<li>
-<p><em>bottom</em>: this is a keyboard, with a spanish layout (i.e. showing letter <strong>Ñ</strong>). Note that keys are alphabetically sorted.</p>
-</li>
-</ul>
-<h2 id="buttons-in-toolbar">Buttons in toolbar</h2>
-<p>The buttons give you access to the following functions:</p>
-<ul>
-<li>
-<p><strong>Nuevo</strong>: to start a new game. It will erase whatever is on the screen, and provide a new word and reset the keyboard.</p>
-</li>
-<li>
-<p><strong>Pista</strong>: this will give you a hint, i.e. show you one of the missing letters. You can only use this once in a game.</p>
-</li>
-<li>
-<p><strong>Teclado</strong>: it allows you to change the skin of your keyboard. Several skins are provided. By pressing the button you cycle through them.</p>
-</li>
-<li>
-<p><strong>Hombre</strong>: it allows you to change the picture of the man being hanged. Two different pictures are provided.</p>
-</li>
-<li>
-<p><strong>Salir</strong>: exit the app.</p>
+<p><em>joystick</em>: to move the tiles, instead of swipping.</p>
 </li>
 </ul>
 <h2 id="other-resources">Other resources</h2>
 <p>Under folder <code>resources</code> you can find additional files that I used to design and build the app. This folder is excluded from <code>buildozer</code> config.</p>
 <ul>
 <li>
-<p><em>esquema.drawio</em>: this is a diagram to help structure the screen, and the different parts.</p>
+<p><em>diagram.drawio</em>: diagrams to help find how to identify the final position of a tile that is moving.</p>
 </li>
 <li>
-<p><em>ahorcado.kv</em> files: these are copies of the different men I had. The original was with strokes (i.e. no real picture).</p>
-</li>
-<li>
-<p><em>cuerda.png</em>: was used to create the icon and splash screen for the game.</p>
-</li>
-<li>
-<p><em>generar_palabras.py</em>: small python script that will take a file as input, and will create a list of words. I've used as input the file called spanish_book.txt. You can use whatever book, or list of words that you want to use as source. The program will find individual words, put them to uppercase, remove any accents and punctuation, and duplicates, and create a list, that can be used by the main.py program.</p>
-</li>
-<li>
-<p><em>spanish_book.txt</em>: this is a book in Spanish, taken from <a href="http://www.gutenberg.org/">Project Guttenberg</a></p>
+<p><em>8E25wA.jpg</em>: original image that I used to build the icon of the application.</p>
 </li>
 </ul>
 <h2 id="credits">Credits</h2>
-<p>The images I used for this game (e.g. desert picture, the rope, the men) I found them over internet, by searching images. No particular copyright or limitation provided.</p>
-<p>The keys from the keyboard I found in <a href="http://www.perfect-icons.com/index.htm">Perfect Icons</a> website, and also I built some others from sets that I found on Internet. These images cannot be used for commercial purposes, otherwise they are free for personal use.</p>
+<p>Image for the icon taken from: https://wallpapersafari.com/w/8E25wA.</p>
 <p>The sounds I found on <a href="https://freesound.org/">Free Sound</a>, and some of them I had found over Internet. I'm not aware of any copyright or limitation to use these.</p>
               
             </div>
@@ -202,10 +168,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../memory/" class="btn btn-neutral float-right" title="Memory">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../pong/" class="btn btn-neutral" title="Pong"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../15puzzle/" class="btn btn-neutral" title="15 puzzle"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -233,10 +199,10 @@
           <a href="https://github.com/osso73/classic_games/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../pong/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../15puzzle/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../memory/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
