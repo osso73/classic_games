@@ -31,7 +31,7 @@ from functools import partial
 SPACING = 20
 TILES = 'images/tiles/'
 MOVE_TILE = 0.075
-MOVE_DURATION = MOVE_TILE + 0.05
+MOVE_DURATION = MOVE_TILE + 0.06
 MINIMUM_SWIPE = 50
 SCORES = [256, 512, 1024, 2048]
 
@@ -56,13 +56,19 @@ class Tile(Label):
 
     
     def on_value(self, tile, value):
-        self.merged = True
+        x, y = self.size
         if self._previous != 0:
-            self.parent.score += value
-            x, y = self.size
-            anim = Animation(size=(1.1*x, 1.1*y), duration=0.1) + \
-                Animation(size=(x, y), duration=0.1)
+            anim = Animation(size=(1.1*x, 1.1*y), duration=0.05) + \
+                Animation(size=(x, y), duration=0.05)
             anim.start(self)
+            self.merged = True
+            self.parent.score += value
+        else:
+            m,n = self.pos
+            self.size = [0, 0]
+            self.pos = [m+self.tamano/2, n+self.tamano/2]
+            anim = Animation(size=(x, y), pos=(m, n), duration=0.1)
+        anim.start(self)
         self._previous = self.value
 
     
@@ -119,11 +125,12 @@ class Board(RelativeLayout):
             for j in range(4):
                 self.add_widget(Tile(position=(i, j), tamano=tamano))        
         self.add_tile()
+        self.add_tile()
+        
 
     def add_tile(self, *args):
         new_tile = choice(self.get_empty_tiles())
         new_tile.value = choice([2, 2, 2, 4, 4])
-        new_tile.merged = False
         
     def get_empty_tiles(self):
         return [child for child in self.children if not child.value]
@@ -282,7 +289,6 @@ class Board(RelativeLayout):
                 obj = Tile(position=tile['position'], tamano=tile['tamano'])
                 self.add_widget(obj)
                 obj.value = tile['value']
-                obj.merged = False
                 self.score -= tile['value']
             self.score = tile['score']
             

@@ -31,14 +31,28 @@
     Message:
         size_hint_y: 0.5
         color: 119/255, 110/255, 101/255, 1
-        text: 'Score: ' + str(board.score)
+        text: 'Score: {:,}'.format(board.score)
     
     Board:
         id: board
     
-    BoxLayout:
+    BoxLayout:       
+        Label:
+            canvas:
+                Color:
+                    rgba: 1,1,1,1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+                    source: 'images/logo.jpg'
         GridLayout:
             cols: 3
+            canvas:
+                Color:
+                    rgba: 0,0,0,1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             Label
             ButtonJoystick:
                 text: '^'
@@ -62,7 +76,6 @@
                 icon: ICONS + 'down.png'
                 on_release: board.move('down')
             Label
-        Label
 
 
 <Board>:
