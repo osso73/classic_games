@@ -9,7 +9,7 @@ The list of games to be developed is inspired in project [GameStore](https://git
 - [x] ahorcado
 - [x] memory
 - [x] 15 puzzle
-- [ ] 2048
+- [x] 2048
 - [ ] asteroids
 - [ ] buscaminas
 - [ ] snake
