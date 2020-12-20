@@ -7,9 +7,10 @@ Created on Thu Dec 17 20:44:48 2020
 """
 
 import pytest
-from twenty_fortyeight import main
 from collections import namedtuple
 from random import randint
+
+from game_2048 import main
 
 Point = namedtuple('Point', 'x y')
 
