@@ -34,9 +34,29 @@ MOVE_TILE = 0.075
 MOVE_DURATION = MOVE_TILE + 0.06
 MINIMUM_SWIPE = 50
 SCORES = [256, 512, 1024, 2048]
+NEW_TILE_SEQUENCE = [2]*4 + [4]
 
 
 class Tile(Label):
+    '''
+    Represents one of the tiles in the board.
+
+    Attributes
+    ----------
+    value : int
+        The number shown on the tile. For each value, a different image is
+        shown, showing the value and a colour.
+    position: list (i, j)
+        Position of the tile in the grid. i, j can have values from 0 to 3
+    tamano: int
+        Size of the tile, in pixels. Needed to calculate position of tile in 
+        screen
+    merged: boolean
+        Has this tile been merged? This is put to False when move start, and 
+        becomes True in case of merging, to avoid a second merge in the 
+        same move
+    
+    '''
     value = NumericProperty(0)
     position = ListProperty()
     tamano = NumericProperty()
@@ -44,10 +64,22 @@ class Tile(Label):
     _previous = 0
     
     def calc_position(self):
+        '''
+        calculate position of Tile in screen, based on attribute self.position
+
+        Returns
+        -------
+        (x, y) : tuple
+            Coordinates in screen
+        '''
         return (self.position[0]*(self.tamano) + SPACING, 
                 (self.position[1])*(self.tamano) + SPACING)
     
     def on_position(self, *args):
+        '''
+        When position changes, trigger an animation to move to the new
+        position on screen, and play sound of moving Tile.
+        '''
         if self.value:  # don't move empty tiles (e.g. self.value=0)
             anim = Animation(pos=self.calc_position(), duration=MOVE_TILE)
             anim.start(self)
@@ -56,6 +88,12 @@ class Tile(Label):
 
     
     def on_value(self, tile, value):
+        '''
+        When value attribute changes, trigger animation: if previous value
+        is 0, animation to spawn a new Tile; if not, animation of merge.
+
+        Use self._previous to store the previous value.
+        '''
         x, y = self.size
         if self._previous != 0:
             anim = Animation(size=(1.1*x, 1.1*y), duration=0.05) + \
@@ -73,6 +111,29 @@ class Tile(Label):
 
     
 class Board(RelativeLayout):
+    '''
+    Board containing the 16 tiles that are moved. This class contains all
+    the intelligence of the moves, and checks if game is finished.
+
+    Attributes
+    ----------
+    ventana : int
+        Size of the board, in pixels.
+    win_score : int
+        Value of the tile that is required to win (2048 by default)
+    score : int
+        Current score. Score is the sum of all values of tiles that have
+        merged.
+    swipe_x, swipe_y : int
+        Coordinates on the screen of initial position of swipe move
+    active_game : boolean
+        The game is active when it starts, until it finished (due to reaching
+        the win_score or lack of possible moves)
+    last_move: list
+        Stores the position and value of all tiles before starting the move. 
+        Used to enable go_back method.
+    
+    '''
     ventana = NumericProperty()
     win_score = NumericProperty(2048)
     score = NumericProperty(0)
@@ -87,36 +148,73 @@ class Board(RelativeLayout):
         Clock.schedule_once(self.initialize_grid)
     
     def initialize_grid(self, *args):
+        '''
+        initialisation is triggered after the parent window has been set up
+        '''
         self.ventana = min(self.parent.height, self.parent.width)
         
     def on_touch_down(self, touch):
+        '''
+        When touch down, store the value of (x, y) in attributes swipe_x
+        and swipe_y. These will be used by method on_touch_up.
+
+        Parameters
+        ----------
+        touch : touch event
+            contains the coordinates of the touch.
+        '''
         if self.collide_point(touch.x, touch.y):
             self.swipe_x = touch.x
             self.swipe_y = touch.y
     
     def on_touch_up(self, touch):
+        '''
+        When touch up, compare coordinates with swipe_x, swipe_y to find
+        the direction of the move, and trigger the move() method.
+
+        Parameters
+        ----------
+        touch : touch event
+            contains the coordinates of the touch.
+
+        Returns
+        -------
+        direction : string
+            Direction of the move.
+
+        '''
         if self.collide_point(touch.x, touch.y):
             dif_x = self.swipe_x - touch.x
             dif_y = self.swipe_y - touch.y
             if abs(dif_x) > MINIMUM_SWIPE or abs(dif_y) > MINIMUM_SWIPE:
                 if abs(dif_x) > abs(dif_y):
                     if dif_x > 0:
-                        self.move('left')
+                        direction = 'left'
                     else:
-                        self.move('right')
+                        direction = 'right'
                 else:
                     if dif_y > 0:
-                        self.move('down')
+                        direction = 'down'
                     else:
-                        self.move('up')
+                        direction = 'up'
+                self.move(direction)
+                return direction
 
     def change_win_score(self):
+        '''
+        Change the winning score, cycling through values stored in SCORES
+        global list. Store the new value in self.win_score.
+        '''
         scores = SCORES
         ind = scores.index(self.win_score)
         new_ind = (ind + 1) % len(scores)
         self.win_score = scores[new_ind]
         
     def start_game(self):
+        '''
+        Start the game: resets the scores, rebuild the board, and add
+        two new tiles.
+        '''
         self.clear_widgets()
         self.active_game = True
         self.score = 0
@@ -129,14 +227,35 @@ class Board(RelativeLayout):
         
 
     def add_tile(self, *args):
+        '''
+        Add a new tile on the board, i.e. change value attribute from 0 to a
+        value. Value taken from a list of 2s and 4s.
+        '''
         new_tile = choice(self.get_empty_tiles())
-        new_tile.value = choice([2, 2, 2, 4, 4])
+        new_tile.value = choice(NEW_TILE_SEQUENCE)
         
     def get_empty_tiles(self):
+        '''
+        Find all empty tiles (i.e. value==0) of the board.
+
+        Returns
+        -------
+        list : list
+            List of empty tiles.
+        '''
         return [child for child in self.children if not child.value]
 
 
     def get_full_tiles(self, row=-1, col=-1):
+        '''
+        Return a list of tiles that are empty. If row or column are 
+        specified, return only that row/column.
+
+        Returns
+        -------
+        full_tiles : list
+            List of non-empty tiles.
+        '''
         full_tiles = [child for child in self.children if child.value]
         if row != -1:
             full_tiles = [t for t in full_tiles if t.position[0] == row]
@@ -146,35 +265,48 @@ class Board(RelativeLayout):
         return full_tiles
     
     def move(self, direction, *args):
+        '''
+        Trigger move of the tiles in a certain direction. Based on the
+        direction will select the rows or columns that need to move, and
+        trigger the moves squentially, leaving enough time in between for 
+        the move to finish before the next row/column moves.
+
+        Parameters
+        ----------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        
+        '''
         if not self.active_game:
             return
         
+        # if the previous move still ongoing, wait (re-schedule for later)
         if self._moving:
             Clock.schedule_once(partial(self.move, direction), 0.01)
         else:
             self._moving = True
             self._moved_tile = False
-            self.save_last_move()
+            self.save_last_position()
             if direction == 'right':
-                for n, row in enumerate(range(2, -1, -1)):  # [2, 1, 0]
+                for n, row in enumerate([2, 1, 0]):
                     Clock.schedule_once(partial(self.move_row_line, 
                                                 direction, 
                                                 self.get_full_tiles(row=row)),
                                         MOVE_DURATION*n)
             elif direction == 'left':
-                for n, row in enumerate(range(1, 4, +1)):  # [1, 2, 3]
+                for n, row in enumerate([1, 2, 3]):
                     Clock.schedule_once(partial(self.move_row_line, 
                                                 direction, 
                                                 self.get_full_tiles(row=row)),
                                         MOVE_DURATION*n)
             elif direction == 'up':
-                for n, col in enumerate(range(2, -1, -1)):  # [2, 1, 0]
+                for n, col in enumerate([2, 1, 0]):
                     Clock.schedule_once(partial(self.move_row_line, 
                                                 direction, 
                                                 self.get_full_tiles(col=col)),
                                         MOVE_DURATION*n)
             else:
-                for n, col in enumerate(range(1, 4, +1)):  # [1, 2, 3]
+                for n, col in enumerate([1, 2, 3]):
                     Clock.schedule_once(partial(self.move_row_line, 
                                                 direction, 
                                                 self.get_full_tiles(col=col)),
@@ -182,6 +314,15 @@ class Board(RelativeLayout):
             Clock.schedule_once(self.end_of_move, MOVE_DURATION*3)
     
     def end_of_move(self, *args):
+        '''
+        Actions taken at the end of the move, once all tiles from all ros/cols
+        have moved. In case no tile has moved these actions don't occur, 
+        only the self._moving is reset to False. It is not considered a true
+        move.
+
+        This method is triggered after all the rows/tiles have moved, giving
+        enough time for all the tiles to move before these actions take place.
+        '''
         if self._moved_tile:
             self.add_tile()
             for child in self.children:
@@ -190,6 +331,19 @@ class Board(RelativeLayout):
         self._moving = False
     
     def end_of_game(self):
+        '''
+        Check if game has finished, by one of the two situations: (1) one 
+        tile reached the value of self.win_score, then player wins; (2) no
+        moves are available, and no empty tiles, then player loses.
+
+        If one of two situation arises, show popup and play the sound of
+        winning or losing.
+
+        Returns
+        -------
+        boolean
+            True if the game has finished; False otherwise.
+        '''
         app = App.get_running_app()
         if [child for child in self.children if child.value >= self.win_score]:
             # win game
@@ -202,14 +356,24 @@ class Board(RelativeLayout):
             app.root.play('end_lose')
         
         else:
-            return
+            return False
         
         p = Popup(title='Final', size_hint=(0.75, 0.20),
                   content=Message(text=msg))
         p.open()
         self.active_game = False
+        return True
     
     def available_moves(self):
+        '''
+        Check if any moves are available. If some spaces are empty, it is
+        considered that moves are available.
+        
+        Returns
+        -------
+        boolean
+            True if there some moves are available, False otherwise
+        '''
         for tile in self.children:
             if not tile.value:
                 return True
@@ -219,14 +383,38 @@ class Board(RelativeLayout):
                 if t and tile.value == t.value:
                     return True
         return False
-
                 
         
     def move_row_line(self, direction, row_line, *args):
+        '''
+        Move all tiles in the row or line towards the direction.
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        row_line : list
+            List of tiles that need to be moved.
+        '''
         for tile in row_line:
             self.move_tile(direction, tile)
     
     def move_tile(self, direction, tile):
+        '''
+        Move the tile in the direction indicated. Check what is the final
+        position, based on the other tiles in the board. If the position is
+        different from current position, then:
+            - change the tile to the new position,
+            - add a new empty tile on the old position
+            - merge the tile with the tile that was in the new position
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        tile : Tile
+            Tiles to be moved.
+        '''
         old_position = tile.position
         final_position = self.check_final(direction, old_position, tile.value)
         if final_position != old_position:
@@ -239,11 +427,43 @@ class Board(RelativeLayout):
                                 MOVE_TILE)
     
     def end_of_move_tile(self, tile_to_remove, tile, *args):
+        '''
+        Execute actions after the tile has physically moved to the new 
+        position: merge the value of the tile with that of previous tile,
+        and remove the previous tile. And resets attribute _moved_tile to True
+
+        Arguments
+        ---------
+        tile_to_remove : Tile
+            Tile that has to be removed
+        tile : Tile
+            Tile that is moving
+        '''
         tile.value += tile_to_remove.value
         self.remove_widget(tile_to_remove)
         self._moved_tile = True
         
     def check_final(self, direction, position, value):
+        '''
+        Return the final position to which the tile has to move. Recursive
+        method, will check the tile next to it and trigger itself again until
+        it reaches a stop value.
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        position: list or tuple (i, j)
+            Position of the tile in the board grid.
+        value : int
+            value of the tile that is moving
+        
+        Returns
+        -------
+        position : list (i, j)
+            Final position where the tile should be moved.
+
+        '''
         x, y = position
         if direction == 'left':
             x -= 1
@@ -267,11 +487,29 @@ class Board(RelativeLayout):
         return self.check_final(direction, new_position, value)
         
     def get_tile(self, position):
+        '''
+        Return the tile that is in the given position in the grid.
+
+        Parameters
+        ----------
+        position : list
+            Coordinates of position of tile in the grid
+        
+        Returns
+        -------
+        tile : Tile
+            Tile that corresponds to the given position
+        '''
         for child in self.children:
             if child.position == position:
                 return child
 
-    def save_last_move(self):
+    def save_last_position(self):
+        '''
+        Save the position of the board in a dictionary. This is called before 
+        starting the move. The saved position can be used to go back to the 
+        previous move.
+        '''
         self.last_move = []
         for child in self.children:
             tile = dict()
@@ -283,6 +521,10 @@ class Board(RelativeLayout):
             
 
     def back_button(self):
+        '''
+        Move position of board to the position before the last move. Use the
+        self.last_move
+        '''
         if self.active_game:
             self.clear_widgets()
             for tile in self.last_move:
@@ -303,18 +545,12 @@ class MainScreen(BoxLayout):
         super(MainScreen, self).__init__(**kwargs)
         self.sounds = self.load_sounds()
         
-    def cambiar_tema(self):
-        if not self.tema_actual:
-            self.tema_actual = self.lista_temas[0]
-        else:
-            ind = self.lista_temas.index(self.tema_actual)
-            new_ind = ind+1 if ind<len(self.lista_temas)-1 else 0
-            self.tema_actual = self.lista_temas[new_ind]
-    
     def load_sounds(self):
+        '''
+        Load sounds in memory at the sstart of the program, so they can be
+        played without delay.
+        '''
         sound = dict()
-        sound['bye'] = SoundLoader.load('audio/bye.ogg')
-        sound['start'] = SoundLoader.load('audio/start.ogg')
         sound['move'] = SoundLoader.load('audio/move.ogg')
         sound['end_win'] = SoundLoader.load('audio/end_win.ogg')
         sound['end_lose'] = SoundLoader.load('audio/end_lose.ogg')
@@ -322,14 +558,14 @@ class MainScreen(BoxLayout):
         return sound
     
     def play(self, sound):
+        '''
+        Function to play one of the sounds. It can be called from anywhere
+        in the program.
+        '''
         if sound in self.sounds:
             self.sounds[sound].play()
         else:
             raise Exception("Bad sound")
-
-    def bye(self):
-        self.play('bye')
-        sleep(1.5)
 
 
 class Message(Label):
