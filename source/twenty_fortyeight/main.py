@@ -286,7 +286,7 @@ class Board(RelativeLayout):
         else:
             self._moving = True
             self._moved_tile = False
-            self.save_last_move()
+            self.save_last_position()
             if direction == 'right':
                 for n, row in enumerate([2, 1, 0]):
                     Clock.schedule_once(partial(self.move_row_line, 
@@ -314,6 +314,15 @@ class Board(RelativeLayout):
             Clock.schedule_once(self.end_of_move, MOVE_DURATION*3)
     
     def end_of_move(self, *args):
+        '''
+        Actions taken at the end of the move, once all tiles from all ros/cols
+        have moved. In case no tile has moved these actions don't occur, 
+        only the self._moving is reset to False. It is not considered a true
+        move.
+
+        This method is triggered after all the rows/tiles have moved, giving
+        enough time for all the tiles to move before these actions take place.
+        '''
         if self._moved_tile:
             self.add_tile()
             for child in self.children:
@@ -322,6 +331,19 @@ class Board(RelativeLayout):
         self._moving = False
     
     def end_of_game(self):
+        '''
+        Check if game has finished, by one of the two situations: (1) one 
+        tile reached the value of self.win_score, then player wins; (2) no
+        moves are available, and no empty tiles, then player loses.
+
+        If one of two situation arises, show popup and play the sound of
+        winning or losing.
+
+        Returns
+        -------
+        boolean
+            True if the game has finished; False otherwise.
+        '''
         app = App.get_running_app()
         if [child for child in self.children if child.value >= self.win_score]:
             # win game
@@ -334,14 +356,24 @@ class Board(RelativeLayout):
             app.root.play('end_lose')
         
         else:
-            return
+            return False
         
         p = Popup(title='Final', size_hint=(0.75, 0.20),
                   content=Message(text=msg))
         p.open()
         self.active_game = False
+        return True
     
     def available_moves(self):
+        '''
+        Check if any moves are available. If some spaces are empty, it is
+        considered that moves are available.
+        
+        Returns
+        -------
+        boolean
+            True if there some moves are available, False otherwise
+        '''
         for tile in self.children:
             if not tile.value:
                 return True
@@ -351,14 +383,38 @@ class Board(RelativeLayout):
                 if t and tile.value == t.value:
                     return True
         return False
-
                 
         
     def move_row_line(self, direction, row_line, *args):
+        '''
+        Move all tiles in the row or line towards the direction.
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        row_line : list
+            List of tiles that need to be moved.
+        '''
         for tile in row_line:
             self.move_tile(direction, tile)
     
     def move_tile(self, direction, tile):
+        '''
+        Move the tile in the direction indicated. Check what is the final
+        position, based on the other tiles in the board. If the position is
+        different from current position, then:
+            - change the tile to the new position,
+            - add a new empty tile on the old position
+            - merge the tile with the tile that was in the new position
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        tile : Tile
+            Tiles to be moved.
+        '''
         old_position = tile.position
         final_position = self.check_final(direction, old_position, tile.value)
         if final_position != old_position:
@@ -371,11 +427,43 @@ class Board(RelativeLayout):
                                 MOVE_TILE)
     
     def end_of_move_tile(self, tile_to_remove, tile, *args):
+        '''
+        Execute actions after the tile has physically moved to the new 
+        position: merge the value of the tile with that of previous tile,
+        and remove the previous tile. And resets attribute _moved_tile to True
+
+        Arguments
+        ---------
+        tile_to_remove : Tile
+            Tile that has to be removed
+        tile : Tile
+            Tile that is moving
+        '''
         tile.value += tile_to_remove.value
         self.remove_widget(tile_to_remove)
         self._moved_tile = True
         
     def check_final(self, direction, position, value):
+        '''
+        Return the final position to which the tile has to move. Recursive
+        method, will check the tile next to it and trigger itself again until
+        it reaches a stop value.
+
+        Arguments
+        ---------
+        direction : string
+            Direction of the move. Can be 'up', 'down', 'left' or 'right'.
+        position: list or tuple (i, j)
+            Position of the tile in the board grid.
+        value : int
+            value of the tile that is moving
+        
+        Returns
+        -------
+        position : list (i, j)
+            Final position where the tile should be moved.
+
+        '''
         x, y = position
         if direction == 'left':
             x -= 1
@@ -399,11 +487,29 @@ class Board(RelativeLayout):
         return self.check_final(direction, new_position, value)
         
     def get_tile(self, position):
+        '''
+        Return the tile that is in the given position in the grid.
+
+        Parameters
+        ----------
+        position : list
+            Coordinates of position of tile in the grid
+        
+        Returns
+        -------
+        tile : Tile
+            Tile that corresponds to the given position
+        '''
         for child in self.children:
             if child.position == position:
                 return child
 
-    def save_last_move(self):
+    def save_last_position(self):
+        '''
+        Save the position of the board in a dictionary. This is called before 
+        starting the move. The saved position can be used to go back to the 
+        previous move.
+        '''
         self.last_move = []
         for child in self.children:
             tile = dict()
@@ -415,6 +521,10 @@ class Board(RelativeLayout):
             
 
     def back_button(self):
+        '''
+        Move position of board to the position before the last move. Use the
+        self.last_move
+        '''
         if self.active_game:
             self.clear_widgets()
             for tile in self.last_move:
@@ -435,18 +545,12 @@ class MainScreen(BoxLayout):
         super(MainScreen, self).__init__(**kwargs)
         self.sounds = self.load_sounds()
         
-    def cambiar_tema(self):
-        if not self.tema_actual:
-            self.tema_actual = self.lista_temas[0]
-        else:
-            ind = self.lista_temas.index(self.tema_actual)
-            new_ind = ind+1 if ind<len(self.lista_temas)-1 else 0
-            self.tema_actual = self.lista_temas[new_ind]
-    
     def load_sounds(self):
+        '''
+        Load sounds in memory at the sstart of the program, so they can be
+        played without delay.
+        '''
         sound = dict()
-        sound['bye'] = SoundLoader.load('audio/bye.ogg')
-        sound['start'] = SoundLoader.load('audio/start.ogg')
         sound['move'] = SoundLoader.load('audio/move.ogg')
         sound['end_win'] = SoundLoader.load('audio/end_win.ogg')
         sound['end_lose'] = SoundLoader.load('audio/end_lose.ogg')
@@ -454,14 +558,14 @@ class MainScreen(BoxLayout):
         return sound
     
     def play(self, sound):
+        '''
+        Function to play one of the sounds. It can be called from anywhere
+        in the program.
+        '''
         if sound in self.sounds:
             self.sounds[sound].play()
         else:
             raise Exception("Bad sound")
-
-    def bye(self):
-        self.play('bye')
-        sleep(1.5)
 
 
 class Message(Label):
