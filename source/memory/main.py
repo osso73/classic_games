@@ -28,17 +28,50 @@ from time import sleep
 import os
 
 
-TEMAS = os.path.join('images', 'temas')
+TEMAS = os.path.join(os.path.dirname(__file__), 'images', 'temas')
 
 
 #######################################################################
 class Tapete(GridLayout):
+    '''
+    Main area of the game, where the tiles are distributed. This class has 
+    the logic to turn tiles, shuffle, etc. The tiles are distributed in a 
+    GridLayout.
+    
+    Attributes
+    ----------
+    columnas : NumericProperty
+        Number of columns of the GridLayout. 
+    current_cards : ListProperty
+        Cards that are turned up, but not yet matched. This list can have 0, 1
+        or 2 cards max.
+    movimientos : NumericProperty
+        Count the number of moves that have been made. It is the score.
+        
+    '''
     columnas = NumericProperty(2)
     current_cards = ListProperty()
     movimientos = NumericProperty(0)
     
         
     def load_images(self, app):
+        '''
+        Load images of current theme, and return them.
+
+        Parameters
+        ----------
+        app : App
+            Instance of the running app.
+
+        Returns
+        -------
+        ims : list
+            List of filenames of the images. These are the images of the 
+            current theme.
+        back : string
+            Filename of the image shown in the back of the cards.
+
+        '''
         p = os.path.join(TEMAS, app.root.tema_actual) 
         ims = os.listdir(p)
         ims = [os.path.join(p,im) for im in ims if im.startswith('image')]
@@ -46,6 +79,14 @@ class Tapete(GridLayout):
         return ims, back
         
     def start_game(self):
+        '''
+        
+
+        Returns
+        -------
+        None.
+
+        '''
         self.clear_widgets()
         
         app = App.get_running_app()
