@@ -55,6 +55,7 @@ class TestMainScreen():
         assert obj.letras_acertadas == ''
         assert obj.letras_falladas == ''
     
+    @pytest.mark.skip
     def test_final(self):
         '''cannot be tested'''
         pass
@@ -220,11 +221,13 @@ class TestTeclado():
         for tecla in obj.children:
             assert tecla.disabled == False
         
+    @pytest.mark.skip
     def test_pulsar_tecla(self):
         '''cannot be tested'''
         pass
 
 
+@pytest.mark.skip
 class TestTecla():
     def test_pulsar(self):
         '''cannot be tested'''

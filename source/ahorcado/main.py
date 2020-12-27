@@ -335,7 +335,7 @@ class PalabraLetras(BoxLayout):
         string
             Word chosen
         ''' 
-        fullname = os.path.join(os.path.dirname(__file__),FICHERO_PALABRAS)
+        fullname = os.path.join(os.path.dirname(__file__), FICHERO_PALABRAS)
         with open(fullname, 'rt') as f:
             lista = [ line.rstrip('\n') for line in f ]
         
