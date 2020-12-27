@@ -317,7 +317,8 @@ class MenuLabel(Label):
 
 class MemoryApp(App):    
     def build(self):
-        self.icon = 'images/icon.png'
+        self.icon = os.path.join(os.path.dirname(__file__), 
+                                 'images', 'icon.png')
         main = MainScreen()
         return main
 
