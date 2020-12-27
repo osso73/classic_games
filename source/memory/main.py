@@ -47,6 +47,8 @@ class Tapete(GridLayout):
         or 2 cards max.
     movimientos : NumericProperty
         Count the number of moves that have been made. It is the score.
+    imagenes : list
+        List of filenames of the images.
         
     '''
     columnas = NumericProperty(2)
@@ -80,12 +82,8 @@ class Tapete(GridLayout):
         
     def start_game(self):
         '''
-        
-
-        Returns
-        -------
-        None.
-
+        Start the game: reset score to 0, load images according to currently
+        selected theme and size, and create the tiles.
         '''
         self.clear_widgets()
         
@@ -95,6 +93,7 @@ class Tapete(GridLayout):
         self.imagenes, back = self.load_images(app)
         self.movimientos = 0
         
+        # take only a number of images of the total, duplicate and shuffle
         imagenes = sample(self.imagenes, num)
         imagenes = sample(imagenes*2, num*2)
         
@@ -103,6 +102,16 @@ class Tapete(GridLayout):
             self.add_widget(Carta(image=im, back=back))
     
     def set_columns(self, num):
+        '''
+        Define the columns of the widget, how the tiles will be distributed
+        based on the number of tiles. The thresholds are determined by trial
+        and error, based on the shape factor of a mobile phone.
+
+        Parameters
+        ----------
+        num : int
+            Total number of pairs of images to be distributed.
+        '''
         if num < 5:
             self.columnas = 2
         elif num < 10:
@@ -113,10 +122,15 @@ class Tapete(GridLayout):
             self.columnas = 5
         
     def on_current_cards(self, *args, **kwargs):
+        '''
+        When the list of current cards changes, check if the length of the
+        list is 2; if so, check if the pair match, in which case the cards
+        are left with the image; if no match, turn the cards down again.
+        '''
         if len(self.current_cards) == 2:
             self.movimientos += 1
             if self.current_cards[0].image != self.current_cards[1].image:
-                sleep(2)
+                sleep(2)  # wait 2 seconds before turning back cards
                 self.current_cards.pop().turn()
                 self.current_cards.pop().turn()
             else:
@@ -124,9 +138,12 @@ class Tapete(GridLayout):
                 self.current_cards.pop()
                 app = App.get_running_app()
                 app.root.play('ok')
-                self.check_end()
+                self.check_end()  # check if the game is finished
     
     def check_end(self):
+        '''
+        Check if the game is finished: all cards are up.
+        '''
         for carta in self.children:
             if not carta.shown:
                 return
@@ -139,7 +156,26 @@ class Tapete(GridLayout):
 
         
 #######################################################################
-class Carta(Button):    
+class Carta(Button):
+    '''
+    This class defines the behaviour of each card: the image that is in the 
+    front and the back, and its status (shown or not shown). The card is 
+    modeled as a button with an image, which can be the back of the card or
+    the front. Action occurs when button is clicked.
+    
+    Attributes
+    ----------
+    back : StringProperty
+        Filename of the image that appears as back of the card.
+    image : StringProperty
+        Filename of the image that is in the front of the card.
+    show : StringProperty
+        Filename of the image that is shown at each moment. It is one of the
+        two: image or show.
+    shown : BooleanProperty
+        Whether the card is turned up or down. False == turned down.
+    
+    '''
     back = StringProperty()
     image = StringProperty()
     show = StringProperty()
@@ -150,6 +186,9 @@ class Carta(Button):
         self.show = self.back
 
     def click(self):
+        '''
+        When button is clicked, trigger the function to turn the card.
+        '''
         if not self.shown:
             self.turn()
             app = App.get_running_app()
@@ -157,10 +196,17 @@ class Carta(Button):
             Clock.schedule_once(self.add_card_to_current)
             
     def add_card_to_current(self, *args):
+        '''
+        Add card to Tapete.current_cards list.
+        '''
         app = App.get_running_app()
         app.root.ids.obj_tapete.current_cards.append(self)
         
     def turn(self):
+        '''
+        Turn the card. If the card is shown, turns it back; if not, 
+        turn it up.
+        '''
         if self.shown:
             self.show = self.back
         else:
@@ -170,16 +216,39 @@ class Carta(Button):
 
 #######################################################################
 class MainScreen(BoxLayout):
+    '''
+    This class organizes the mainscreen in the different areas: menu at the 
+    top, and the board with the cards for the rest of screen.
+    
+    Attributes
+    ----------
+    sounds : dict
+        Dictionary of sounds, containing all sounds to be played during the 
+        game. Different functions will play them as needed.
+    tamano : NumericProperty
+        Number of pairs to be discovered.
+    tema_actual : StringProperty
+        Current theme to be used.
+    lista_temas : list
+        List of themes available.
+    '''
     tamano = NumericProperty(6)
     tema_actual = StringProperty()
     
     def __init__(self, **kwargs):
+        '''
+        Create the list of themes based on the folders available, load the
+        sounds to memory so they can be played without delay.
+        '''
         super(MainScreen, self).__init__(**kwargs)
         self.lista_temas = os.listdir(TEMAS)
         self.cambiar_tema()
         self.sounds = self.load_sounds()
         
     def cambiar_tema(self):
+        '''
+        Switch to the following theme of the lista_temas.
+        '''
         if not self.tema_actual:
             self.tema_actual = self.lista_temas[0]
         else:
@@ -188,23 +257,45 @@ class MainScreen(BoxLayout):
             self.tema_actual = self.lista_temas[new_ind]
     
     def load_sounds(self):
-        sound = dict()
-        sound['bye'] = SoundLoader.load('audio/bye.ogg')
-        # sound['ambience'] = SoundLoader.load('audio/ambience.ogg')
-        sound['ok'] = SoundLoader.load('audio/ok.ogg')
-        sound['start'] = SoundLoader.load('audio/start.ogg')
-        sound['turn'] = SoundLoader.load('audio/turn.ogg')
-        sound['end_game'] = SoundLoader.load('audio/end_game.ogg')
+        '''
+        Load all sounds of the game, and put them into the dictionary.
         
+        Returns
+        -------
+        sound : dict
+            The dictionary of sounds that have been loaded
+        '''
+        sound = dict()        
+        folder = os.path.join(os.path.dirname(__file__),'audio')
+        for s in ['bye', 'ok', 'start', 'turn', 'end_game']:
+            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
+            
         return sound
     
     def play(self, sound):
+        '''
+        Play a sound from the dictionary of sounds.
+        
+        Parameters
+        ----------
+        sound : string
+            Key of the dictionary corresponding to the sound to be played.
+        
+        Raises
+        ------
+        Exception
+            If string passed is not in the dictionary.
+        '''
         if sound in self.sounds:
             self.sounds[sound].play()
         else:
             raise Exception("Bad sound")
 
     def bye(self):
+        '''
+        Play a sound before closing the app, and wait a delay so the sound 
+        can be heard (Trump saying 'thank you very much')
+        '''
         self.play('bye')
         sleep(1.5)
 
