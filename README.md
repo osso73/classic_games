@@ -10,8 +10,8 @@ The list of games to be developed is inspired in project [GameStore](https://git
 - [x] memory
 - [x] 15 puzzle
 - [x] 2048
+- [x] buscaminas
 - [ ] asteroids
-- [ ] buscaminas
 - [ ] snake
 - [ ] pacman(?)
 

@@ -1,0 +1,62 @@
+
+<MainScreen>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 250/255, 248/255, 239/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        id: menu
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: root.height / 10 * 0.8
+        padding: 5
+        spacing: 5
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.8
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        Label:
+            text: '{:03}'.format(field.mines)
+            
+        Button:
+            text: 'start'
+            on_release: field.start_game()
+
+        Label:
+            text: '111'
+    
+    Field:
+        id: field
+    
+    BoxLayout:
+        Label:
+            text: 'empty space'
+
+
+<Field>:
+    canvas:
+        Color:
+            rgba: 0.8, 0.8, 0.8, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    size_hint: None, None
+    size: self.parent.width, self.parent.width
+    cols: self.columnas
+    Label:
+        text: 'oriol'
+
+<Area>:
+    canvas:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+            source: self.show

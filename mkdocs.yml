@@ -14,4 +14,5 @@ nav:
       - games/memory.md
       - games/15puzzle.md
       - games/2048.md
+      - games/buscaminas.md
   - About: about.md
