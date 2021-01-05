@@ -16,20 +16,26 @@
         spacing: 5
         canvas:
             Color:
-                rgba: 1, 0, 0, 0.8
+                rgba: 0.7, 0.7, 0.7, 1
             Rectangle:
                 size: self.size
                 pos: self.pos
                 
-        Label:
-            text: '{:03}'.format(field.mines)
-            
-        Button:
-            text: 'start'
-            on_release: field.start_game()
+        Indicator:
+            text: '{:04}'.format(field.mines)
 
-        Label:
-            text: '111'
+        StartButton:
+            canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Ellipse:
+                    size: min(self.height, self.width), min(self.height, self.width)
+                    pos: self.parent.width / 2 - 0.5*min(self.height, self.width), self.y
+                    # source: 'images/playing.png'
+                    source: self.button_face
+
+        Indicator:
+            text: '{:04}'.format(field.time)
     
     Field:
         id: field
@@ -60,3 +66,18 @@
             size: self.size
             pos: self.pos
             source: self.show
+
+<Indicator>:
+    bold: True
+    color: 1,0,0,1
+    font_size: 120
+    size: self.texture_size
+    texture_size: self.size
+    padding: 50, 20
+    font_name: 'fonts/digital-7 (mono)'
+    canvas.before:
+        Color:
+            rgba: 0,0,0,1
+        Rectangle:
+            size: self.size
+            pos: self.pos            

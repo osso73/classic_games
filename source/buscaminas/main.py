@@ -45,6 +45,7 @@ class Field(GridLayout):
     '''
     columnas = NumericProperty(9)
     mines = NumericProperty(0)
+    time = NumericProperty(123)
     
     def start_game(self):
         '''
@@ -282,6 +283,87 @@ class Area(Label):
                 self._current_touch = Clock.schedule_once(
                     self.uncover, DOUBLE_TAP)
                 
+
+class StartButton(Label):
+    '''
+    The button to start the game. This class controls the image to use, and
+    the action.
+    
+    Attributes
+    ----------
+    button_face: StringProperty
+        Name of the image to be shown
+    '''
+    button_face = StringProperty()
+    
+    def __init__(self, **kwargs):
+        super(StartButton, self).__init__(**kwargs)
+        self.change_face('standard')
+    
+    def on_touch_down(self, touch):
+        '''
+        Change the face of button when it's pressed.
+
+        Parameters
+        ----------
+        touch : touch event
+            Has the coordinates of the touch.
+
+        Returns
+        -------
+        bool
+            True, in case the touch point was within the widget.
+
+        '''
+        if self.collide_point(*touch.pos):
+            self.change_face('press')
+            return True
+    
+    def on_touch_up(self, touch):
+        '''
+        Trigger the start of the game, and change back the button face.
+
+        Parameters
+        ----------
+        touch : touch event
+            Has the coordinates of the touch.
+
+        Returns
+        -------
+        bool
+            True, in case the touch point was within the widget.
+
+        '''
+        if self.collide_point(*touch.pos):
+            self.change_face('standard')
+            self.parent.parent.ids.field.start_game()
+            return True
+    
+    def change_face(self, face):
+        '''
+        Change the face of the button that is shown.
+
+        Parameters
+        ----------
+        face : string
+            Can be one of the 4 options: 'lost', 'press', 'standard', 'won'.
+
+        '''
+        if face not in ['lost', 'press', 'standard', 'won']:
+            raise ValueError("Face incorrect")
+        
+        filename = f'{face}.png'
+        self.button_face = os.path.join(os.path.dirname(__file__), 
+                                        'images', filename)
+
+        
+
+
+class Indicator(Label):
+    '''
+    For the indicators of mines and time.
+    '''
+    pass
 
 
 class MainScreen(BoxLayout):

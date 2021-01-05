@@ -212,4 +212,53 @@ class TestArea():
         assert obj.uncovered == True
         obj.uncover()
         assert obj.uncovered == True
-            
+
+
+class TestStartButton():
+    @pytest.mark.parametrize("touch", [
+        ((200,200)), ((300,200)), ((200,300)), ((300,300)),
+        ])
+    def test_on_touch_down_true(self, touch):
+        obj = main.StartButton()
+        obj.size = (500, 500)
+        obj.pos = (100, 100)
+        assert 'standard' in obj.button_face
+        class touch_point():
+            pos = touch
+        obj.on_touch_down(touch_point)
+        assert 'standard' not in obj.button_face
+        assert 'press' in obj.button_face
+
+    @pytest.mark.parametrize("touch", [
+        ((800,200)), ((300,900)), ((900,1200)), ((50,300)),
+        ])
+    def test_on_touch_down_false(self, touch):
+        obj = main.StartButton()
+        obj.size = (500, 500)
+        obj.pos = (100, 100)
+        assert 'standard' in obj.button_face
+        class touch_point():
+            pos = touch
+        obj.on_touch_down(touch_point)
+        assert 'standard' in obj.button_face
+        assert 'press' not in obj.button_face
+
+
+    @pytest.mark.skip
+    def test_on_touch_up(self):
+        '''cannot be checked'''
+        pass
+
+    def test_change_face_ok(self):
+        obj = main.StartButton()
+        options = ['lost', 'press', 'standard', 'won']
+        for opt in options:
+            obj.change_face(opt)
+            assert opt in obj.button_face
+
+    def test_change_face_error(self):
+        obj = main.StartButton()
+        options = ['new', 'non-existing']
+        for opt in options:
+            with pytest.raises(ValueError):
+                obj.change_face(opt)
