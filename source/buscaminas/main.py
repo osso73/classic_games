@@ -46,6 +46,7 @@ class Field(GridLayout):
     columnas = NumericProperty(9)
     mines = NumericProperty(0)
     time = NumericProperty(123)
+    game_active = False
     
     def start_game(self):
         '''
@@ -55,6 +56,7 @@ class Field(GridLayout):
         self.clear_widgets()
         self.distribute_mines()
         self.find_adjacent_mines()
+        self.game_active = True
 
     def distribute_mines(self):
         '''
@@ -155,21 +157,22 @@ class Field(GridLayout):
         
     def game_lost(self):
         '''
-        When game is lost, a popup is shown.
+        When game is lost, show all mines and change the face of button.
         '''
-        txt = 'Lo siento, ¡has perdido!'
-        p = Popup(title='Final', size_hint=(0.75, 0.15),
-                  content=Label(text=txt))
-        p.open()
+        self.game_active = False
+        self.parent.ids.start_button.change_face('lost')
+        for area in self.children:
+            if area.flag and area.value != 9:
+                area.set_show(name='wrong')
+            elif area.value == 9 and not area.flag:
+                area.uncovered = True
     
     def game_won(self):
         '''
         When game is won, a popup is shown.
         '''
-        txt = '¡Muy bien! Has descubierto\ntodas las minas'
-        p = Popup(title='Final', size_hint=(0.75, 0.15),
-                  content=Label(text=txt))
-        p.open()
+        self.game_active = False
+        self.parent.ids.start_button.change_face('won')
     
     def no_adjacent_mines(self, area):
         '''
@@ -217,18 +220,22 @@ class Area(Label):
         super(Area, self).__init__(**kwargs)
         self.set_show()
     
-    def set_show(self):
+    def set_show(self, name=None):
         '''
         Evaluate the different flags (flag, uncovered) and define what image
         should be shown on the tile.
         '''
-        if self.uncovered:
-            file = f'{self.value}.jpg'
+        
+        if name:
+            file = f'{name}.jpg'
         else:
-            if self.flag:
-                file = 'bandera.jpg'
+            if self.uncovered:
+                file = f'{self.value}.jpg'
             else:
-                file = 'covered.jpg'
+                if self.flag:
+                    file = 'bandera.jpg'
+                else:
+                    file = 'covered.jpg'
         
         self.show = os.path.join(IMAGES, file)
     
@@ -270,7 +277,7 @@ class Area(Label):
         Evaluate if touch is double-tap or single, or right-click, and
         trigger the right even: switch flag or switch uncovered.
         '''
-        if self.collide_point(*touch.pos):
+        if self.collide_point(*touch.pos) and self.parent.game_active:
             if self._current_touch is not None:
                 self._current_touch.cancel()
                 self._current_touch = None

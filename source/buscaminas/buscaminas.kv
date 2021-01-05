@@ -12,7 +12,7 @@
         orientation: 'horizontal'
         size_hint_y: None
         height: root.height / 10 * 0.8
-        padding: 5
+        padding: 10
         spacing: 5
         canvas:
             Color:
@@ -25,14 +25,7 @@
             text: '{:04}'.format(field.mines)
 
         StartButton:
-            canvas:
-                Color:
-                    rgba: 1, 1, 1, 1
-                Ellipse:
-                    size: min(self.height, self.width), min(self.height, self.width)
-                    pos: self.parent.width / 2 - 0.5*min(self.height, self.width), self.y
-                    # source: 'images/playing.png'
-                    source: self.button_face
+            id: start_button
 
         Indicator:
             text: '{:04}'.format(field.time)
@@ -81,3 +74,13 @@
         Rectangle:
             size: self.size
             pos: self.pos            
+
+<StartButton>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Ellipse:
+            size: min(self.height, self.width), min(self.height, self.width)
+            pos: self.parent.width / 2 - 0.5*min(self.height, self.width), self.y
+            # source: 'images/playing.png'
+            source: self.button_face

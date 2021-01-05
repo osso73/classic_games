@@ -13,22 +13,30 @@ from buscaminas import main
 
 
 class TestField():
+    @pytest.fixture
+    def field_with_mines_and_parent(self):
+        class Parent(main.BoxLayout):
+            class ids():
+                class start_button():
+                    def change_face(self, *args):
+                        pass
+        obj = main.Field()
+        obj.mines = 10
+        obj.columnas = 9
+        obj.distribute_mines()
+        parent = Parent()
+        parent.add_widget(obj)
+        return obj
+
     def test_start_game(self):
         obj = main.Field()
         obj.start_game()
         assert obj.mines == 10
         assert len(obj.children) == obj.columnas ** 2
+        assert obj.game_active == True
         
-    @pytest.fixture
-    def field_with_mines(self):
-        obj = main.Field()
-        obj.mines = 10
-        obj.columnas = 9
-        obj.distribute_mines()
-        return obj
-        
-    def test_distribute_mines(self, field_with_mines):
-        obj = field_with_mines
+    def test_distribute_mines(self, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
         count = 0
         for child in obj.children:
             if child.value == 9:
@@ -37,7 +45,7 @@ class TestField():
         assert len(obj.children) == 81
 
  
-    def test_find_adjacent_mines(self, field_with_mines):
+    def test_find_adjacent_mines(self, field_with_mines_and_parent):
         data = [[0, 0, 0, 1, 9, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 9, 1],
                 [2, 9, 1, 0, 0, 0, 2, 2, 2],
@@ -47,7 +55,7 @@ class TestField():
                 [9, 2, 0, 0, 0, 1, 9, 1, 0],
                 [1, 1, 0, 1, 1, 2, 1, 1, 0],
                 [0, 0, 0, 1, 9, 1, 0, 0, 0]]
-        obj = field_with_mines
+        obj = field_with_mines_and_parent
         for tile in obj.children:
             i, j = tile.posicion
             if data[j][i] == 9:
@@ -73,8 +81,8 @@ class TestField():
         ((2,2), {(1,1), (2,1), (3,1), (3,2), (3,3), (2,3), (1,3), (1,2)}),
         ((6,6), {(5,5), (6,5), (7,5), (7,6), (7,7), (6,7), (5,7), (5,6)}),
         ])
-    def test_find_neighbours(self, p_ref, n_ref, field_with_mines):
-        obj = field_with_mines
+    def test_find_neighbours(self, p_ref, n_ref, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
         neighbour_list = obj.find_neighbours(p_ref)
         neighbour_list_pos =  {tuple(n.posicion) for n in neighbour_list}
         assert neighbour_list_pos == n_ref
@@ -84,8 +92,8 @@ class TestField():
         '''cannot be checked'''
         pass
     
-    def test_all_discovered(self, field_with_mines):
-        obj = field_with_mines
+    def test_all_discovered(self, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
         assert obj.all_discovered() == False
         
         for area in obj.children:
@@ -101,22 +109,37 @@ class TestField():
             area.uncovered = False
         assert obj.all_discovered() == False
     
-    @pytest.mark.skip
-    def test_game_lost(self):
-        '''cannot be checked'''
-        pass
-    
-    @pytest.mark.skip
-    def test_game_won(self):
-        '''cannot be checked'''
-        pass
+    @pytest.fixture
+    def field_with_parent(self, field_with_mines_and_parent):
+        class Parent(main.BoxLayout):
+            class ids():
+                class start_button():
+                    def change_face(self, *args):
+                        pass
+
+        obj = field_with_mines_and_parent
+        parent = Parent()
+        parent.add_widget(obj)
+        return obj
+
+    def test_game_lost(self, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
+        obj.game_active = True
+        obj.game_lost()
+        assert obj.game_active == False
+        
+    def test_game_won(self, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
+        obj.game_active = True
+        obj.game_won()
+        assert obj.game_active == False
         
     @pytest.mark.parametrize("blank_zone",[
         [(0,0), (1,0), (2,0)],
         [(3,2), (4,2), (5,2), (4,3), (5,3), (4,4), (5,4), (4,5), (2,6), (3,6), (4,6), (2,7), (0,8), (1,8), (2,8)],
         [(8,5), (8,6), (8,7), (8,8), (7,8), (6,8)],
         ])
-    def test_no_adjacent_mines(self, field_with_mines, blank_zone):
+    def test_no_adjacent_mines(self, field_with_mines_and_parent, blank_zone):
         data = [[0, 0, 0, 1, 9, 1, 1, 1, 1],
                 [1, 1, 1, 1, 1, 1, 1, 9, 1],
                 [2, 9, 1, 0, 0, 0, 2, 2, 2],
@@ -126,7 +149,7 @@ class TestField():
                 [9, 2, 0, 0, 0, 1, 9, 1, 0],
                 [1, 1, 0, 1, 1, 2, 1, 1, 0],
                 [0, 0, 0, 1, 9, 1, 0, 0, 0]]
-        obj = field_with_mines
+        obj = field_with_mines_and_parent
         for t in obj.children:
             i, j = t.posicion
             t.value = data[j][i]
@@ -161,6 +184,7 @@ class TestArea():
         parent.add_widget(obj)
         return obj
 
+
     @pytest.mark.parametrize("flag, uncovered, value, show",[
         (True, True, 3, '3.jpg'),
         (True, False, 2, 'bandera.jpg'),
@@ -174,6 +198,11 @@ class TestArea():
         obj.flag = flag
         obj.set_show()
         assert os.path.basename(obj.show) == show
+
+    def test_set_show_with_name(self, area_with_parent):
+        obj = area_with_parent
+        obj.set_show(name='whatever-name')
+        assert os.path.basename(obj.show) == 'whatever-name.jpg'
     
     def test_on_flag(self, area_with_parent):
         obj = area_with_parent
@@ -223,9 +252,9 @@ class TestStartButton():
         obj.size = (500, 500)
         obj.pos = (100, 100)
         assert 'standard' in obj.button_face
-        class touch_point():
+        class TouchPoint():
             pos = touch
-        obj.on_touch_down(touch_point)
+        obj.on_touch_down(TouchPoint)
         assert 'standard' not in obj.button_face
         assert 'press' in obj.button_face
 
@@ -237,9 +266,9 @@ class TestStartButton():
         obj.size = (500, 500)
         obj.pos = (100, 100)
         assert 'standard' in obj.button_face
-        class touch_point():
+        class TouchPoint():
             pos = touch
-        obj.on_touch_down(touch_point)
+        obj.on_touch_down(TouchPoint)
         assert 'standard' in obj.button_face
         assert 'press' not in obj.button_face
 
