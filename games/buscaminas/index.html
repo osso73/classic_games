@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="osso73">
-  <link rel="canonical" href="https://osso73.github.io/classic_games/games/pong/">
+  <link rel="canonical" href="https://osso73.github.io/classic_games/games/buscaminas/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Pong - classic_games</title>
+  <title>Buscaminas (Minesweeper) - classic_games</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Pong";
-    var mkdocs_page_input_path = "games\\pong.md";
-    var mkdocs_page_url = "/classic_games/games/pong/";
+    var mkdocs_page_name = "Buscaminas (Minesweeper)";
+    var mkdocs_page_input_path = "games\\buscaminas.md";
+    var mkdocs_page_url = "/classic_games/games/buscaminas/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -57,19 +57,7 @@
                 </ul>
                 <p class="caption"><span class="caption-text">Games</span></p>
                 <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Pong</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#rules-of-the-game">Rules of the game</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#main-screen">Main screen</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#buttons-in-toolbar">Buttons in toolbar</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-resources">Other resources</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a>
-    </li>
-    </ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../pong/">Pong</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../ahorcado/">Ahorcado</a>
                     </li>
@@ -79,7 +67,19 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../2048/">2048</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../buscaminas/">Buscaminas (Minesweeper)</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Buscaminas (Minesweeper)</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#rules-of-the-game">Rules of the game</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#main-screen">Main screen</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#toolbar-buttons-and-indicators">Toolbar buttons and indicators</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#other-resources">Other resources</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a>
+    </li>
+    </ul>
                     </li>
                 </ul>
                 <ul>
@@ -111,10 +111,10 @@
         
       
     
-    <li>Pong</li>
+    <li>Buscaminas (Minesweeper)</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/pong.md"
+        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/buscaminas.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -125,46 +125,47 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="pong">Pong</h1>
+                <h1 id="buscaminas-minesweeper">Buscaminas (Minesweeper)</h1>
 <h2 id="rules-of-the-game">Rules of the game</h2>
-<p>Classic game of pong. This was my first app, I followed the tutorial from <a href="https://kivy.org">Kivy website</a>, and added some functionality in terms of changing skin, etc.</p>
-<p>Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.</p>
-<p>If you miss the ball, your opponent gets a point. Game ends at 5 points.</p>
+<p>There is a field of mines. The field is divided in areas, each area can contain a mine or not. If no mines, it will show a number indicating the number of mines adjacent to the area. You have to use this information to discover where the mines are hiding. Your objective is to discover all mines, and uncover all areas without a mine.</p>
+<p>Flag the areas where you think the mines are, with double click or right-click. You can flag and unflag the area as many times as you want; but when you uncover the area, it remains uncovered.</p>
+<p>In the initial version, the minefield is always 9x9 size, with 10 mines. No option yet to change size or number of mines.</p>
 <h2 id="main-screen">Main screen</h2>
 <p>This is the main screen of the game.</p>
-<p><img alt="screenshot" src="../../img/pong_screen.jpg" /></p>
+<p><img alt="screenshot" src="../../img/buscaminas_screen.jpg" /></p>
 <p>It is divided in two areas:</p>
 <ul>
 <li>
-<p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions</p>
+<p><em>top row</em>: has some indicators, and buttons. Left indicator is the number of mines left (i.e. each flag will you put decrease this number). The right indicator is the amount of seconds used.</p>
 </li>
 <li>
-<p><em>main field</em>: this is the field where you play</p>
+<p><em>playing ground</em>: this is the minefield. In the initial version, this is always 9x9 size, with 10 mines.</p>
 </li>
 </ul>
-<h2 id="buttons-in-toolbar">Buttons in toolbar</h2>
-<p>The buttons give you access to the following functions:</p>
+<h2 id="toolbar-buttons-and-indicators">Toolbar buttons and indicators</h2>
 <ul>
 <li>
-<p><strong>New game</strong>: to start a new game. It will reset the score, and start from the beginning, at the chosen speed.</p>
+<p>Left indicator: it is the number of mines left (i.e. each flag will you put decrease this number).</p>
 </li>
 <li>
-<p><strong>Pause</strong>: will pause the game. Clicking again will continue the game.</p>
+<p>Right indicator: it shows the amount of seconds since the game started.</p>
 </li>
 <li>
-<p><strong>Initial speed</strong>: the buttons allow to increase or decrease the initial speed of the ball. Choose to your liking.</p>
+<p>Center button: this is the button to start a new game. It also will indicate the end of the game, showing different smileys if the game is won or lost.</p>
 </li>
 <li>
-<p><strong>Skin</strong>: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles. Clicking the button will cycle through the different skins provided.</p>
+<p>Size selector: this button allows you to select different board sizes. For now, only 9x9 is implemented.</p>
 </li>
 <li>
-<p><strong>Exit</strong>: exit the app.</p>
+<p>Action button: this button defines what action is triggered by the click: either flag an area, or uncover it.</p>
 </li>
 </ul>
 <h2 id="other-resources">Other resources</h2>
-<p>I have used one additional file, <code>pong.drawio</code>, to structure the different elements of the screen. The file is in the main folder of the game.</p>
+<p>Under folder <code>resources</code> I have a file with a diagram to know the position of the areas, and to help design the screen distribution.</p>
+<p>I also have the original zip file of the font used, with the credits.</p>
 <h2 id="credits">Credits</h2>
-<p>The images I used for the skins of this game I found mainly in <a href="http://www.perfect-icons.com/index.htm">Perfect Icons</a> website. These images cannot be used for commercial purposes, otherwise they are free for personal use.</p>
+<p>I've used the images of this game from the original windows version. I've taken them from this website: https://minesweeper.us</p>
+<p>For the indicators (mines and time), I've used the font digital-7, from     Sizenko Alexander (http://www.styleseven.com)</p>
               
             </div>
           </div>
@@ -172,10 +173,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../ahorcado/" class="btn btn-neutral float-right" title="Ahorcado">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../../getting-started/" class="btn btn-neutral" title="Getting started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../2048/" class="btn btn-neutral" title="2048"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -203,10 +204,10 @@
           <a href="https://github.com/osso73/classic_games/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../2048/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../ahorcado/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
