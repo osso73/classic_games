@@ -16,18 +16,30 @@ from buscaminas import main
 class TestField():
     @pytest.fixture
     def field_with_mines_and_parent(self):
-        class Parent(main.BoxLayout):
-            class ids():
-                class start_button():
-                    def change_face(self, *args):
-                        pass
-        obj = main.Field()
-        obj.mines = 10
-        obj.columnas = 9
-        obj.distribute_mines()
-        parent = Parent()
-        parent.add_widget(obj)
-        return obj
+        def _method(level):
+            class Parent(main.BoxLayout):
+                class ids():
+                    class start_button():
+                        def change_face(self, *args):
+                            pass
+            obj = main.Field()
+            if level == 1:
+                obj.mines = 10
+                obj.columnas = 9
+                obj.filas = 9
+            elif level == 2:
+                obj.mines = 20
+                obj.columnas = 9
+                obj.filas = 18
+            elif level == 3:
+                obj.mines = 80
+                obj.columnas = 18
+                obj.filas = 36
+            obj.distribute_mines()
+            parent = Parent()
+            parent.add_widget(obj)
+            return obj
+        return _method
 
     def test_start_game(self):
         obj = main.Field()
@@ -44,14 +56,15 @@ class TestField():
         obj.tick()
         assert obj.time == 1
         
-    def test_distribute_mines(self, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+    @pytest.mark.parametrize("level", [1, 2, 3])
+    def test_distribute_mines(self, field_with_mines_and_parent, level):
+        obj = field_with_mines_and_parent(level)
         count = 0
         for child in obj.children:
             if child.value == 9:
                 count += 1
-        assert count == 10
-        assert len(obj.children) == 81
+        assert count == obj.mines
+        assert len(obj.children) == obj.columnas * obj.filas
 
  
     def test_find_adjacent_mines(self, field_with_mines_and_parent):
@@ -64,7 +77,7 @@ class TestField():
                 [9, 2, 0, 0, 0, 1, 9, 1, 0],
                 [1, 1, 0, 1, 1, 2, 1, 1, 0],
                 [0, 0, 0, 1, 9, 1, 0, 0, 0]]
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         for tile in obj.children:
             i, j = tile.posicion
             if data[j][i] == 9:
@@ -91,7 +104,7 @@ class TestField():
         ((6,6), {(5,5), (6,5), (7,5), (7,6), (7,7), (6,7), (5,7), (5,6)}),
         ])
     def test_find_neighbours(self, p_ref, n_ref, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         neighbour_list = obj.find_neighbours(p_ref)
         neighbour_list_pos =  {tuple(n.posicion) for n in neighbour_list}
         assert neighbour_list_pos == n_ref
@@ -102,7 +115,7 @@ class TestField():
         pass
     
     def test_all_discovered(self, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         assert obj.all_discovered() == False
         
         for area in obj.children:
@@ -126,19 +139,19 @@ class TestField():
                     def change_face(self, *args):
                         pass
 
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         parent = Parent()
         parent.add_widget(obj)
         return obj
 
     def test_game_lost(self, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         obj.game_active = True
         obj.game_lost()
         assert obj.game_active == False
         
     def test_game_won(self, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         obj.game_active = True
         obj.game_won()
         assert obj.game_active == False
@@ -158,7 +171,7 @@ class TestField():
                 [9, 2, 0, 0, 0, 1, 9, 1, 0],
                 [1, 1, 0, 1, 1, 2, 1, 1, 0],
                 [0, 0, 0, 1, 9, 1, 0, 0, 0]]
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         for t in obj.children:
             i, j = t.posicion
             t.value = data[j][i]
@@ -178,7 +191,7 @@ class TestField():
     
 
     def test_open_adjacent(self, field_with_mines_and_parent):
-        obj = field_with_mines_and_parent
+        obj = field_with_mines_and_parent(1)
         def get_tile_at_position(i, j, tiles):
             for t in tiles:
                 if t.posicion == [i, j]:

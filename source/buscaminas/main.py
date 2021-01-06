@@ -37,10 +37,19 @@ class Field(GridLayout):
     ----------
     columnas : NumericProperty
         Number of columns of the field
+    filas : NumericProperty
+        Number of rows of the field
     mines : NumericProperty
         Number of mines
+    time : NumericProperty
+        Number of seconds since the start of the game
+    game_active : boolean
+        Determines if the game is ongoing or not. When True, the clicks 
+        trigger actions; if False, nothing happens until the start button is
+        clicked again.
     '''
     columnas = NumericProperty(9)
+    filas = NumericProperty(9)
     mines = NumericProperty(0)
     time = NumericProperty(0)
     game_active = False
@@ -54,7 +63,23 @@ class Field(GridLayout):
         '''
         Start a new game: reset score and timer, rebuild the field.
         '''
-        self.mines = 10
+        level = int(self.parent.ids.size_button.option[-1])
+        if level == 1:
+            self.mines = 10
+            self.columnas = 9
+            self.filas = 9
+            self.size = (self.parent.width, self.parent.width)
+        elif level == 2:
+            self.mines = 20
+            self.columnas = 9
+            self.filas = 18
+            self.size = (self.parent.width, 2*self.parent.width)
+        elif level == 3:
+            self.mines = 80
+            self.columnas = 18
+            self.filas = 36
+            self.size = (self.parent.width, 2*self.parent.width)
+            
         self.clear_widgets()
         self.distribute_mines()
         self.find_adjacent_mines()
@@ -73,11 +98,11 @@ class Field(GridLayout):
         Create a field with mines distributed randomly. The number of mines 
         is defined by mines attribute.
         '''
-        areas = [9]*self.mines + [0]*(self.columnas**2 - self.mines)
+        areas = [9]*self.mines + [0]*(self.columnas*self.filas - self.mines)
         shuffle(areas)
         
         n=0
-        for i in range(self.columnas):
+        for i in range(self.filas):
             for j in range(self.columnas):
                 self.add_widget(Area(posicion=[j, i], value=areas[n]))
                 n += 1
@@ -310,6 +335,7 @@ class Area(Label):
         or uncover() methods.
         '''
         if self.collide_point(*touch.pos) and self.parent.game_active:
+        # if True:
             if self.uncovered:
                 self.parent.open_adjacent(self)
             elif hasattr(touch, 'button') and touch.button == 'right':
