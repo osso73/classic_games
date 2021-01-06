@@ -7,6 +7,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+### Added:
+- Added app icon and splash screen, as per iss. #31
+- Control when game is finished, as per iss #30
+- Timer counting seconds, as per iss #25
+- Add button to change size of board
+
+### Changed:
+- Change top-bar indicators and button, as per iss. #26
+- Changed final behaviour, as per iss. #27
+- Control of uncover/flag action through a button, instead of double-tapping, as per iss. #
+
+
+## 0.1 - 2021-01-03
+
 Initial version of the game. It has basic functionality to play a game, no options for different sizes, no sounds, etc. Interface to be improved.
 
 ### Added:

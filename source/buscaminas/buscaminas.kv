@@ -22,13 +22,24 @@
                 pos: self.pos
                 
         Indicator:
-            text: '{:04}'.format(field.mines)
+            text: '{:03}'.format(field.mines)
+
+        MenuButton:
+            id: size_button
+            options: ['lev1', 'lev2', 'lev3']
+            
 
         StartButton:
             id: start_button
+        
+        MenuButton:
+            id: flag_button
+            options: ['covered', 'bandera']
+            
+            
 
         Indicator:
-            text: '{:04}'.format(field.time)
+            text: '{:03}'.format(field.time)
     
     Field:
         id: field
@@ -48,8 +59,6 @@
     size_hint: None, None
     size: self.parent.width, self.parent.width
     cols: self.columnas
-    Label:
-        text: 'oriol'
 
 <Area>:
     canvas:
@@ -66,7 +75,7 @@
     font_size: 120
     size: self.texture_size
     texture_size: self.size
-    padding: 50, 20
+    padding: 5, 5
     font_name: 'fonts/digital-7 (mono)'
     canvas.before:
         Color:
@@ -80,7 +89,37 @@
         Color:
             rgba: 1, 1, 1, 1
         Ellipse:
-            size: min(self.height, self.width), min(self.height, self.width)
-            pos: self.parent.width / 2 - 0.5*min(self.height, self.width), self.y
-            # source: 'images/playing.png'
+            size: self.height, self.height
+            pos: self.x + self.width / 2 - 0.5*self.height, self.y
+            source: self.button_face
+
+<FlagButton>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.height, self.height
+            pos: self.x + self.width / 2 - 0.5*self.height, self.y
+            source: self.button_face
+
+<SizeButton>:
+    text: self.option
+    color: 0,0,0,1
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.height, self.height
+            pos: self.x + self.width / 2 - 0.5*self.height, self.y
+            source: self.button_face
+
+<MenuButton>:
+    options: ['empty']
+    option: self.options[0]
+    canvas:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            size: self.height, self.height
+            pos: self.x + self.width / 2 - 0.5*self.height, self.y
             source: self.button_face

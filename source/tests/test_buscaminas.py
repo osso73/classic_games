@@ -8,6 +8,7 @@ Created on Mon Dec 28 16:45:54 2020
 
 import os
 import pytest
+import time
 
 from buscaminas import main
 
@@ -34,6 +35,14 @@ class TestField():
         assert obj.mines == 10
         assert len(obj.children) == obj.columnas ** 2
         assert obj.game_active == True
+        
+    def test_tick(self):
+        obj = main.Field()
+        obj.game_active = True
+        obj._start_time = time.time()
+        time.sleep(1)
+        obj.tick()
+        assert obj.time == 1
         
     def test_distribute_mines(self, field_with_mines_and_parent):
         obj = field_with_mines_and_parent
@@ -241,6 +250,10 @@ class TestArea():
         assert obj.uncovered == True
         obj.uncover()
         assert obj.uncovered == True
+    
+    @pytest.mark.skip
+    def test_on_touch_down(self):
+        '''cannot be tested'''
 
 
 class TestStartButton():
@@ -265,7 +278,6 @@ class TestStartButton():
         obj = main.StartButton()
         obj.size = (500, 500)
         obj.pos = (100, 100)
-        assert 'standard' in obj.button_face
         class TouchPoint():
             pos = touch
         obj.on_touch_down(TouchPoint)
@@ -291,3 +303,72 @@ class TestStartButton():
         for opt in options:
             with pytest.raises(ValueError):
                 obj.change_face(opt)
+
+class TestMenuButton():
+    
+    @pytest.fixture
+    def menu_button_with_size(self):
+        obj = main.MenuButton()
+        obj.size = (500, 500)
+        obj.pos = (100, 100)
+        obj.options = [f'option_{n+1}' for n in range(5)]
+        obj.option = obj.options[0]
+        return obj
+        
+    @pytest.mark.parametrize("touch", [
+        ((200,200)), ((300,200)), ((200,300)), ((300,300)),
+        ])
+    def test_on_touch_down_true(self, menu_button_with_size, touch):
+        obj = menu_button_with_size
+        class TouchPoint():
+            pos = touch
+        result = obj.on_touch_down(TouchPoint)
+        assert result == True
+        assert 'hover' in obj.button_face
+        for op in obj.options:
+            assert op not in obj.button_face
+
+    @pytest.mark.parametrize("touch", [
+        ((800,200)), ((300,900)), ((900,1200)), ((50,300)),
+        ])
+    def test_on_touch_down_false(self, menu_button_with_size, touch):
+        obj = menu_button_with_size
+        class TouchPoint():
+            pos = touch
+        result = obj.on_touch_down(TouchPoint)
+        assert result == None
+        assert 'hover' not in obj.button_face
+
+
+    @pytest.mark.parametrize("touch", [
+        ((200,200)), ((300,200)), ((200,300)), ((300,300)),
+        ])
+    def test_on_touch_up_true(self, menu_button_with_size, touch):
+        obj = menu_button_with_size
+        class TouchPoint():
+            pos = touch
+        result = obj.on_touch_up(TouchPoint)
+        assert result == True
+
+    @pytest.mark.parametrize("touch", [
+        ((800,200)), ((300,900)), ((900,1200)), ((50,300)),
+        ])
+    def test_on_touch_up_false(self, menu_button_with_size, touch):
+        obj = menu_button_with_size
+        class TouchPoint():
+            pos = touch
+        result = obj.on_touch_up(TouchPoint)
+        assert result == None
+
+    
+    def test_change_option(self, menu_button_with_size):
+        obj = menu_button_with_size
+        for _ in range(2):
+            for opt in obj.options:
+                assert obj.option == opt
+                obj.change_option()
+            
+        
+
+class TestSizeButton():
+    pass

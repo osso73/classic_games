@@ -26,6 +26,7 @@ from kivy.properties import (
 )
 
 import os
+from time import time
 from random import shuffle
 
 
@@ -45,9 +46,14 @@ class Field(GridLayout):
     '''
     columnas = NumericProperty(9)
     mines = NumericProperty(0)
-    time = NumericProperty(123)
+    time = NumericProperty(0)
     game_active = False
     
+    def __init__(self, **kwargs):
+        super(Field, self).__init__(**kwargs)
+        self._start_time = 0
+        Clock.schedule_interval(self.tick, 0.1)
+        
     def start_game(self):
         '''
         Start a new game: reset score and timer, rebuild the field.
@@ -57,7 +63,15 @@ class Field(GridLayout):
         self.distribute_mines()
         self.find_adjacent_mines()
         self.game_active = True
+        self._start_time = time()
 
+    def tick(self, *args):
+        '''
+        Update timer. This function is called every 0.1s
+        '''
+        if self.game_active:
+            self.time = int(time() - self._start_time)
+                
     def distribute_mines(self):
         '''
         Create a field with mines distributed randomly. The number of mines 
@@ -272,24 +286,19 @@ class Area(Label):
         if not self.uncovered and not self.flag:
             self.uncovered = True
         
+                
     def on_touch_down(self, touch):
         '''
-        Evaluate if touch is double-tap or single, or right-click, and
-        trigger the right even: switch flag or switch uncovered.
+        Depending on the value of the flag button, trigger the switch_flag() 
+        or uncover() methods.
         '''
         if self.collide_point(*touch.pos) and self.parent.game_active:
-            if self._current_touch is not None:
-                self._current_touch.cancel()
-                self._current_touch = None
-            if touch.is_double_tap:
+            if hasattr(touch, 'button') and touch.button == 'right':
                 self.switch_flag()
-            elif hasattr(touch, 'button') and touch.button == 'right':
-                self._current_touch = Clock.schedule_once(
-                    self.switch_flag, DOUBLE_TAP)
-            else:
-                self._current_touch = Clock.schedule_once(
-                    self.uncover, DOUBLE_TAP)
-                
+            elif self.parent.parent.ids.flag_button.option == 'bandera':
+                self.switch_flag()
+            elif self.parent.parent.ids.flag_button.option == 'covered':
+                self.uncover()
 
 class StartButton(Label):
     '''
@@ -364,6 +373,76 @@ class StartButton(Label):
                                         'images', filename)
 
         
+class MenuButton(Label):
+    '''
+    To control behaviour of flag button in the menu.
+    
+    Attributes
+    ----------
+    button_face: StringProperty
+        Name of the image to be shown
+    option: StringProperty
+        Option selected. Can be any of the following: 'bandera', 'covered'
+    '''
+    button_face = StringProperty()
+    option = StringProperty()
+    options = ListProperty()
+        
+    def on_option(self, *args):
+        '''
+        When option changes, generate the name of the image to be shown.
+        '''
+        filename = f'{self.option}.jpg'
+        self.button_face = os.path.join(os.path.dirname(__file__), 
+                                        'images', filename)
+
+    def on_touch_down(self, touch):
+        '''
+        Change the face of button when it's pressed.
+
+        Parameters
+        ----------
+        touch : touch event
+            Has the coordinates of the touch.
+
+        Returns
+        -------
+        bool
+            True, in case the touch point was within the widget.
+
+        '''
+        if self.collide_point(*touch.pos):
+            self.button_face = os.path.join(os.path.dirname(__file__), 
+                                            'images', 'hover.jpg')
+            return True
+
+    def on_touch_up(self, touch):
+        '''
+        Trigger the change of option.
+
+        Parameters
+        ----------
+        touch : touch event
+            Has the coordinates of the touch.
+
+        Returns
+        -------
+        bool
+            True, in case the touch point was within the widget.
+
+        '''
+        if self.collide_point(*touch.pos):
+            self.change_option()
+            return True
+    
+    def change_option(self):
+        '''
+        Change the option selected, cycling through the options available: 
+        'bandera', 'covered'
+        '''
+        ind = self.options.index(self.option)
+        ind = (ind+ 1) % len(self.options)
+        self.option = self.options[ind]
 
 
 class Indicator(Label):
@@ -371,7 +450,6 @@ class Indicator(Label):
     For the indicators of mines and time.
     '''
     pass
-
 
 class MainScreen(BoxLayout):
     '''
