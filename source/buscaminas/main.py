@@ -11,18 +11,14 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
-from kivy.animation import Animation
 
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.popup import Popup
-from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.gridlayout import GridLayout
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
-    ObjectProperty, BooleanProperty
+    BooleanProperty
 )
 
 import os
@@ -131,8 +127,8 @@ class Field(GridLayout):
 
         Parameters
         ----------
-        value : int
-            Value of the last uncovered area.
+        area : Area
+            Area where the last action has taken place.
 
         '''
         if area.value == 9:
@@ -201,6 +197,27 @@ class Field(GridLayout):
         for neighbour in neighbours:
             neighbour.uncover()
     
+    def open_adjacent(self, area):
+        '''
+        If area has the same number of flagged neighbours as mines, uncover 
+        all the other adjacent areas.
+        
+        This method is triggered when clicking on an uncovered aera.
+
+        Parameters
+        ----------
+        area : Area
+            Area around which we need to open the uncovered areas.
+
+        '''
+        if 0 < area.value < 9:
+            neighbours = self.find_neighbours(area.posicion)
+            flagged = [n for n in neighbours if n.flag]
+            if len(flagged) == area.value:
+                not_flagged = [n for n in neighbours if not n.flag]
+                for tile in not_flagged:
+                    tile.uncover()
+
 
 
 class Area(Label):
@@ -293,7 +310,9 @@ class Area(Label):
         or uncover() methods.
         '''
         if self.collide_point(*touch.pos) and self.parent.game_active:
-            if hasattr(touch, 'button') and touch.button == 'right':
+            if self.uncovered:
+                self.parent.open_adjacent(self)
+            elif hasattr(touch, 'button') and touch.button == 'right':
                 self.switch_flag()
             elif self.parent.parent.ids.flag_button.option == 'bandera':
                 self.switch_flag()

@@ -177,6 +177,39 @@ class TestField():
                 assert area.uncovered == True
     
 
+    def test_open_adjacent(self, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent
+        def get_tile_at_position(i, j, tiles):
+            for t in tiles:
+                if t.posicion == [i, j]:
+                    return t
+        data = [[0, 0, 0, 1, 9, 1, 1, 1, 1],
+                [1, 1, 1, 1, 1, 1, 1, 9, 1],
+                [2, 9, 1, 0, 0, 0, 2, 2, 2],
+                [9, 3, 2, 1, 0, 0, 1, 9, 1],
+                [2, 3, 9, 1, 0, 0, 1, 1, 1],
+                [9, 3, 1, 1, 0, 1, 1, 1, 0],
+                [9, 2, 0, 0, 0, 1, 9, 1, 0],
+                [1, 1, 0, 1, 1, 2, 1, 1, 0],
+                [0, 0, 0, 1, 9, 1, 0, 0, 0]]
+        for t in obj.children:
+            i, j = t.posicion
+            t.value = data[j][i]
+            t.uncovered = False
+        
+        tile = get_tile_at_position(5, 7, obj.children)
+        for pos in [(6,6), (4,8)]:
+            t = get_tile_at_position(*pos, obj.children)
+            t.flag = True
+        
+        obj.open_adjacent(tile)
+        for pos in [(4,7), (4,6), (5,6), (5,8), (6,8), (6,7)]:
+            t = get_tile_at_position(*pos, obj.children)
+            assert t.uncovered == True
+
+        
+        
+
 class TestArea():
     @pytest.fixture
     def area_with_parent(self):
@@ -305,7 +338,6 @@ class TestStartButton():
                 obj.change_face(opt)
 
 class TestMenuButton():
-    
     @pytest.fixture
     def menu_button_with_size(self):
         obj = main.MenuButton()
@@ -368,7 +400,3 @@ class TestMenuButton():
                 assert obj.option == opt
                 obj.change_option()
             
-        
-
-class TestSizeButton():
-    pass
