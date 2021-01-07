@@ -46,3 +46,8 @@ I also have the original zip file of the font used, with the credits.
 I've used the images of this game from the original windows version. I've taken them from this website: https://minesweeper.us
 
 For the indicators (mines and time), I've used the font digital-7, from 	Sizenko Alexander (http://www.styleseven.com)
+
+
+9x9, 10 => 10/81 = 0.12345679
+9x18, 20
+18x36, 80

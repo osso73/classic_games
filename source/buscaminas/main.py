@@ -64,21 +64,23 @@ class Field(GridLayout):
         Start a new game: reset score and timer, rebuild the field.
         '''
         level = int(self.parent.ids.size_button.option[-1])
+        ventana_width = self.parent.width
+        ventana_height = 0.9 * self.parent.height / 2
         if level == 1:
             self.mines = 10
             self.columnas = 9
             self.filas = 9
-            self.size = (self.parent.width, self.parent.width)
+            self.size = (ventana_width, ventana_height)
         elif level == 2:
-            self.mines = 20
+            self.mines = 25
             self.columnas = 9
             self.filas = 18
-            self.size = (self.parent.width, 2*self.parent.width)
+            self.size = (ventana_width, 2*ventana_height)
         elif level == 3:
-            self.mines = 80
+            self.mines = 99
             self.columnas = 18
             self.filas = 36
-            self.size = (self.parent.width, 2*self.parent.width)
+            self.size = (ventana_width, 2*ventana_height)
             
         self.clear_widgets()
         self.distribute_mines()

@@ -106,9 +106,28 @@ class TestField():
     def test_find_neighbours(self, p_ref, n_ref, field_with_mines_and_parent):
         obj = field_with_mines_and_parent(1)
         neighbour_list = obj.find_neighbours(p_ref)
-        neighbour_list_pos =  {tuple(n.posicion) for n in neighbour_list}
+        neighbour_list_pos = {tuple(n.posicion) for n in neighbour_list}
         assert neighbour_list_pos == n_ref
-        
+
+
+    @pytest.mark.parametrize('p_ref, n_ref', [
+        ((0,0), {(0,1), (1,0), (1,1)}),
+        ((0,8), {(0,7), (1,7), (1,8)}),
+        ((8,0), {(7,0), (7,1), (8,1)}),
+        ((8,8), {(7,8), (7,7), (8,7)}),
+        ((0,4), {(0,3), (1,3), (1,4), (1,5), (0,5)}),
+        ((4,0), {(3,0), (3,1), (4,1), (5,1), (5,0)}),
+        ((8,3), {(8,2), (7,2), (7,3), (7,4), (8,4)}),
+        ((3,8), {(2,8), (2,7), (3,7), (4,7), (4,8)}),
+        ((2,2), {(1,1), (2,1), (3,1), (3,2), (3,3), (2,3), (1,3), (1,2)}),
+        ((6,6), {(5,5), (6,5), (7,5), (7,6), (7,7), (6,7), (5,7), (5,6)}),
+        ])
+    def test_find_neighbours(self, p_ref, n_ref, field_with_mines_and_parent):
+        obj = field_with_mines_and_parent(1)
+        neighbour_list = obj.find_neighbours(p_ref)
+        neighbour_list_pos = {tuple(n.posicion) for n in neighbour_list}
+        assert neighbour_list_pos == n_ref
+   
     @pytest.mark.skip
     def test_check_uncover(self):
         '''cannot be checked'''

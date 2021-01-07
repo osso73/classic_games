@@ -7,14 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased
 
+
+## 1.0 - 2021-01-07
+
 Polish of interface and app behaviour, and adding some enhancements.
 
 
 ### Added:
 - Added app icon and splash screen, as per iss. #31
-- Control when game is finished, as per iss #30
-- Timer counting seconds, as per iss #25
-- Add button to change size of board
+- Control when game is finished, as per iss. #30
+- Timer counting seconds, as per iss. #25
+- Enable different sizes of the board (3 levels of difficutly), as per iss. #24
 - Uncover areas when clicking a number, as per iss. #29
 
 ### Changed:
