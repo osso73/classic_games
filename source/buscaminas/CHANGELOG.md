@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
-## Unreleased
+## 1.1 - 2021-01-10
+
+### Added:
+- Sounds at the end of game, if winning or losing (iss. #34).
+
+### Changed:
+- Increased the number of mines from 99 to 125 in expert mode (level 3), as per iss. #32.
 
 
 ## 1.0 - 2021-01-07
