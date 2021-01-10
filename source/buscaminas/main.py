@@ -28,6 +28,12 @@ from random import shuffle
 
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
 DOUBLE_TAP = 0.3  # seconds to wait to evaluat if double-tap is clicked
+LEVELS = {
+    1: {'mines': 10, 'columnas': 9, 'filas': 9, 'window': (1,1)},
+    2: {'mines': 25, 'columnas': 9, 'filas': 18, 'window': (1,2)},
+    3: {'mines': 125, 'columnas': 18, 'filas': 36, 'window': (1,2)},    
+    }
+
 
 class Field(GridLayout):
     '''
@@ -47,6 +53,8 @@ class Field(GridLayout):
         Determines if the game is ongoing or not. When True, the clicks 
         trigger actions; if False, nothing happens until the start button is
         clicked again.
+    sounds : dictionary
+        Dictionary with all the sounds of the game.
     '''
     columnas = NumericProperty(9)
     filas = NumericProperty(9)
@@ -58,7 +66,45 @@ class Field(GridLayout):
         super(Field, self).__init__(**kwargs)
         self._start_time = 0
         Clock.schedule_interval(self.tick, 0.1)
+        self.sounds = self.load_sounds()
         
+    def load_sounds(self):
+        '''
+        Load all sounds of the game, and put them into the dictionary.
+
+        Returns
+        -------
+        sound : dict
+            The dictionary of sounds that have been loaded
+
+        '''
+        sound = dict()
+        folder = os.path.join(os.path.dirname(__file__),'sounds')
+        for s in ['lose', 'win']:
+            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
+        
+        return sound
+
+    def play(self, sound):
+        '''
+        Play a sound from the dictionary of sounds.
+
+        Parameters
+        ----------
+        sound : string
+            Key of the dictionary corresponding to the sound to be played.
+
+        Raises
+        ------
+        Exception
+            If string passed is not in the dictionary.
+
+        '''
+        if sound in self.sounds:
+            self.sounds[sound].play()
+        else:
+            raise Exception("Bad sound")
+
     def start_game(self):
         '''
         Start a new game: reset score and timer, rebuild the field.
@@ -66,21 +112,11 @@ class Field(GridLayout):
         level = int(self.parent.ids.size_button.option[-1])
         ventana_width = self.parent.width
         ventana_height = 0.9 * self.parent.height / 2
-        if level == 1:
-            self.mines = 10
-            self.columnas = 9
-            self.filas = 9
-            self.size = (ventana_width, ventana_height)
-        elif level == 2:
-            self.mines = 25
-            self.columnas = 9
-            self.filas = 18
-            self.size = (ventana_width, 2*ventana_height)
-        elif level == 3:
-            self.mines = 99
-            self.columnas = 18
-            self.filas = 36
-            self.size = (ventana_width, 2*ventana_height)
+        self.mines = LEVELS[level]['mines']
+        self.columnas = LEVELS[level]['columnas']
+        self.filas = LEVELS[level]['filas']
+        self.size = (ventana_width * LEVELS[level]['window'][0], 
+                     ventana_height * LEVELS[level]['window'][1])
             
         self.clear_widgets()
         self.distribute_mines()
@@ -198,6 +234,7 @@ class Field(GridLayout):
         '''
         self.game_active = False
         self.parent.ids.start_button.change_face('lost')
+        self.play('lose')
         for area in self.children:
             if area.flag and area.value != 9:
                 area.set_show(name='wrong')
@@ -210,6 +247,7 @@ class Field(GridLayout):
         '''
         self.game_active = False
         self.parent.ids.start_button.change_face('won')
+        self.play('win')
     
     def no_adjacent_mines(self, area):
         '''
