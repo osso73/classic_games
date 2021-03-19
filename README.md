@@ -11,8 +11,8 @@ The list of games to be developed is inspired in project [GameStore](https://git
 - [x] 15 puzzle
 - [x] 2048
 - [x] buscaminas
+- [x] snake
 - [ ] asteroids
-- [ ] snake
 - [ ] pacman(?)
 
 The ones ticked are already developed standalone. This is work in progress.
@@ -28,6 +28,8 @@ python main.py
 ```
 
 If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `buildozer.spec` file that I use to compile it for android. You can adjust the parameters from there to your liking.
+
+You can find information about how to play these games in this page: https://osso73.github.io/classic_games/.
 
 
 ## Contribution

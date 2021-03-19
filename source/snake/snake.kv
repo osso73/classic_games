@@ -1,0 +1,30 @@
+#:set SIZE 50
+
+<MainScreen>:
+    canvas.before:
+        Color:
+            rgba: 250/255, 248/255, 239/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<SnakePart>:
+    size: SIZE, SIZE
+    canvas.before:
+        Color:
+            rgba: 0, 1, 0, 1
+        Rectangle:
+            source: self.image
+            pos: self.pos
+            size: self.size
+
+<Food>:
+    size: SIZE, SIZE
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            source: self.image
+            pos: self.pos
+            size: self.size
