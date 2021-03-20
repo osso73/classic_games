@@ -27,7 +27,7 @@ import random
 from functools import partial
 
 
-SIZE = 50
+SIZE = 100
 SPEED = 0.2
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
@@ -41,8 +41,6 @@ class MainScreen(Widget):
     def __init__(self, *args, **kwargs):
         super(MainScreen, self).__init__(*args, **kwargs)
         self.snake = []
-        self.food = Food(*Window.size)
-        self.add_widget(self.food)
         Clock.schedule_once(self.start_game)
         Clock.schedule_interval(self.update, SPEED)
         
@@ -105,7 +103,7 @@ class MainScreen(Widget):
         self.active = False
         
         # remove snake
-        parts = [p for p in self.children if isinstance(p, SnakePart)]
+        parts = [p for p in self.children if isinstance(p, (SnakePart, Food))]
         for p in parts:
             self.remove_widget(p)
         
@@ -125,6 +123,8 @@ class MainScreen(Widget):
         self.snake.append(head)
         
         # create food
+        self.food = Food(*Window.size)
+        self.add_widget(self.food)
         self.food.spawn(self.snake)
         
         # reset parameters
@@ -207,13 +207,13 @@ class MainScreen(Widget):
 
 class Food(Widget):
     image = StringProperty()
+    size = SIZE, SIZE
     
     def __init__(self, w, h, *args, **kwargs):
         super(Food, self).__init__(*args, **kwargs)
         self.w = int(w / SIZE) - 1
         self.h = int(h / SIZE) - 1
         self.images = os.listdir(os.path.join(IMAGES, 'food'))
-        print(self.images)
         
     
     def spawn(self, snake):
@@ -232,6 +232,7 @@ class Food(Widget):
 
 class SnakePart(Widget):
     image = StringProperty()
+    size = SIZE, SIZE
 
 
 class SnakeApp(App):    
