@@ -15,6 +15,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -24,9 +26,10 @@ from kivy.properties import (
 import os
 import random
 from functools import partial
+from time import sleep
 
 
-SIZE = 50
+SIZE = 100
 SPEED = 0.3
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
@@ -37,14 +40,19 @@ class MainScreen(BoxLayout):
 
 
 class GameBoard(FloatLayout):
+    
     '''
     This is the board of the game, where all logic occurs.
     '''
+    
+    score = NumericProperty(0)
+    
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.snake_parts = []
         self.active = False
         Clock.schedule_interval(self.update, SPEED)
+        self.sounds = self.load_sounds()
         # Clock.schedule_once(self.start_game)
 
     def start_game(self, *args):
@@ -52,6 +60,7 @@ class GameBoard(FloatLayout):
         self.snake_parts = []
         self.move_x = 0
         self.move_y = 0
+        self.score = 0
 
         # remove previous snake & food
         instances = (SnakeHead, SnakePart, Food)
@@ -76,6 +85,7 @@ class GameBoard(FloatLayout):
         self.add_widget(self.food)
         
         # activate game
+        self.play('start')
         self.active = True
         self.change_direction('RIGHT')
 
@@ -108,6 +118,8 @@ class GameBoard(FloatLayout):
         
         # check if food is found
         if head.pos == self.food.pos:        
+            self.score += 1
+            self.play('eat')
             new_part = SnakePart()
             new_part.pos = old_positions[-1]
             self.snake_parts.append(new_part)
@@ -131,12 +143,14 @@ class GameBoard(FloatLayout):
         
         return False
         
-        
-        
+                
     def game_over(self):
         self.active = False
-                
-        
+        self.play('end_game')
+        p = Popup(title='End', size_hint=(0.75, 0.3),
+          content=PopupMsg(text='Sorry, snake crashed!'))
+        p.open()
+
     
     def change_direction(self, direct, *args):
         # if position not multiple of SIZE, re-schedule the function
@@ -203,6 +217,50 @@ class GameBoard(FloatLayout):
             self.change_direction(direction)
             
             return direction
+    
+    def load_sounds(self):
+        '''
+        Load all sounds of the game, and put them into the dictionary.
+        
+        Returns
+        -------
+        sound : dict
+            The dictionary of sounds that have been loaded
+        '''
+        sound = dict()        
+        folder = os.path.join(os.path.dirname(__file__),'audio')
+        for s in ['bye', 'eat', 'start', 'end_game']:
+            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
+            
+        return sound
+    
+    def play(self, sound):
+        '''
+        Play a sound from the dictionary of sounds.
+        
+        Parameters
+        ----------
+        sound : string
+            Key of the dictionary corresponding to the sound to be played.
+        
+        Raises
+        ------
+        Exception
+            If string passed is not in the dictionary.
+        '''
+        if sound in self.sounds:
+            self.sounds[sound].play()
+        else:
+            raise Exception("Bad sound")
+
+    def bye(self):
+        '''
+        Play a sound before closing the app, and wait a delay so the sound 
+        can be heard (Trump saying 'thank you very much')
+        '''
+        self.play('bye')
+        sleep(1.5)
+
        
 
 class Food(Widget):
@@ -275,6 +333,17 @@ class SnakeHead(Widget):
     
     def change_image(self):
         self.image = self.head_images[self.direction][self.mouth_open]
+
+
+class MenuButton(Button):
+    pass
+
+
+class MenuLabel(Label):
+    pass
+
+class PopupMsg(Label):
+    pass
 
 
 class SnakeApp(App):    

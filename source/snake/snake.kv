@@ -13,39 +13,26 @@
                 size: self.size
                 pos: self.pos
                 
-        Button:
+        MenuButton:
             text: 'Start'
-            font_size: 120
-            size: self.texture_size
-            texture_size: self.size
-            padding: 50, 50
             on_press: game.start_game()
             
-        Button:
+        MenuButton:
             text: 'Size'
-            font_size: 120
-            size: self.texture_size
-            texture_size: self.size
-            padding: 50, 50
             # on_press: root.dar_pista()
             
-        Button:
+        MenuButton:
             text: 'Speed'
-            font_size: 120
-            size: self.texture_size
-            texture_size: self.size
-            padding: 50, 50
             # on_press: root.dar_pista()
             
+        MenuLabel:
+            text: 'Score: ' + str(game.score)
+
         Label:
-        Button:
+        MenuButton:
             text: 'Exit'
-            font_size: 120
-            size: self.texture_size
-            texture_size: self.size
-            padding: 50, 50
             on_release: 
-            #     root.thanks()
+                game.bye()
                 app.stop()
     
     GameBoard:
@@ -57,6 +44,8 @@
                 pos: self.pos
                 size: self.size
 
+
+########################### Snake parts #####################################
 
 <SnakePart>:
     canvas.before:
@@ -75,6 +64,7 @@
             pos: self.pos
             size: self.size
 
+############################## Food ########################################
 <Food>:
     canvas.before:
         Color:
@@ -83,3 +73,25 @@
             source: self.image
             pos: self.pos
             size: self.size
+
+
+############################## Popup ########################################
+<PopupMsg>
+    padding: 20, 20
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+
+############################## Menu ########################################
+
+<MenuButton>:
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+    padding: 20, 20
+
+<MenuLabel>:
+    font_size: 120
+    texture_size: self.size
+    size: self.texture_size
+    padding: 20, 20

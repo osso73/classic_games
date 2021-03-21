@@ -10,14 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Increased size of snake and food, as per iss. #36
 
-
 ### Added
 - Spash screen, as per iss. #41
 - Snake opens mouth before eating (iss. #47)
-
+- Sounds for start, eat, game over and close app (iss. #39)
+- Score tracking (iss #35)
+- Added end of game message and sound (iss. #42)
 
 ### Fixed
 - Food to check window limits at the start of a game, so it spawns correctly inside the window (iss. #43)
+- Check collision with top and right have been fixed
 
 
 ## 0.1 - 2021-03-19
