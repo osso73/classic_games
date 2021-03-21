@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Spash screen, as per iss. #41
+- Snake opens mouth before eating (iss. #47)
 
 
 ### Fixed

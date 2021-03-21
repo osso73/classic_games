@@ -9,3 +9,5 @@ This is the list of games currently available:
 - memory
 - 15 puzzle
 - 2048
+- buscaminas
+- snake

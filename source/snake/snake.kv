@@ -1,16 +1,75 @@
 <MainScreen>:
-    canvas.before:
-        Color:
-            rgba: 250/255, 248/255, 239/255, 1
-        Rectangle:
-            pos: self.pos
-            size: self.size
+    orientation: 'vertical'
+
+    BoxLayout:
+        size_hint_y: None
+        height: root.height / 10 * 0.5
+        padding: 5
+        spacing: 20
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+                
+        Button:
+            text: 'Start'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_press: game.start_game()
+            
+        Button:
+            text: 'Size'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            # on_press: root.dar_pista()
+            
+        Button:
+            text: 'Speed'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            # on_press: root.dar_pista()
+            
+        Label:
+        Button:
+            text: 'Exit'
+            font_size: 120
+            size: self.texture_size
+            texture_size: self.size
+            padding: 50, 50
+            on_release: 
+            #     root.thanks()
+                app.stop()
+    
+    GameBoard:
+        id: game
+        canvas.before:
+            Color:
+                rgba: 250/255, 248/255, 239/255, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
 
 <SnakePart>:
     canvas.before:
         Color:
             rgba: 140/255, 198/255, 62/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<SnakeHead>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
         Rectangle:
             source: self.image
             pos: self.pos

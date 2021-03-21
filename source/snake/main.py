@@ -12,8 +12,9 @@ from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
 
 from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.gridlayout import GridLayout
+from kivy.uix.floatlayout import FloatLayout
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -21,51 +22,86 @@ from kivy.properties import (
 )
 
 import os
-from time import time
-from random import shuffle
 import random
 from functools import partial
 
 
-SIZE = 100
-SPEED = 0.2
+SIZE = 50
+SPEED = 0.3
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
 
 
+class MainScreen(BoxLayout):
+    pass
 
-class MainScreen(Widget):
+
+class GameBoard(FloatLayout):
     '''
-    This class organizes the main screen.
+    This is the board of the game, where all logic occurs.
     '''
     def __init__(self, *args, **kwargs):
-        super(MainScreen, self).__init__(*args, **kwargs)
-        self.snake = []
-        Clock.schedule_once(self.start_game)
+        super(GameBoard, self).__init__(*args, **kwargs)
+        self.snake_parts = []
+        self.active = False
         Clock.schedule_interval(self.update, SPEED)
-        
+        # Clock.schedule_once(self.start_game)
 
+    def start_game(self, *args):
+        # reset parameters
+        self.snake_parts = []
+        self.move_x = 0
+        self.move_y = 0
+
+        # remove previous snake & food
+        instances = (SnakeHead, SnakePart, Food)
+        parts = [p for p in self.children if isinstance(p, instances)]
+        for p in parts:
+            self.remove_widget(p)
+
+        w, h = self.size
+        print('window size:', w, h)
+        w_int = int(w / SIZE)
+        h_int = int(h / SIZE)
+        
+        # create snake
+        p = [int(w_int/2)*SIZE, int(h_int/2)*SIZE]
+        head = SnakeHead(pos=p)
+        self.add_widget(head)
+        self.snake_parts.append(head)
+
+        # create food
+        self.food = Food(w, h)
+        self.food.spawn(self.snake_parts)
+        self.add_widget(self.food)
+        
+        # activate game
+        self.active = True
+        self.change_direction('RIGHT')
+
+    
     def update(self, *args):
         if not self.active:
             return
         
         # save position of parts
         old_positions = []
-        for part in self.snake:
+        for part in self.snake_parts:
             old_positions.append(list(part.pos))
         
         
         # move head
-        head = self.snake[0]
+        head = self.snake_parts[0]
         head.x += self.move_x
         head.y += self.move_y
+        head.open_mouth(self.food)
        
         # check collision
         if self.collision():
             self.game_over()
 
         # move body
-        for i, part in enumerate(self.snake):
+        for i, part in enumerate(self.snake_parts):
             if i == 0:
                 continue
             part.pos = old_positions[i-1]
@@ -74,23 +110,22 @@ class MainScreen(Widget):
         if head.pos == self.food.pos:        
             new_part = SnakePart()
             new_part.pos = old_positions[-1]
-            self.snake.append(new_part)
+            self.snake_parts.append(new_part)
             self.add_widget(new_part)
-            self.food.spawn(self.snake)
-        
+            self.food.spawn(self.snake_parts)
+            head.mouth_open = False
             
         
     def collision(self):
         # collision with body
-        head = self.snake[0]
-        for part in self.snake[1:]:
-            # if head.collide_widget(part):
+        head = self.snake_parts[0]
+        for part in self.snake_parts[1:]:
             if head.pos == part.pos:
                 return True
-        
+
         # collision with borders
-        if (head.top > self.height or head.y < 0 or 
-            head.x < 0 or head.right > self.width):
+        if (head.y + SIZE > self.height or head.y < 0 or 
+            head.x < 0 or head.x + SIZE > self.width):
             
             return True
         
@@ -99,63 +134,29 @@ class MainScreen(Widget):
         
         
     def game_over(self):
-        self.snake = []
         self.active = False
-        
-        # remove snake
-        parts = [p for p in self.children if isinstance(p, (SnakePart, Food))]
-        for p in parts:
-            self.remove_widget(p)
-        
-        self.start_game()
-        
-    
-    def start_game(self, *args):
-        w, h = self.size
-        w = int(w / SIZE)
-        h = int(h / SIZE)
-        
-        # create snake
-        p = [int(w/2)*SIZE, int(h/2)*SIZE]
-        head = SnakePart(pos=p)
-        head.image = 'images/head_right.png'
-        self.add_widget(head)
-        self.snake.append(head)
-        
-        # create food
-        self.food = Food(*Window.size)
-        self.add_widget(self.food)
-        self.food.spawn(self.snake)
-        
-        # reset parameters
-        self.move_x = SIZE
-        self.move_y = 0
-        self.active = True
-        
+                
         
     
     def change_direction(self, direct, *args):
         # if position not multiple of SIZE, re-schedule the function
-        head = self.snake[0]
-        if head.x % SIZE != 0 or head.y % SIZE != 0:
-            Clock.schedule_once(partial(self.change_direction, direct))
-        else:
-            if direct is 'LEFT' and self.move_x == 0:
-                self.move_x = -SIZE
-                self.move_y = 0
-                head.image = 'images/head_left.png'
-            elif direct is 'RIGHT' and self.move_x == 0:
-                self.move_x = SIZE
-                self.move_y = 0
-                head.image = 'images/head_right.png'
-            elif direct is 'UP' and self.move_y == 0:
-                self.move_x = 0
-                self.move_y = SIZE
-                head.image = 'images/head_up.png'
-            elif direct is 'DOWN' and self.move_y == 0:
-                self.move_x = 0
-                self.move_y = -SIZE
-                head.image = 'images/head_down.png'
+        head = self.snake_parts[0]
+        if direct is 'LEFT' and self.move_x == 0:
+            self.move_x = -SIZE
+            self.move_y = 0
+            head.direction = direct
+        elif direct is 'RIGHT' and self.move_x == 0:
+            self.move_x = SIZE
+            self.move_y = 0
+            head.direction = direct
+        elif direct is 'UP' and self.move_y == 0:
+            self.move_x = 0
+            self.move_y = SIZE
+            head.direction = direct
+        elif direct is 'DOWN' and self.move_y == 0:
+            self.move_x = 0
+            self.move_y = -SIZE
+            head.direction = direct
 
     def on_touch_down(self, touch):
         '''
@@ -202,8 +203,7 @@ class MainScreen(Widget):
             self.change_direction(direction)
             
             return direction
-
-        
+       
 
 class Food(Widget):
     image = StringProperty()
@@ -226,13 +226,55 @@ class Food(Widget):
         self.image = os.path.join(IMAGES, 'food', random.choice(self.images))
     
     def _get_pos(self):
-        return [random.randint(0, self.w)*SIZE,
-                random.randint(0, self.h)*SIZE]
+        return [random.randint(0, self.w) * SIZE,
+                random.randint(0, self.h) * SIZE]
  
 
 class SnakePart(Widget):
-    image = StringProperty()
     size = SIZE, SIZE
+
+
+class SnakeHead(Widget):
+    image = StringProperty()
+    direction = StringProperty()
+    mouth_open = BooleanProperty(False)
+    size = SIZE, SIZE
+    
+    def __init__(self, *args, **kwargs):
+        super(SnakeHead, self).__init__(*args, **kwargs)
+        self.head_images = dict()
+        self.head_images['LEFT'] = dict()
+        self.head_images['LEFT'][True] = os.path.join(IMAGES, 'head', 'open_left.png')
+        self.head_images['LEFT'][False] = os.path.join(IMAGES, 'head', 'head_left.png')
+        
+        self.head_images['RIGHT'] = dict()
+        self.head_images['RIGHT'][True] = os.path.join(IMAGES, 'head', 'open_right.png')
+        self.head_images['RIGHT'][False] = os.path.join(IMAGES, 'head', 'head_right.png')
+        
+        self.head_images['UP'] = dict()
+        self.head_images['UP'][True] = os.path.join(IMAGES, 'head', 'open_up.png')
+        self.head_images['UP'][False] = os.path.join(IMAGES, 'head', 'head_up.png')
+        
+        self.head_images['DOWN'] = dict()
+        self.head_images['DOWN'][True] = os.path.join(IMAGES, 'head', 'open_down.png')
+        self.head_images['DOWN'][False] = os.path.join(IMAGES, 'head', 'head_down.png')
+
+    
+    def on_direction(self, *args):
+        self.change_image()
+        
+    def on_mouth_open(self, *args):
+        self.change_image()
+        
+    def open_mouth(self, food):
+        radius = SIZE
+        if abs(food.x - self.x) <= radius and abs(food.y - self.y) <= radius:
+            self.mouth_open = True
+        else:
+            self.mouth_open = False
+    
+    def change_image(self):
+        self.image = self.head_images[self.direction][self.mouth_open]
 
 
 class SnakeApp(App):    
