@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
-## Unreleased
+## v1.0 - 2021-03-21
 
 ### Changed
 - Increased size of snake and food, as per iss. #36
@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Sounds for start, eat, game over and close app (iss. #39)
 - Score tracking (iss #35)
 - Added end of game message and sound (iss. #42)
+- Menu at the top, with options for start game, end application (iss. #37)
 
 ### Fixed
 - Food to check window limits at the start of a game, so it spawns correctly inside the window (iss. #43)
