@@ -12,40 +12,81 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-                
+
         MenuButton:
             text: 'Start'
             on_press: game.start_game()
-            
+
         MenuButton:
             text: 'Size'
             # on_press: root.dar_pista()
-            
+
         MenuButton:
             text: 'Speed'
             # on_press: root.dar_pista()
-            
+
         MenuLabel:
             text: 'Score: ' + str(game.score)
 
         Label:
-        MenuButton:
-            text: 'Exit'
-            on_release: 
+
+        MenuButtonSmall:
+            canvas:
+                Rectangle:
+                    source: 'icons/help.png'
+                    size: self.size
+                    pos: self.pos
+            on_release: root.help()
+
+
+        MenuButtonSmall:
+            canvas:
+                Rectangle:
+                    source: 'icons/power.png'
+                    size: self.size
+                    pos: self.pos
+            on_release:
                 game.bye()
                 app.stop()
-    
-    GameBoard:
-        id: game
-        canvas.before:
+
+    GridLayout:
+        cols: 3
+        on_size: game.set_size()
+        canvas:
             Color:
-                rgba: 250/255, 248/255, 239/255, 1
+                rgba: 0, 1, 1, 0.2
             Rectangle:
-                pos: self.pos
                 size: self.size
+                pos: self.pos
+        
+        Label:
+        Label:
+        Label:
+
+        Label:
+        GameBoard:
+            id: game
+            size_hint: None, None
+            canvas.before:
+                Color:
+                    rgba: 250/255, 248/255, 239/255, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Label:
+        
+        Label:
+        Label:
+        Label:
 
 
 ########################### Snake parts #####################################
+
+<GridElement>:
+    size_pixels: app.root.ids.game.size_pixels
+    grid: app.root.ids.game.size_grid
+    size: self.size_pixels, self.size_pixels
+
 
 <SnakePart>:
     canvas.before:
@@ -57,6 +98,8 @@
 
 <SnakeHead>:
     canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
         Rectangle:
             source: self.image
             pos: self.pos
@@ -65,6 +108,8 @@
 ############################## Food ########################################
 <Food>:
     canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
         Rectangle:
             source: self.image
             pos: self.pos
@@ -85,6 +130,11 @@
     texture_size: self.size
     size: self.texture_size
     padding: 20, 20
+
+<MenuButtonSmall>:
+    size_hint_x: None
+    width: self.parent.height * 0.8
+    padding: 10, 10
 
 <MenuLabel>:
     font_size: 120
