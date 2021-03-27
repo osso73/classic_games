@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="osso73">
-  <link rel="canonical" href="https://osso73.github.io/classic_games/games/15puzzle/">
+  <link rel="canonical" href="https://osso73.github.io/classic_games/games/snake/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>15 puzzle - classic_games</title>
+  <title>Snake - classic_games</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -18,9 +18,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "15 puzzle";
-    var mkdocs_page_input_path = "games/15puzzle.md";
-    var mkdocs_page_url = "/classic_games/games/15puzzle/";
+    var mkdocs_page_name = "Snake";
+    var mkdocs_page_input_path = "games/snake.md";
+    var mkdocs_page_url = "/classic_games/games/snake/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -63,7 +63,13 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../memory/">Memory</a>
                     </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">15 puzzle</a>
+                    <li class="toctree-l1"><a class="reference internal" href="../15puzzle/">15 puzzle</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../2048/">2048</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../buscaminas/">Buscaminas (Minesweeper)</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Snake</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#rules-of-the-game">Rules of the game</a>
     </li>
@@ -71,19 +77,9 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#buttons-in-toolbar">Buttons in toolbar</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#solvable-puzzles">Solvable puzzles</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#other-resources">Other resources</a>
-    </li>
     <li class="toctree-l2"><a class="reference internal" href="#credits">Credits</a>
     </li>
     </ul>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../2048/">2048</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../buscaminas/">Buscaminas (Minesweeper)</a>
-                    </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../snake/">Snake</a>
                     </li>
                 </ul>
                 <ul>
@@ -115,10 +111,10 @@
         
       
     
-    <li>15 puzzle</li>
+    <li>Snake</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/15puzzle.md"
+        <a href="https://github.com/osso73/classic_games/blob/main/docs/games/snake.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -129,66 +125,45 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="15-puzzle">15 puzzle</h1>
+                <h1 id="snake">Snake</h1>
 <h2 id="rules-of-the-game">Rules of the game</h2>
-<p>This is the classic game where you have 15 tiles in a 4x4 grid, and you need to put them in the right order by using the empty tile to move the others. The image below shows an example of such a puzzle (almost solved):</p>
-<p><img alt="example 15puzzle" src="../../img/15puzzle_example.png" /></p>
-<p>The game offers different levels of difficulty (3x3, 4x4 or 5x5 game), and different themes besides the classical numbers: each theme is a square image, that has been cut into pieces (see below <a href="#other-resources">Other resources</a> for info how to create a new theme).</p>
-<p>You move the tiles by touching a tile adjacent to the empty space. This tile will move then to the empty space.</p>
+<p>Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.</p>
+<p>In here, the player controls a snake that goes on the screen. There is a piece of food in a random location of the screen. When the snake eats the food, it grows the length by one unit, and a new piece of food appears. The player has to avoid that the snake hits the extreme of the screen, or the body of the snake: this will kill the snake.</p>
+<p>Turning the snake can be done by swiping on the screen. The snake can turn 90 degrees in any direction.</p>
+<p>The screen can be either portrait or landscape. If the screen changes, you should start a new game to take the dimensions into account.</p>
 <h2 id="main-screen">Main screen</h2>
 <p>This is the main screen of the game.</p>
-<p><img alt="screenshot" src="../../img/15puzzle_screen.jpg" /></p>
-<p>It is divided in several areas:</p>
+<p><img alt="screenshot" src="../../img/snake_screen.jpg" /></p>
+<p>It is divided in two areas:</p>
 <ul>
 <li>
-<p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions, and give the score.</p>
+<p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions. Here you can see as well the current score of the game.</p>
 </li>
 <li>
-<p><em>main square</em>: this is where you have the tiles that you need to move, to complete the picture. They are randomly sorted at the beginning.</p>
-</li>
-<li>
-<p><em>bottom</em>: here is where you choose the theme and level. You can see an example of the current theme image complete below. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). The buttons allow you to change the level and the theme. Several themes are provided, the buttom will cycle through them.</p>
+<p><em>playing ground</em>: this is where the snake will run.</p>
 </li>
 </ul>
 <h2 id="buttons-in-toolbar">Buttons in toolbar</h2>
 <p>The buttons give you access to the following functions:</p>
 <ul>
 <li>
-<p><strong>Nuevo</strong>: to start a new game. It will reset the score of movimientos, and start a new board with tiles randomly ordered, using the current theme and level.</p>
+<p><strong>Start</strong>: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.</p>
 </li>
 <li>
-<p><strong>Movimientos</strong>: this is just a level (e.g. no button), it shows the current number of moves you made. This is the score, the higher the worse. The goal is to achieve a complete image with the minimum number of moves.</p>
+<p><strong>Size</strong>: (not yet implemented). To change the size of the head and food. They can be larger or smaller. At each click it will switch to the next size. You can cycle through a number of pre-defined sizes.</p>
 </li>
 <li>
-<p><strong>X</strong>: exit the app.</p>
-</li>
-</ul>
-<p>On the bottom toolbar, you find 2 buttons:</p>
-<ul>
-<li>
-<p><strong>Nivel n</strong>: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.</p>
+<p><strong>Speed</strong>: (not yet implemented). To change the speed of the snake. At each click it will switch to the next speed. You can cycle through a number of pre-defined speeds.</p>
 </li>
 <li>
-<p><strong>Theme</strong>: this is to change the theme. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.</p>
-</li>
-</ul>
-<h2 id="solvable-puzzles">Solvable puzzles</h2>
-<p>Note that not all puzzles of this kind (e.g. a puzzle of n x n squares with an empty space, randomly sorted) can be solved. I quickly realized that when I was doing the first tests. Fortunately, there is a way to find if a particular puzzle is solved, as explained in this page: <a href="https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/">How to check if an instance of 15 puzzle is solvable?</a>.</p>
-<p>So I implemented a function based on this methodology to find if the puzzle that was randomly sorted was solvable; if not, I shuffle again and test again. This way I can ensure that all puzzles are solvable.</p>
-<h2 id="other-resources">Other resources</h2>
-<p>Under folder <code>resources</code> you can find additional files that I used to design and build the app. This folder is excluded from <code>buildozer</code> config.</p>
-<ul>
-<li>
-<p><em>esquemas.drawio</em>: diagrams to help identify how to identify tiles adjacent to the empty space.</p>
+<p><strong>Help</strong>: open a webpage with the instructions on how to play the game (this manual you are reading).</p>
 </li>
 <li>
-<p><em>creacion_temas</em>: this folder contains a couple of scripts I created to create new themes from a square image:</p>
+<p><strong>Exit</strong>: exit the app.</p>
 </li>
-<li>cut_image.py: will take a single image (to be provided in the command line) and will cut it into pieces of 3x3, 4x4, and 5x5, each of the sets under a folder named 3, 4, and 5 respectively.</li>
-<li>cut_images.py: this will do the same process for all the images found in the directory. It will first create a folder with the same name as the image, move the image there, and cut it into different sets as described.</li>
 </ul>
 <h2 id="credits">Credits</h2>
-<p>The images I used for this game are taken from <a href="https://www.goodfon.com/">GoodFon.com</a>, they have no copyright limitations.</p>
+<p>I found the snake head in <a href="https://www.iconfinder.com/icons/3015218/dangerous_animal_reptile_serpent_head_snake_face_viper_icon">here</a>. And the images for food are from <a href="http://www.perfect-icons.com/index.htm">Perfect Icons</a> website. These images cannot be used for commercial purposes, otherwise they are free for personal use.</p>
 <p>The sounds I found on <a href="https://freesound.org/">Free Sound</a>, and some of them I had found over Internet. I'm not aware of any copyright or limitation to use these.</p>
               
             </div>
@@ -197,10 +172,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../2048/" class="btn btn-neutral float-right" title="2048">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../memory/" class="btn btn-neutral" title="Memory"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../buscaminas/" class="btn btn-neutral" title="Buscaminas (Minesweeper)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -228,10 +203,10 @@
           <a href="https://github.com/osso73/classic_games/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
       
-        <span><a href="../memory/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../buscaminas/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../2048/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
