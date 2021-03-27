@@ -3,7 +3,7 @@
 
     BoxLayout:
         size_hint_y: None
-        height: root.height / 10 * 0.5
+        height: '40sp'
         padding: 5
         spacing: 20
         canvas:
@@ -19,11 +19,9 @@
 
         MenuButton:
             text: 'Size'
-            # on_press: root.dar_pista()
 
         MenuButton:
             text: 'Speed'
-            # on_press: root.dar_pista()
 
         MenuLabel:
             text: 'Score: ' + str(game.score)
@@ -117,19 +115,23 @@
 
 
 ############################## Popup ########################################
+<PopupWin>
+    size_hint: None, None
+    size: '250sp', '100sp'
+
 <PopupMsg>
     padding: 20, 20
-    font_size: 120
-    texture_size: self.size
+    font_size: '20sp'
+    size_hint_x: None
     size: self.texture_size
 
 ############################## Menu ########################################
 
 <MenuButton>:
-    font_size: 120
-    texture_size: self.size
+    font_size: '20sp'
+    size_hint_x: None
     size: self.texture_size
-    padding: 20, 20
+    padding: 5, 5
 
 <MenuButtonSmall>:
     size_hint_x: None
@@ -137,7 +139,7 @@
     padding: 10, 10
 
 <MenuLabel>:
-    font_size: 120
-    texture_size: self.size
+    font_size: '20sp'
+    size_hint_x: None
     size: self.texture_size
-    padding: 20, 20
+    padding: 5, 5

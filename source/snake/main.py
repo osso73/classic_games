@@ -154,12 +154,13 @@ class GameBoard(Widget):
     def game_over(self):
         self.active = False
         self.play('end_game')
-        p = Popup(title='End', size_hint=(0.75, 0.3),
-          content=PopupMsg(text='Sorry, snake crashed!'))
+        p = PopupWin(title='End', content=PopupMsg(text='Sorry, snake crashed!'))
         p.open()
 
 
     def change_direction(self, direct, *args):
+        if not self.active:
+            return
         head = self.snake_parts[0]
         if direct is 'LEFT' and self.move_x == 0:
             self.move_x = -1
@@ -375,6 +376,9 @@ class MenuLabel(Label):
     pass
 
 class PopupMsg(Label):
+    pass
+
+class PopupWin(Popup):
     pass
 
 
