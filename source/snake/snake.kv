@@ -18,15 +18,12 @@
             on_press: game.start_game()
 
         MenuButton:
-            text: 'Size'
+            text: 'Size: ' + str(game.size_snake)
             on_press: game.button_size()
 
         MenuButton:
-            text: 'Speed'
+            text: 'Speed: ' + str(game.speed_factor)
             on_press: game.button_speed()
-
-        MenuLabel:
-            text: 'Score: ' + str(game.score)
 
         Label:
 
@@ -58,9 +55,13 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        
+
         Label:
         Label:
+            text: 'Score: ' + str(game.score)
+            font_size: '36sp'
+
+
         Label:
 
         Label:
@@ -74,7 +75,7 @@
                     pos: self.pos
                     size: self.size
         Label:
-        
+
         Label:
         Label:
         Label:

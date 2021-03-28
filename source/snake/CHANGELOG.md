@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
+## v1.1 - 2021-03-28
+
+### Changed
+- Changed graphic of head
+- Menu buttons updated, and now using scale-independent pixels (#49)
+- Improved the way the screen size is defined, and centered within the available space (#45)
+- Score label moved
+- Snake starts with 3 parts, instead of only head
+- Increased base speed of the snake
+- App icon changed
+
+### Added
+- Implemented speed button, as per iss. #37
+- Implemented size button, as per iss. #50
+- Added help button
+- Snake opens mouth when close to the food (#47)
+
+### Fixed
+- Several internal fixes, improving the detection of collisions and end of screen
+
+
 ## v1.0 - 2021-03-21
 
 ### Changed

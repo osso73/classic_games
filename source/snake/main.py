@@ -31,16 +31,16 @@ from functools import partial
 from time import sleep
 
 
-SPEED = 0.5
-GRID_SIZES = [5, 10, 15, 20, 25, 30]
-SPEED_FACTORS = [0.5, 0.8, 1, 1.2, 1.5, 2]
+SPEED = 0.3
+GRID_SIZES = [5, 10, 15, 20, 25]
+SPEED_FACTORS = [0.5, 0.8, 1, 1.5, 2, 3]
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
 
 
 class MainScreen(BoxLayout):
     def help(self):
-        webbrowser.open('https://osso73.github.io/classic_games/games/snake/')    
+        webbrowser.open('https://osso73.github.io/classic_games/games/snake/')
 
 
 class GameBoard(Widget):
@@ -51,16 +51,17 @@ class GameBoard(Widget):
     score = NumericProperty(0)
     size_pixels = NumericProperty(0)
     size_grid = ListProperty()
-    size_snake = NumericProperty(GRID_SIZES[0])
+    size_snake = NumericProperty(10)
     speed_factor = NumericProperty(1)
 
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.snake_parts = []
+        # self.wall = []
         self.active = False
         self.sounds = self.load_sounds()
         self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
-    
+
     def button_size(self):
         sizes = GRID_SIZES
         idx = sizes.index(self.size_snake)
@@ -70,30 +71,26 @@ class GameBoard(Widget):
         p = PopupWin(title='Size change', content=PopupMsg(text=msg))
 
         p.open()
-        
+
 
     def button_speed(self):
         speeds = SPEED_FACTORS
         idx = speeds.index(self.speed_factor)
         idx = (idx + 1) % len(speeds)
         self.speed_factor = speeds[idx]
-        msg = f'Speed factor set to {self.speed_factor}'
-        p = PopupWin(title='Size change', content=PopupMsg(text=msg))
-
-        p.open()
         self.event.cancel()
         self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
-        
+
 
     def set_size(self, *args):
-        factor = 0.95
+        factor = 0.90
         side = factor * min(*self.parent.size)
         self.size_pixels = int(side / self.size_snake)
         w = int(factor*self.parent.width / self.size_pixels)
         h = int(factor*self.parent.height / self.size_pixels)
         self.size = (w*self.size_pixels, h*self.size_pixels)
         self.size_grid = w-1, h-1
-        
+
 
     def start_game(self, *args):
         # reset parameters
@@ -109,12 +106,21 @@ class GameBoard(Widget):
         for p in parts:
             self.remove_widget(p)
 
+        # build wall
+        # self.build_wall()
+
         # create snake
         head = SnakeHead()
         self.add_widget(head)
         n_ini, m_ini = self.size_grid
         head.pos_nm = n_ini / 2, m_ini / 2
-        self.snake_parts.append(head)          
+        self.snake_parts.append(head)
+        for _ in range(2):
+            new_part = SnakePart()
+            self.add_widget(new_part)
+            new_part.pos_nm = head.pos_nm
+            self.snake_parts.append(new_part)
+            
 
         # create food
         self.food = Food()
@@ -157,7 +163,7 @@ class GameBoard(Widget):
         #     head.m = self.size_grid[1]
         # if head.m > self.size_grid[1]:
         #     head.m = 0
-            
+
         # check collision
         if self.collision():
             self.game_over()
@@ -182,7 +188,7 @@ class GameBoard(Widget):
                 return True
 
         # collision with borders
-        if (head.n < 0 or head.n > self.size_grid[0] or 
+        if (head.n < 0 or head.n > self.size_grid[0] or
             head.m < 0 or head.m > self.size_grid[1]):
 
             return True
@@ -307,35 +313,35 @@ class GameBoard(Widget):
         '''
         self.play('bye')
         sleep(1.5)
-    
+
 
 class GridElement(Widget):
     n = NumericProperty()
     m = NumericProperty()
     pos_nm = ListProperty()
     grid = ListProperty()
-    
+
     def __init__(self, *args, **kwargs):
         super(GridElement, self).__init__(*args, **kwargs)
-    
-    
+
+
     def set_position(self):
         self.x = self.parent.x + self.n * self.width
         self.y = self.parent.y + self.m * self.height
-    
+
     def on_n(self, *args):
         self.n = int(self.n)
         self.pos_nm = [self.n, self.m]
-    
+
     def on_m(self, *args):
         self.m = int(self.m)
         self.pos_nm = [self.n, self.m]
-    
+
     def on_pos_nm(self, *args):
         self.n, self.m = self.pos_nm
         self.set_position()
-        
-    
+
+
 
 
 class Food(GridElement):
@@ -426,8 +432,8 @@ class PopupWin(Popup):
         a call to give enough time to calculate size of the content.
         '''
         Clock.schedule_once(self.change_size)
-        
-    def change_size(self, *args):        
+
+    def change_size(self, *args):
         '''Set the size of the window based on the text of the content'''
         x, y = self.content.size
         self.size = x + metrics.sp(30), y + metrics.sp(100)

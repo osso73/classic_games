@@ -33,9 +33,9 @@ The buttons give you access to the following functions:
 
   - **Start**: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.
 
-  - **Size**: to change the size of the head and food. They can be larger or smaller. At each click it will switch to the next size. You can cycle through a number of pre-defined sizes: 5, 10, 15, 20, 25, 30. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.
+  - **Size**: to change the size of the head and food. They can be larger or smaller. At each click it will switch to the next size. You can cycle through a number of pre-defined sizes: 5, 10, 15, 20, 25. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.
 
-  - **Speed**: to change the speed of the snake. At each click it will switch to the next speed factor, varying from: 0.5, 0.8, 1, 1.2, 1.5, 2. The game starts with a factor of 1 by default. The factor will be dividing the interval between updates of the game. Therefore, the higher the factor the smaller is the interval between updates, producing a higher speed.
+  - **Speed**: to change the speed of the snake. At each click it will switch to the next speed factor, varying from: 0.5, 0.8, 1, 1.5, 2, 3. The game starts with a factor of 1 by default. The factor will be dividing the interval between updates of the game. Therefore, the higher the factor the smaller is the interval between updates, producing a higher speed.
 
   - ![Help button](../img/snake_btn_help.png "Help button"): open a webpage with the instructions on how to play the game (this manual you are reading).
 
