@@ -4,8 +4,8 @@
     BoxLayout:
         size_hint_y: None
         height: '40sp'
-        padding: 5
-        spacing: 20
+        padding: sp(5)
+        spacing: sp(5)
         canvas:
             Color:
                 rgba: 1, 0, 0, 0.2
@@ -19,9 +19,11 @@
 
         MenuButton:
             text: 'Size'
+            on_press: game.button_size()
 
         MenuButton:
             text: 'Speed'
+            on_press: game.button_speed()
 
         MenuLabel:
             text: 'Score: ' + str(game.score)
@@ -117,10 +119,9 @@
 ############################## Popup ########################################
 <PopupWin>
     size_hint: None, None
-    size: '250sp', '100sp'
 
 <PopupMsg>
-    padding: 20, 20
+    padding: sp(20), sp(20)
     font_size: '20sp'
     size_hint_x: None
     size: self.texture_size
@@ -131,15 +132,15 @@
     font_size: '20sp'
     size_hint_x: None
     size: self.texture_size
-    padding: 5, 5
+    padding: sp(5), sp(5)
 
 <MenuButtonSmall>:
     size_hint_x: None
     width: self.parent.height * 0.8
-    padding: 10, 10
+    padding: sp(10), sp(10)
 
 <MenuLabel>:
     font_size: '20sp'
     size_hint_x: None
     size: self.texture_size
-    padding: 5, 5
+    padding: sp(5), sp(5)
