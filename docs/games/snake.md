@@ -19,15 +19,14 @@ This is the main screen of the game.
 
 It is divided in two areas:
 
-- _top row_: it shows a toolbar with some buttons that will allow you different functions. Here you can see as well the current score of the game, which is the number of fruits you have eaten (e.g. equivalent to the length of the snake).
+- _top row_: it shows a toolbar with some buttons that will allow you different functions.
 
-- _playing ground_: this is where the snake will run.
+- _playing ground_: this is where the snake will run. Here you can see as well the current score of the game, which is the number of fruits you have eaten.
 
 
 
 
 ## Buttons in toolbar
-
 
 The buttons give you access to the following functions:
 
