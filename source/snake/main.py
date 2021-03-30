@@ -36,16 +36,52 @@ GRID_SIZES = [5, 10, 15, 20, 25]
 SPEED_FACTORS = [0.5, 0.8, 1, 1.5, 2, 3]
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
+HELP_URL = 'https://osso73.github.io/classic_games/games/snake/'
 
 
 class MainScreen(BoxLayout):
     def help(self):
-        webbrowser.open('https://osso73.github.io/classic_games/games/snake/')
+        webbrowser.open(HELP_URL)
 
 
 class GameBoard(Widget):
     '''
-    This is the board of the game, where all logic occurs.
+    This is the board of the game, where all logic occurs. It creates
+    as a grid, with n x m squares, where the snake and the food will
+    be located. It controls the movement of the snake, checking if there
+    is any collision, and when food is eaten, spawning a new food. Keeps
+    track of the score.
+    
+    Attributes
+    ----------
+    score : NumericProperty
+        Score of the game (+1 for every food)
+    size_pixels : NumericProperty
+        Each square of the grid has size_pixels x size_pixels pixels.
+    size_grid : ListProperty
+        This is a 2-values list with the number of squares of the grid, in
+        the form of [n, m]. So in fact the number of squares are n+1 x m+1.
+    size_snake : NumericProperty
+        This defines the number of squares that exist in the shortest window
+        side. So the higher the number, the smaller will be the squares, and
+        therefore the snake and food. It cycles through a number of
+        pre-defined values: GRID_SIZES
+    speed_factor : NumericProperty
+        This defines the speed of the snake. This factor divides the
+        interval between updates, so the higher the value the higher the
+        speed of the snake.
+    move_x : int
+        Defines the move of the snake: value that the position x is 
+        incremented/decremented at each step. The unit is the square of the 
+        grid, not the pixels. Can be 1, -1 or 0.
+    move_y : int
+        Defines the move of the snake: value that the position y is 
+        incremented/decremented at each step. The unit is the square of the 
+        grid, not the pixels. Can be 1, -1 or 0.
+    active : boolean
+        If True, the update function will move the snake; if False, it will
+        do nothing. This is set to False when the game finishes, and set
+        to active when a new game starts.
     '''
 
     score = NumericProperty(0)
@@ -62,7 +98,20 @@ class GameBoard(Widget):
         self.sounds = self.load_sounds()
         self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
 
+
     def button_size(self):
+        '''
+        Cycle self.size_snake through a set of pre-defined sizes (GRID_SIZES).
+        Show an informative message of the new speed, and to restart
+        the game to take into account.
+        
+        This is called when button "size" is pressed.
+
+        Returns
+        -------
+        None.
+
+        '''
         sizes = GRID_SIZES
         idx = sizes.index(self.size_snake)
         idx = (idx + 1) % len(sizes)
@@ -74,6 +123,17 @@ class GameBoard(Widget):
 
 
     def button_speed(self):
+        '''
+        Cycle self.speed_factor through a set of pre-defined sizes 
+        (SPEED_FACTORS).
+        
+        This is called when button "speed" is pressed.
+
+        Returns
+        -------
+        None.
+
+        '''
         speeds = SPEED_FACTORS
         idx = speeds.index(self.speed_factor)
         idx = (idx + 1) % len(speeds)
@@ -82,7 +142,17 @@ class GameBoard(Widget):
         self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
 
 
-    def set_size(self, *args):
+    def set_size(self):
+        '''
+        Define the size of the GameBoard widget. Based on the size of the
+        grid, self.size_snake, it calculates the number of pixels of each 
+        square of the grid, and stores it in self.size_pixels.
+
+        Returns
+        -------
+        None.
+
+        '''
         factor = 0.90
         side = factor * min(*self.parent.size)
         self.size_pixels = int(side / self.size_snake)
@@ -92,7 +162,17 @@ class GameBoard(Widget):
         self.size_grid = w-1, h-1
 
 
-    def start_game(self, *args):
+    def start_game(self):
+        '''
+        Start a new game. Reset the values (score, move, etc.), remove the
+        previous snake and food, and recreate a new snake and food. Finally
+        set the game to active, which will start moving the snake.
+
+        Returns
+        -------
+        None.
+
+        '''
         # reset parameters
         self.snake_parts = []
         self.move_x = 0
@@ -134,6 +214,21 @@ class GameBoard(Widget):
 
 
     def update(self, *args):
+        '''
+        Make the move of the snake. This callback is called periodically to
+        update the position of the snake, and check if there is a collision
+        or it has eaten food.
+
+        Parameters
+        ----------
+        *args : ?
+            Arguments passed by the Clock.schedule function. Not used.
+
+        Returns
+        -------
+        None.
+
+        '''
         if not self.active:
             return
 
