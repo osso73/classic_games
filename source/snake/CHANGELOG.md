@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
+## Unreleased
+
+### Changed
+- End of screen will pop to the other end
+- Screen sizes adapted, to accomodate the wall
+
+
+### Added
+- Walls around the edges of the screen
+
+
 ## v1.1 - 2021-03-28
 
 ### Changed

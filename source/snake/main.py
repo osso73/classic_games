@@ -32,7 +32,7 @@ from time import sleep
 
 
 SPEED = 0.3
-GRID_SIZES = [5, 10, 15, 20, 25]
+GRID_SIZES = [9, 15, 21, 27]
 SPEED_FACTORS = [0.5, 0.8, 1, 1.5, 2, 3]
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
@@ -66,6 +66,11 @@ class GameBoard(Widget):
         side. So the higher the number, the smaller will be the squares, and
         therefore the snake and food. It cycles through a number of
         pre-defined values: GRID_SIZES
+    wall : list
+        Contains all the widgets that form the wall, of type Wall
+    snake_parts : list
+        Contains all the widgets that form the snake: one SnakeHead, the
+        rest SnakePart
     speed_factor : NumericProperty
         This defines the speed of the snake. This factor divides the
         interval between updates, so the higher the value the higher the
@@ -87,13 +92,13 @@ class GameBoard(Widget):
     score = NumericProperty(0)
     size_pixels = NumericProperty(0)
     size_grid = ListProperty()
-    size_snake = NumericProperty(10)
+    size_snake = NumericProperty(9)
     speed_factor = NumericProperty(1)
 
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.snake_parts = []
-        # self.wall = []
+        self.wall = []
         self.active = False
         self.sounds = self.load_sounds()
         self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
@@ -175,19 +180,20 @@ class GameBoard(Widget):
         '''
         # reset parameters
         self.snake_parts = []
+        self.wall = []
         self.move_x = 0
         self.move_y = 0
         self.score = 0
         self.set_size()
 
         # remove previous snake & food
-        instances = (SnakeHead, SnakePart, Food)
+        instances = (SnakeHead, SnakePart, Food, Wall)
         parts = [p for p in self.children if isinstance(p, instances)]
         for p in parts:
             self.remove_widget(p)
 
         # build wall
-        # self.build_wall()
+        self.build_wall()
 
         # create snake
         head = SnakeHead()
@@ -205,14 +211,53 @@ class GameBoard(Widget):
         # create food
         self.food = Food()
         self.add_widget(self.food)
-        self.food.spawn(self.snake_parts)
+        self.food.spawn(self.snake_parts + self.wall)
 
         # activate game
         self.play('start')
         self.active = True
         self.change_direction('RIGHT')
-
-
+    
+    
+    def build_wall(self):
+        # around the screen
+        n_max, m_max = self.size_grid
+        n_list = [n for n in range(n_max+1)]
+        m_list = [m for m in range(m_max+1)]
+        
+        if n_max < m_max:
+            idx = int((n_max + 1) / 3)
+            n_list = n_list[:idx] + n_list[-idx:]
+            idx = int((m_max + 1) / 6)
+            m_list = m_list[:idx] + m_list[2*idx:-2*idx] + m_list[-idx:]
+        else:
+            idx = int((m_max + 1) / 3)
+            m_list = m_list[:idx] + m_list[-idx:]
+            idx = int((n_max + 1) / 6)
+            n_list = n_list[:idx] + n_list[2*idx:-2*idx] + n_list[-idx:]
+            
+        for i in n_list:
+            brick = Wall()
+            self.add_widget(brick)
+            brick.pos_nm = i, 0
+            self.wall.append(brick)
+            brick = Wall()
+            self.add_widget(brick)
+            brick.pos_nm = i, m_max
+            self.wall.append(brick)
+        
+        for j in m_list:
+            brick = Wall()
+            self.add_widget(brick)
+            brick.pos_nm = 0, j
+            self.wall.append(brick)
+            brick = Wall()
+            self.add_widget(brick)
+            brick.pos_nm = n_max, j
+            self.wall.append(brick)
+            
+            
+        
     def update(self, *args):
         '''
         Make the move of the snake. This callback is called periodically to
@@ -249,15 +294,15 @@ class GameBoard(Widget):
                 continue
             part.pos_nm = old_positions[i-1]
 
-        # # borders
-        # if head.n < 0:
-        #     head.n = self.size_grid[0]
-        # if head.n > self.size_grid[0]:
-        #     head.n = 0
-        # if head.m < 0:
-        #     head.m = self.size_grid[1]
-        # if head.m > self.size_grid[1]:
-        #     head.m = 0
+        # borders
+        if head.n < 0:
+            head.n = self.size_grid[0]
+        if head.n > self.size_grid[0]:
+            head.n = 0
+        if head.m < 0:
+            head.m = self.size_grid[1]
+        if head.m > self.size_grid[1]:
+            head.m = 0
 
         # check collision
         if self.collision():
@@ -271,22 +316,23 @@ class GameBoard(Widget):
             self.add_widget(new_part)
             new_part.pos_nm = old_positions[-1]
             self.snake_parts.append(new_part)
-            self.food.spawn(self.snake_parts)
+            self.food.spawn(self.snake_parts + self.wall)
             head.mouth_open = False
 
 
     def collision(self):
         # collision with body
         head = self.snake_parts[0]
-        for part in self.snake_parts[1:]:
-            if head.pos_nm == part.pos_nm:
+        for element in self.snake_parts[1:]:
+            if head.pos_nm == element.pos_nm:
+                self.remove_widget(head)
+                self.add_widget(head)
                 return True
-
-        # collision with borders
-        if (head.n < 0 or head.n > self.size_grid[0] or
-            head.m < 0 or head.m > self.size_grid[1]):
-
-            return True
+        
+        # collision with wall
+        for element in self.wall:
+            if head.pos_nm == element.pos_nm:
+                return True
 
         return False
 
@@ -460,6 +506,10 @@ class Food(GridElement):
     def _get_pos(self):
         return [random.choice(range(self.grid[0]+1)),
                 random.choice(range(self.grid[1]+1))]
+
+
+class Wall(GridElement):
+    pass
 
 
 class SnakePart(GridElement):
