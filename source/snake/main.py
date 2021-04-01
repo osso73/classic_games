@@ -100,13 +100,13 @@ class GameBoard(Widget):
     size_pixels = NumericProperty(0)
     size_grid = ListProperty()
     size_snake = NumericProperty(9)
+    snake_parts = ListProperty([])
     speed_factor = NumericProperty(1)
     mute = BooleanProperty(False)
     pause = BooleanProperty(False)
 
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
-        self.snake_parts = []
         self.wall = []
         self.active = False
         self.sounds = self.load_sounds()
@@ -134,6 +134,8 @@ class GameBoard(Widget):
         p = PopupWin(title='Size change', content=PopupMsg(text=msg))
 
         p.open()
+        self.set_size()
+
 
 
     def button_speed(self):
@@ -174,6 +176,8 @@ class GameBoard(Widget):
         h = int(factor*self.parent.height / self.size_pixels)
         self.size = (w*self.size_pixels, h*self.size_pixels)
         self.size_grid = w-1, h-1
+        self.active = False
+
 
 
     def start_game(self):
@@ -327,6 +331,46 @@ class GameBoard(Widget):
             self.snake_parts.append(new_part)
             self.food.spawn(self.snake_parts + self.wall)
             head.mouth_open = False
+        
+        # change direction of tail based on previous part
+        n_prev, m_prev = self.snake_parts[-2].pos_nm
+        n_last, m_last = self.snake_parts[-1].pos_nm
+        if n_last != n_prev:
+            if n_last == n_prev-1 or n_last > n_prev+1:
+                direction = 'RIGHT'
+            else:
+                direction = 'LEFT'
+        else:
+            if m_last == m_prev-1 or m_last > m_prev+1:
+                direction = 'UP'
+            else:
+                direction = 'DOWN'
+        self.snake_parts[-1].direction = direction
+        print(direction)
+ 
+            
+    
+    def on_snake_parts(self, *args):
+        '''
+        When the snake_parts changes (i.e. a new part is added), it flags the
+        last part as a tail, and all others as non-tail.
+
+        Returns
+        -------
+        None.
+
+        '''
+        # if only head, return
+        if len(self.snake_parts) < 2:
+            return
+        
+        # remove tail flag from all parts
+        for p in self.snake_parts[1:]:
+            p.is_tail = False
+        
+
+        # change flag
+        self.snake_parts[-1].is_tail = True
 
 
     def collision(self):
@@ -527,7 +571,31 @@ class Wall(GridElement):
 
 
 class SnakePart(GridElement):
-    pass
+    image = StringProperty('')
+    is_tail = BooleanProperty()
+    direction = StringProperty('RIGHT')
+    
+    def __init__(self, *args, **kwargs):
+        super(SnakePart, self).__init__(*args, **kwargs)
+        self.tail_image = dict()
+        self.tail_image['LEFT'] = os.path.join(IMAGES, 'snake', 'tail_left.png')
+        self.tail_image['RIGHT'] = os.path.join(IMAGES, 'snake', 'tail_right.png')
+        self.tail_image['UP'] = os.path.join(IMAGES, 'snake', 'tail_up.png')
+        self.tail_image['DOWN'] = os.path.join(IMAGES, 'snake', 'tail_down.png')
+    
+    
+    def on_is_tail(self, *args):
+        if self.is_tail:
+            self.image = self.tail_image[self.direction]
+        else:
+            self.image = ''
+        
+    def on_direction(self, *args):
+        if self.is_tail:
+            self.image = self.tail_image[self.direction]
+        else:
+            self.image = ''
+
 
 
 class SnakeHead(GridElement):
@@ -540,20 +608,20 @@ class SnakeHead(GridElement):
         super(SnakeHead, self).__init__(*args, **kwargs)
         self.head_images = dict()
         self.head_images['LEFT'] = dict()
-        self.head_images['LEFT'][True] = os.path.join(IMAGES, 'head', 'open_left.png')
-        self.head_images['LEFT'][False] = os.path.join(IMAGES, 'head', 'head_left.png')
+        self.head_images['LEFT'][True] = os.path.join(IMAGES, 'snake', 'open_left.png')
+        self.head_images['LEFT'][False] = os.path.join(IMAGES, 'snake', 'head_left.png')
 
         self.head_images['RIGHT'] = dict()
-        self.head_images['RIGHT'][True] = os.path.join(IMAGES, 'head', 'open_right.png')
-        self.head_images['RIGHT'][False] = os.path.join(IMAGES, 'head', 'head_right.png')
+        self.head_images['RIGHT'][True] = os.path.join(IMAGES, 'snake', 'open_right.png')
+        self.head_images['RIGHT'][False] = os.path.join(IMAGES, 'snake', 'head_right.png')
 
         self.head_images['UP'] = dict()
-        self.head_images['UP'][True] = os.path.join(IMAGES, 'head', 'open_up.png')
-        self.head_images['UP'][False] = os.path.join(IMAGES, 'head', 'head_up.png')
+        self.head_images['UP'][True] = os.path.join(IMAGES, 'snake', 'open_up.png')
+        self.head_images['UP'][False] = os.path.join(IMAGES, 'snake', 'head_up.png')
 
         self.head_images['DOWN'] = dict()
-        self.head_images['DOWN'][True] = os.path.join(IMAGES, 'head', 'open_down.png')
-        self.head_images['DOWN'][False] = os.path.join(IMAGES, 'head', 'head_down.png')
+        self.head_images['DOWN'][True] = os.path.join(IMAGES, 'snake', 'open_down.png')
+        self.head_images['DOWN'][False] = os.path.join(IMAGES, 'snake', 'head_down.png')
 
 
     def on_direction(self, *args):

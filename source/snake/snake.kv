@@ -95,8 +95,9 @@
 <SnakePart>:
     canvas.before:
         Color:
-            rgba: 140/255, 198/255, 62/255, 1
+            rgba: (1,1,1,1) if self.image else (140/255, 198/255, 62/255, 1)
         Rectangle:
+            source: self.image
             pos: self.pos
             size: self.size
 

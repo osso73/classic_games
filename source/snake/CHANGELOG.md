@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
+## Unreleased
+
+### Added
+- Tail: last part of the snake is a tail, instead of a regular part (iss. #56)
+
+### fixed
+- When change of size, the grid is not well aligned. Now the change of size button will stop the game, and change screen size. (iss. #52).
+
+
 ## v1.2 - 2021-04-01
 
 ### Changed
