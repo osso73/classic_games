@@ -1,3 +1,6 @@
+#:set COLOUR_IMAGE [1, 1, 1, 1]
+#:set COLOUR_SNAKE [140/255, 198/255, 62/255, 1]
+
 <MainScreen>:
     orientation: 'vertical'
 
@@ -95,16 +98,17 @@
 <SnakePart>:
     canvas.before:
         Color:
-            rgba: (1,1,1,1) if self.image else (140/255, 198/255, 62/255, 1)
+            rgba: COLOUR_IMAGE if self.image else COLOUR_SNAKE
         Rectangle:
             source: self.image
             pos: self.pos
             size: self.size
 
 <SnakeHead>:
+    colour: COLOUR_IMAGE
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: self.colour
         Rectangle:
             source: self.image
             pos: self.pos
@@ -114,7 +118,7 @@
 <Food>:
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: COLOUR_IMAGE
         Rectangle:
             source: self.image
             pos: self.pos
@@ -125,7 +129,7 @@
 <Wall>:
     canvas.before:
         Color:
-            rgba: 1, 1, 1, 1
+            rgba: COLOUR_IMAGE
         Rectangle:
             source: 'images/wall.jpg'
             pos: self.pos

@@ -10,8 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Tail: last part of the snake is a tail, instead of a regular part (iss. #56)
 
-### fixed
+### Fixed
 - When change of size, the grid is not well aligned. Now the change of size button will stop the game, and change screen size. (iss. #52).
+
+### Changed
+- End of game: instead of popup, now the colour of head will change to multiple colours, to indicate game over (iss. #55)
 
 
 ## v1.2 - 2021-04-01

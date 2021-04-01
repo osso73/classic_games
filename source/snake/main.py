@@ -345,9 +345,7 @@ class GameBoard(Widget):
                 direction = 'UP'
             else:
                 direction = 'DOWN'
-        self.snake_parts[-1].direction = direction
-        print(direction)
- 
+        self.snake_parts[-1].direction = direction 
             
     
     def on_snake_parts(self, *args):
@@ -392,10 +390,11 @@ class GameBoard(Widget):
 
     def game_over(self):
         self.active = False
+        self.snake_parts[0].crashed = True
         self.play('end_game')
         msg = 'Sorry, snake crashed!'
         p = PopupWin(title='End', content=PopupMsg(text=msg))
-        p.open()
+        #p.open()
 
 
     def change_direction(self, direct, *args):
@@ -602,6 +601,8 @@ class SnakeHead(GridElement):
     image = StringProperty()
     direction = StringProperty()
     mouth_open = BooleanProperty(False)
+    crashed = BooleanProperty(False)
+    colour = ListProperty()
 
 
     def __init__(self, *args, **kwargs):
@@ -622,6 +623,9 @@ class SnakeHead(GridElement):
         self.head_images['DOWN'] = dict()
         self.head_images['DOWN'][True] = os.path.join(IMAGES, 'snake', 'open_down.png')
         self.head_images['DOWN'][False] = os.path.join(IMAGES, 'snake', 'head_down.png')
+        self.list_colours = [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1],
+                             [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1], 
+                             [1, 1, 1, 1]]
 
 
     def on_direction(self, *args):
@@ -639,6 +643,14 @@ class SnakeHead(GridElement):
 
     def change_image(self):
         self.image = self.head_images[self.direction][self.mouth_open]
+    
+    def on_crashed(self, *args):
+        Clock.schedule_interval(self.change_colour, 0.2)
+    
+    def change_colour(self, *args):
+        idx = self.list_colours.index(self.colour)
+        idx = (idx +1) % len(self.list_colours)
+        self.colour = self.list_colours[idx]
 
 
 class MenuButton(Button):
@@ -674,6 +686,4 @@ class SnakeApp(App):
 
 
 if __name__ == '__main__':
-    # Window.size = (1080, 2340)
-    # Window.size = (375, 800)
     SnakeApp().run()
