@@ -87,6 +87,13 @@ class GameBoard(Widget):
         If True, the update function will move the snake; if False, it will
         do nothing. This is set to False when the game finishes, and set
         to active when a new game starts.
+    pause : boolean
+        When True, the game will pause (i.e. the update function will not
+        update). Set to False by default. This is triggered by button in 
+        toolbar.
+    mute : boolean
+        If True, the sounds will not play; otherwise, they will play. Set
+        to False by default. This is triggered by button in toolbar.
     '''
 
     score = NumericProperty(0)
@@ -94,6 +101,8 @@ class GameBoard(Widget):
     size_grid = ListProperty()
     size_snake = NumericProperty(9)
     speed_factor = NumericProperty(1)
+    mute = BooleanProperty(False)
+    pause = BooleanProperty(False)
 
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
@@ -274,7 +283,7 @@ class GameBoard(Widget):
         None.
 
         '''
-        if not self.active:
+        if not self.active or self.pause:
             return
 
         # save position of parts
@@ -428,6 +437,7 @@ class GameBoard(Widget):
 
         return sound
 
+
     def play(self, sound):
         '''
         Play a sound from the dictionary of sounds.
@@ -442,10 +452,14 @@ class GameBoard(Widget):
         Exception
             If string passed is not in the dictionary.
         '''
+        if self.mute:
+            return
+        
         if sound in self.sounds:
             self.sounds[sound].play()
         else:
             raise Exception("Bad sound")
+
 
     def bye(self):
         '''
@@ -563,7 +577,7 @@ class MenuButton(Button):
     pass
 
 class MenuButtonSmall(Button):
-    pass
+    image = ListProperty(['',''])
 
 class MenuLabel(Label):
     pass

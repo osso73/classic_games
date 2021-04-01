@@ -5,15 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
-## Unreleased
+## v1.2 - 2021-04-01
 
 ### Changed
-- End of screen will pop to the other end
+- Snake doesn't die when hitting the end of screen: it pops out at the opposite end. Only hitting the wall or hitting the snake will kill the snake.
 - Screen sizes adapted, to accomodate the wall
 
 
 ### Added
-- Walls around the edges of the screen
+- Walls around the edges of the screen (iss. #38)
+- Menu buttons for pause and mute (iss. #51)
 
 
 ## v1.1 - 2021-03-28

@@ -28,23 +28,26 @@
         Label:
 
         MenuButtonSmall:
-            canvas:
-                Rectangle:
-                    source: 'icons/help.png'
-                    size: self.size
-                    pos: self.pos
+            image: 'icons/mute_off.png', 'icons/mute_on.png'
+            on_release: game.mute = not game.mute
+
+
+        MenuButtonSmall:
+            image: 'icons/pause.png', 'icons/play.png'
+            on_release: game.pause = not game.pause
+                            
+
+        MenuButtonSmall:
+            image: 'icons/help.png', 'icons/help.png'
             on_release: root.help()
 
 
         MenuButtonSmall:
-            canvas:
-                Rectangle:
-                    source: 'icons/power.png'
-                    size: self.size
-                    pos: self.pos
+            image: 'icons/power.png', 'icons/power.png'
             on_release:
                 game.bye()
                 app.stop()
+
 
     GridLayout:
         cols: 3
@@ -140,7 +143,7 @@
 ############################## Menu ########################################
 
 <MenuButton>:
-    font_size: '20sp'
+    font_size: '18sp'
     size_hint_x: None
     size: self.texture_size
     padding: sp(5), sp(5)
@@ -149,9 +152,9 @@
     size_hint_x: None
     width: self.parent.height * 0.8
     padding: sp(10), sp(10)
-
-<MenuLabel>:
-    font_size: '20sp'
-    size_hint_x: None
-    size: self.texture_size
-    padding: sp(5), sp(5)
+    canvas:
+        Rectangle:
+            source: self.image[0]
+            size: self.size
+            pos: self.pos
+    on_press: self.image = self.image[1], self.image[0]
