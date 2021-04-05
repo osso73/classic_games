@@ -7,7 +7,6 @@ Created on Mon Mar 15, 2020
 """
 
 from kivy.app import App
-from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
 from kivy import metrics
@@ -15,7 +14,6 @@ from kivy import metrics
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
@@ -27,12 +25,13 @@ from kivy.properties import (
 import os
 import random
 import webbrowser
-from functools import partial
 from time import sleep
 
+from levels import Level
 
-SPEED = 0.3
-GRID_SIZES = [9, 15, 21, 27]
+
+SPEED = 0.25
+GRID_SIZES = [11, 15, 19, 23]
 SPEED_FACTORS = [0.5, 0.8, 1, 1.5, 2, 3]
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
@@ -40,6 +39,8 @@ HELP_URL = 'https://osso73.github.io/classic_games/games/snake/'
 
 
 class MainScreen(BoxLayout):
+    level_progress_bar = NumericProperty(0)
+
     def help(self):
         webbrowser.open(HELP_URL)
 
@@ -94,16 +95,24 @@ class GameBoard(Widget):
     mute : boolean
         If True, the sounds will not play; otherwise, they will play. Set
         to False by default. This is triggered by button in toolbar.
+    level : Level class
+        Object that keeps record of the current level, and has all properties
+        associated to the level: wall, maximum score, level score.
+    num_level : NumericProperty
+        Current level. This can be set by menu buttons, or automatically at 
+        the end of the level, moving to next level.
     '''
 
     score = NumericProperty(0)
     size_pixels = NumericProperty(0)
     size_grid = ListProperty()
-    size_snake = NumericProperty(9)
+    size_snake = NumericProperty(GRID_SIZES[0])
     snake_parts = ListProperty([])
     speed_factor = NumericProperty(1)
     mute = BooleanProperty(False)
     pause = BooleanProperty(False)
+    num_level = NumericProperty(1)
+
 
     def __init__(self, *args, **kwargs):
         super(GameBoard, self).__init__(*args, **kwargs)
@@ -169,7 +178,7 @@ class GameBoard(Widget):
         None.
 
         '''
-        factor = 0.90
+        factor = 0.95
         side = factor * min(*self.parent.size)
         self.size_pixels = int(side / self.size_snake)
         w = int(factor*self.parent.width / self.size_pixels)
@@ -191,28 +200,57 @@ class GameBoard(Widget):
         None.
 
         '''
-        # reset parameters
-        self.snake_parts = []
-        self.wall = []
-        self.move_x = 0
-        self.move_y = 0
+        self.play('start')
         self.score = 0
-        self.set_size()
+        self.num_level = 1
+        self.level = Level(self.size_grid, self.num_level)
+        self.new_level()
 
-        # remove previous snake & food
-        instances = (SnakeHead, SnakePart, Food, Wall)
-        parts = [p for p in self.children if isinstance(p, instances)]
-        for p in parts:
-            self.remove_widget(p)
+
+    def new_level(self):
+        '''
+        Start a new game. Reset the values (score, move, etc.), remove the
+        previous snake and food, and recreate a new snake and food. Finally
+        set the game to active, which will start moving the snake.
+
+        Returns
+        -------
+        None.
+
+        '''
+        # reset parameters & clear screen
+        self.clear_screen()
 
         # build wall
         self.build_wall()
 
         # create snake
+        self.create_snake()
+
+        # create food
+        self.food = Food()
+        self.add_widget(self.food)
+        self.food.spawn(self.snake_parts + self.wall)
+
+        # activate game
+        self.active = True
+        self.change_direction(self.level.get_start_direction())
+    
+    
+    def build_wall(self):        
+        positions = self.level.get_walls()
+        
+        for p in positions:
+            brick = Wall()
+            self.add_widget(brick)
+            brick.pos_nm = p
+            self.wall.append(brick)
+
+
+    def create_snake(self):
         head = SnakeHead()
         self.add_widget(head)
-        n_ini, m_ini = self.size_grid
-        head.pos_nm = n_ini / 2, m_ini / 2
+        head.pos_nm = self.level.get_start_position()
         self.snake_parts.append(head)
         for _ in range(2):
             new_part = SnakePart()
@@ -221,55 +259,19 @@ class GameBoard(Widget):
             self.snake_parts.append(new_part)
             
 
-        # create food
-        self.food = Food()
-        self.add_widget(self.food)
-        self.food.spawn(self.snake_parts + self.wall)
+    def clear_screen(self):
+        self.snake_parts = []
+        self.wall = []
+        self.move_x = 0
+        self.move_y = 0
+        self.set_size()
 
-        # activate game
-        self.play('start')
-        self.active = True
-        self.change_direction('RIGHT')
-    
-    
-    def build_wall(self):
-        # around the screen
-        n_max, m_max = self.size_grid
-        n_list = [n for n in range(n_max+1)]
-        m_list = [m for m in range(m_max+1)]
-        
-        if n_max < m_max:
-            idx = int((n_max + 1) / 3)
-            n_list = n_list[:idx] + n_list[-idx:]
-            idx = int((m_max + 1) / 6)
-            m_list = m_list[:idx] + m_list[2*idx:-2*idx] + m_list[-idx:]
-        else:
-            idx = int((m_max + 1) / 3)
-            m_list = m_list[:idx] + m_list[-idx:]
-            idx = int((n_max + 1) / 6)
-            n_list = n_list[:idx] + n_list[2*idx:-2*idx] + n_list[-idx:]
-            
-        for i in n_list:
-            brick = Wall()
-            self.add_widget(brick)
-            brick.pos_nm = i, 0
-            self.wall.append(brick)
-            brick = Wall()
-            self.add_widget(brick)
-            brick.pos_nm = i, m_max
-            self.wall.append(brick)
-        
-        for j in m_list:
-            brick = Wall()
-            self.add_widget(brick)
-            brick.pos_nm = 0, j
-            self.wall.append(brick)
-            brick = Wall()
-            self.add_widget(brick)
-            brick.pos_nm = n_max, j
-            self.wall.append(brick)
-            
-            
+        # remove previous snake & food & wall
+        instances = (SnakeHead, SnakePart, Food, Wall)
+        parts = [p for p in self.children if isinstance(p, instances)]
+        for p in parts:
+            self.remove_widget(p)
+       
         
     def update(self, *args):
         '''
@@ -353,6 +355,11 @@ class GameBoard(Widget):
         When the snake_parts changes (i.e. a new part is added), it flags the
         last part as a tail, and all others as non-tail.
 
+        Parameters
+        ----------
+        *args : ?
+            Arguments passed by the event. Not used.
+
         Returns
         -------
         None.
@@ -371,6 +378,55 @@ class GameBoard(Widget):
         self.snake_parts[-1].is_tail = True
 
 
+    def on_score(self, parent, value):
+        '''
+        When score changes, ensure score is added to the partial level score,
+        update the level progress bar and check if end-of level is reached.
+
+        Parameters
+        ----------
+        parent : object
+            Argument passed by the event. Not used.
+        value : number
+            Argument passed by the event. The value that has changed, i.e. 
+            the new score.
+
+        Returns
+        -------
+        None.
+
+        '''
+        if self.score == 0:
+            return
+        
+        # self.level.level_curr_score += 1
+        self.level.inc_score(+1)
+        app = App.get_running_app()
+        app.root.level_progress_bar = self.level.level_pct
+        if self.level.level_pct >= 1:
+            if self.num_level == 12:
+                self.game_over(win=True)
+            else:
+                self.change_level()
+    
+    
+    def change_level(self):
+        self.play('next_level')
+        self.active = False
+        msg = 'Reached end of level\nMoving to next level.'
+        p = PopupWin(title='End of level', content=PopupMsg(text=msg))
+        p.bind(on_dismiss=self.start_next_level)
+        p.open()
+    
+    def start_next_level(self, *args):
+        self.level.set_level(self.level.num_level+1)
+        self.num_level = self.level.num_level
+        app = App.get_running_app()
+        app.root.level_progress_bar = self.level.level_pct
+        self.new_level()
+        
+            
+    
     def collision(self):
         # collision with body
         head = self.snake_parts[0]
@@ -388,32 +444,36 @@ class GameBoard(Widget):
         return False
 
 
-    def game_over(self):
+    def game_over(self, win=False):
         self.active = False
-        self.snake_parts[0].crashed = True
-        self.play('end_game')
-        msg = 'Sorry, snake crashed!'
-        p = PopupWin(title='End', content=PopupMsg(text=msg))
-        #p.open()
+        if win:
+            self.play('win')
+            msg = 'Congratulations!\nYOU WIN!!!'
+            p = PopupWin(title='End', content=PopupMsg(text=msg))
+            p.open()
+
+        else:
+            self.snake_parts[0].crashed = True
+            self.play('game_over')
 
 
     def change_direction(self, direct, *args):
         if not self.active:
             return
         head = self.snake_parts[0]
-        if direct is 'LEFT' and self.move_x == 0:
+        if direct == 'LEFT' and self.move_x == 0:
             self.move_x = -1
             self.move_y = 0
             head.direction = direct
-        elif direct is 'RIGHT' and self.move_x == 0:
+        elif direct =='RIGHT' and self.move_x == 0:
             self.move_x = 1
             self.move_y = 0
             head.direction = direct
-        elif direct is 'UP' and self.move_y == 0:
+        elif direct == 'UP' and self.move_y == 0:
             self.move_x = 0
             self.move_y = 1
             head.direction = direct
-        elif direct is 'DOWN' and self.move_y == 0:
+        elif direct == 'DOWN' and self.move_y == 0:
             self.move_x = 0
             self.move_y = -1
             head.direction = direct
@@ -475,7 +535,7 @@ class GameBoard(Widget):
         '''
         sound = dict()
         folder = os.path.join(os.path.dirname(__file__),'audio')
-        for s in ['bye', 'eat', 'start', 'end_game']:
+        for s in ['bye', 'eat', 'start', 'next_level', 'game_over', 'win']:
             sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
 
         return sound
@@ -607,6 +667,7 @@ class SnakeHead(GridElement):
 
     def __init__(self, *args, **kwargs):
         super(SnakeHead, self).__init__(*args, **kwargs)
+        self.counter = 0
         self.head_images = dict()
         self.head_images['LEFT'] = dict()
         self.head_images['LEFT'][True] = os.path.join(IMAGES, 'snake', 'open_left.png')
@@ -645,18 +706,21 @@ class SnakeHead(GridElement):
         self.image = self.head_images[self.direction][self.mouth_open]
     
     def on_crashed(self, *args):
-        Clock.schedule_interval(self.change_colour, 0.2)
+        self.event = Clock.schedule_interval(self.change_colour, 0.2)
     
     def change_colour(self, *args):
         idx = self.list_colours.index(self.colour)
         idx = (idx +1) % len(self.list_colours)
         self.colour = self.list_colours[idx]
+        self.counter += 1
+        if self.counter == 10:
+            return False
 
 
 class MenuButton(Button):
     pass
 
-class MenuButtonSmall(Button):
+class MenuButtonImage(Button):
     image = ListProperty(['',''])
 
 class MenuLabel(Label):
@@ -676,6 +740,7 @@ class PopupWin(Popup):
         '''Set the size of the window based on the text of the content'''
         x, y = self.content.size
         self.size = x + metrics.sp(30), y + metrics.sp(100)
+        
 
 
 class SnakeApp(App):

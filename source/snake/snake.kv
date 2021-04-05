@@ -18,74 +18,98 @@
 
         MenuButton:
             text: 'Start'
-            on_press: game.start_game()
+            on_release: game.start_game()
 
         MenuButton:
             text: 'Size: ' + str(game.size_snake)
-            on_press: game.button_size()
+            on_release: game.button_size()
 
         MenuButton:
             text: 'Speed: ' + str(game.speed_factor)
-            on_press: game.button_speed()
+            on_release: game.button_speed()
+        
+#        MenuButtonImage:
+#            image: 'icons/level_up.png', 'icons/level_up.png'
+#            on_release: game.num_level = 1 if game.num_level==12 else game.num_level+1
+
+#        MenuButtonImage:
+#            image: 'icons/level_down.png', 'icons/level_down.png'
+#            on_release: game.num_level = 12 if game.num_level==1 else game.num_level-1
 
         Label:
 
-        MenuButtonSmall:
+        MenuButtonImage:
             image: 'icons/mute_off.png', 'icons/mute_on.png'
             on_release: game.mute = not game.mute
 
 
-        MenuButtonSmall:
+        MenuButtonImage:
             image: 'icons/pause.png', 'icons/play.png'
             on_release: game.pause = not game.pause
                             
 
-        MenuButtonSmall:
+        MenuButtonImage:
             image: 'icons/help.png', 'icons/help.png'
             on_release: root.help()
 
 
-        MenuButtonSmall:
+        MenuButtonImage:
             image: 'icons/power.png', 'icons/power.png'
             on_release:
                 game.bye()
                 app.stop()
 
-
-    GridLayout:
-        cols: 3
-        on_size: game.set_size()
+    BoxLayout:
+        orientation: 'vertical'
         canvas:
             Color:
                 rgba: 0, 1, 1, 0.2
             Rectangle:
                 size: self.size
                 pos: self.pos
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: score.texture_size[1]
+            Label:
+                id: score
+                text: 'Score: ' + str(game.score)
+                font_size: '36sp'
+            Label:
+                text: 'Level: ' + str(game.num_level)
+                font_size: '36sp'
+                canvas.before:
+                    Color:
+                        rgba: 1, 0, 0, 0.5
+                    Rectangle:
+                        size: self.width * root.level_progress_bar, self.height
+                        pos: self.pos
 
-        Label:
-        Label:
-            text: 'Score: ' + str(game.score)
-            font_size: '36sp'
-
-
-        Label:
-
-        Label:
-        GameBoard:
-            id: game
-            size_hint: None, None
-            canvas.before:
-                Color:
-                    rgba: 250/255, 248/255, 239/255, 1
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-        Label:
-
-        Label:
-        Label:
-        Label:
-
+        GridLayout:
+            cols: 3
+            on_size: game.set_size()
+    
+            Label:
+            Label:
+            Label:
+    
+            Label:
+            GameBoard:
+                id: game
+                size_hint: None, None
+                canvas.before:
+                    Color:
+                        rgba: 250/255, 248/255, 239/255, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+    
+            Label:
+            Label:
+            Label:
+        
 
 ########################### Snake parts #####################################
 
@@ -153,9 +177,9 @@
     size: self.texture_size
     padding: sp(5), sp(5)
 
-<MenuButtonSmall>:
+<MenuButtonImage>:
     size_hint_x: None
-    width: self.parent.height * 0.8
+    width: self.parent.height * 0.7
     padding: sp(10), sp(10)
     canvas:
         Rectangle:
