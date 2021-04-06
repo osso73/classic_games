@@ -16,4 +16,8 @@ nav:
       - games/2048.md
       - games/buscaminas.md
       - games/snake.md
+  - Changelogs:
+      - changelogs/2048_changelog.md
+      - changelogs/buscaminas_changelog.md
+      - changelogs/snake_changelog.md
   - About: about.md
