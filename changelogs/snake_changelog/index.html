@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="osso73">
+  <link rel="canonical" href="https://osso73.github.io/classic_games/changelogs/snake_changelog/">
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Snake changelog - classic_games</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../../css/theme.css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Snake changelog";
+    var mkdocs_page_input_path = "changelogs/snake_changelog.md";
+    var mkdocs_page_url = "/classic_games/changelogs/snake_changelog/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> classic_games</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Games</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/pong/">Pong</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/ahorcado/">Ahorcado</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/memory/">Memory</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/15puzzle/">15 puzzle</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/2048/">2048</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/buscaminas/">Buscaminas (Minesweeper)</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../games/snake/">Snake</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Changelogs</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../2048_changelog/">2048 changelog</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../buscaminas_changelog/">Buscaminas changelog</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Snake changelog</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#v13-2021-04-06">v1.3 - 2021-04-06</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#added">Added</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#changed">Changed</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v12-2021-04-01">v1.2 - 2021-04-01</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_1">Changed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#added_1">Added</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v11-2021-03-28">v1.1 - 2021-03-28</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_2">Changed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#added_2">Added</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixed_1">Fixed</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v10-2021-03-21">v1.0 - 2021-03-21</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_3">Changed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#added_3">Added</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixed_2">Fixed</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#01-2021-03-19">0.1 - 2021-03-19</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#added_4">Added:</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">classic_games</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Changelogs &raquo;</li>
+        
+      
+    
+    <li>Snake changelog</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/osso73/classic_games/blob/main/docs/changelogs/snake_changelog.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="snake-changelog">Snake changelog</h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>. For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder <code>releases</code>.</p>
+<h2 id="v13-2021-04-06">v1.3 - 2021-04-06</h2>
+<h3 id="added">Added</h3>
+<ul>
+<li>Tail: last part of the snake is a tail, instead of a regular part (iss. #56)</li>
+<li>Created 12 different levels (iss. #44). Now game move to the next level after a certain score.</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>When change of size, the grid is not well aligned. Now the change of size button will stop the game, and change screen size. (iss. #52).</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>End of game: instead of popup, now the colour of head will change to multiple colours, to indicate game over (iss. #55)</li>
+<li>Changed speed options to 11, 15, 19, 23, to have better visual on some levels</li>
+</ul>
+<h2 id="v12-2021-04-01">v1.2 - 2021-04-01</h2>
+<h3 id="changed_1">Changed</h3>
+<ul>
+<li>Snake doesn't die when hitting the end of screen: it pops out at the opposite end. Only hitting the wall or hitting the snake will kill the snake.</li>
+<li>Screen sizes adapted, to accomodate the wall</li>
+</ul>
+<h3 id="added_1">Added</h3>
+<ul>
+<li>Walls around the edges of the screen (iss. #38)</li>
+<li>Menu buttons for pause and mute (iss. #51)</li>
+</ul>
+<h2 id="v11-2021-03-28">v1.1 - 2021-03-28</h2>
+<h3 id="changed_2">Changed</h3>
+<ul>
+<li>Changed graphic of head</li>
+<li>Menu buttons updated, and now using scale-independent pixels (#49)</li>
+<li>Improved the way the screen size is defined, and centered within the available space (#45)</li>
+<li>Score label moved</li>
+<li>Snake starts with 3 parts, instead of only head</li>
+<li>Increased base speed of the snake</li>
+<li>App icon changed</li>
+</ul>
+<h3 id="added_2">Added</h3>
+<ul>
+<li>Implemented speed button, as per iss. #37</li>
+<li>Implemented size button, as per iss. #50</li>
+<li>Added help button</li>
+<li>Snake opens mouth when close to the food (#47)</li>
+</ul>
+<h3 id="fixed_1">Fixed</h3>
+<ul>
+<li>Several internal fixes, improving the detection of collisions and end of screen</li>
+</ul>
+<h2 id="v10-2021-03-21">v1.0 - 2021-03-21</h2>
+<h3 id="changed_3">Changed</h3>
+<ul>
+<li>Increased size of snake and food, as per iss. #36</li>
+</ul>
+<h3 id="added_3">Added</h3>
+<ul>
+<li>Spash screen, as per iss. #41</li>
+<li>Snake opens mouth before eating (iss. #47)</li>
+<li>Sounds for start, eat, game over and close app (iss. #39)</li>
+<li>Score tracking (iss #35)</li>
+<li>Added end of game message and sound (iss. #42)</li>
+<li>Menu at the top, with options for start game, end application (iss. #37)</li>
+</ul>
+<h3 id="fixed_2">Fixed</h3>
+<ul>
+<li>Food to check window limits at the start of a game, so it spawns correctly inside the window (iss. #43)</li>
+<li>Check collision with top and right have been fixed</li>
+</ul>
+<h2 id="01-2021-03-19">0.1 - 2021-03-19</h2>
+<h3 id="added_4">Added:</h3>
+<ul>
+<li>Initial version of the game.</li>
+<li>Basic functionality of snake game</li>
+<li>Image for the head of snake, and food</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../buscaminas_changelog/" class="btn btn-neutral" title="Buscaminas changelog"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/osso73/classic_games/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../buscaminas_changelog/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

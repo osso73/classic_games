@@ -82,6 +82,15 @@
     </ul>
                     </li>
                 </ul>
+                <p class="caption"><span class="caption-text">Changelogs</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changelogs/2048_changelog/">2048 changelog</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changelogs/buscaminas_changelog/">Buscaminas changelog</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changelogs/snake_changelog/">Snake changelog</a>
+                    </li>
+                </ul>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../about/">About</a>
                     </li>
@@ -126,18 +135,23 @@
             <div class="section">
               
                 <h1 id="snake">Snake</h1>
+<p>These instructions are for version 1.3. You can find <a href="../../changelogs/snake_changelog/">here</a> a changelog explaining the changes introduced in each version.</p>
 <h2 id="rules-of-the-game">Rules of the game</h2>
 <p>Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.</p>
-<p>In here, the player controls a snake that goes on the screen. There is a piece of food in a random location of the screen. When the snake eats the food, it grows the length by one unit, and a new piece of food appears. The player has to avoid that the snake hits the extreme of the screen, or the body of the snake: this will kill the snake.</p>
+<p>In here, the player controls a snake that goes on the screen. There is a piece of food in a random location of the screen. When the snake eats the food, it grows the length by one unit, and a new piece of food appears. The player has to avoid that the snake hits a wall or the body of the snake: this will kill the snake.</p>
+<p>The game has different levels of difficulty, each of them has a certain amount of walls that the snake has to avoid. Once you reach a partial score of the level (which depends on the grid size), you move to the next level.</p>
 <p>Turning the snake can be done by swiping on the screen. The snake can turn 90 degrees in any direction.</p>
 <p>The screen can be either portrait or landscape. If the screen changes, you should start a new game to take the dimensions into account.</p>
 <h2 id="main-screen">Main screen</h2>
 <p>This is the main screen of the game.</p>
 <p><img alt="screenshot" src="../../img/snake_screen.jpg" /></p>
-<p>It is divided in two areas:</p>
+<p>It is divided in three areas:</p>
 <ul>
 <li>
 <p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions.</p>
+</li>
+<li>
+<p><em>results row</em>: display the score and the current level, with a progress bar on the level. When the progress bar reaches 100%, you move to the next level.</p>
 </li>
 <li>
 <p><em>playing ground</em>: this is where the snake will run. Here you can see as well the current score of the game, which is the number of fruits you have eaten.</p>
@@ -156,6 +170,12 @@
 <p><strong>Speed</strong>: to change the speed of the snake. At each click it will switch to the next speed factor, varying from: 0.5, 0.8, 1, 1.5, 2, 3. The game starts with a factor of 1 by default. The factor will be dividing the interval between updates of the game. Therefore, the higher the factor the smaller is the interval between updates, producing a higher speed.</p>
 </li>
 <li>
+<p><img alt="Mute on" src="../../img/snake_btn_mute_on.png" title="Mute on" />/<img alt="Mute on" src="../../img/snake_btn_mute_off.png" title="Mute off" />: mute the sounds of the game. Another click will unmmute.</p>
+</li>
+<li>
+<p><img alt="Pause" src="../../img/snake_btn_pause.png" title="Pause" />/<img alt="Play" src="../../img/snake_btn_play.png" title="Play" />: this button will pause the game. Another click will continue the game where it was.</p>
+</li>
+<li>
 <p><img alt="Help button" src="../../img/snake_btn_help.png" title="Help button" />: open a webpage with the instructions on how to play the game (this manual you are reading).</p>
 </li>
 <li>
@@ -163,6 +183,7 @@
 </li>
 </ul>
 <h2 id="credits">Credits</h2>
+<p>For the icons in the menubar I'm using <a href="https://material.io/resources/icons">Material Design icons</a>.</p>
 <p>I found the snake head in <a href="https://www.iconfinder.com/icons/3015218/dangerous_animal_reptile_serpent_head_snake_face_viper_icon">here</a>. And the images for food are from <a href="http://www.perfect-icons.com/index.htm">Perfect Icons</a> website. These images cannot be used for commercial purposes, otherwise they are free for personal use.</p>
 <p>The sounds I found on <a href="https://freesound.org/">Free Sound</a>, and some of them I had found over Internet. I'm not aware of any copyright or limitation to use these.</p>
               
@@ -172,7 +193,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../about/" class="btn btn-neutral float-right" title="About">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../../changelogs/2048_changelog/" class="btn btn-neutral float-right" title="2048 changelog">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../buscaminas/" class="btn btn-neutral" title="Buscaminas (Minesweeper)"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -206,7 +227,7 @@
         <span><a href="../buscaminas/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../../about/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../../changelogs/2048_changelog/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
