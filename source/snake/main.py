@@ -140,9 +140,7 @@ class GameBoard(Widget):
         idx = (idx + 1) % len(sizes)
         self.size_snake = sizes[idx]
         msg = f'Size set to {self.size_snake}\nRestart the game to take it into effect'
-        p = PopupWin(title='Size change', content=PopupMsg(text=msg))
-
-        p.open()
+        PopupButton(title='Size change', msg=msg)
         self.set_size()
 
 
@@ -414,9 +412,9 @@ class GameBoard(Widget):
         self.play('next_level')
         self.active = False
         msg = 'Reached end of level\nMoving to next level.'
-        p = PopupWin(title='End of level', content=PopupMsg(text=msg))
+        p = PopupButton(title='End of level', msg=msg)
         p.bind(on_dismiss=self.start_next_level)
-        p.open()
+
     
     def start_next_level(self, *args):
         self.level.set_level(self.level.num_level+1)
@@ -449,8 +447,8 @@ class GameBoard(Widget):
         if win:
             self.play('win')
             msg = 'Congratulations!\nYOU WIN!!!'
-            p = PopupWin(title='End', content=PopupMsg(text=msg))
-            p.open()
+            PopupButton(title='End', msg=msg)
+
 
         else:
             self.snake_parts[0].crashed = True
@@ -726,21 +724,29 @@ class MenuButtonImage(Button):
 class MenuLabel(Label):
     pass
 
-class PopupMsg(Label):
-    pass
 
-class PopupWin(Popup):
-    def on_content(self, *args):
-        '''Trigger change of size when the contents changes. Schedule
-        a call to give enough time to calculate size of the content.
-        '''
-        Clock.schedule_once(self.change_size)
+class PopupButton(Popup):
+    msg = StringProperty()
+    
+    def __init__(self, *args, **kwargs):
+        super(PopupButton, self).__init__(*args, **kwargs)
+        Clock.schedule_once(self.open)
+        Clock.schedule_once(self.set_size)
+    
+    def calculate_size(self):
+        width = height = 0
+        for child in self.content.children:
+            x, y = child.size
+            width = max(width, x)
+            height += y 
+        width += metrics.sp(50)
+        height += metrics.sp(60)
 
-    def change_size(self, *args):
-        '''Set the size of the window based on the text of the content'''
-        x, y = self.content.size
-        self.size = x + metrics.sp(30), y + metrics.sp(100)
-        
+        return width, height
+
+    def set_size(self, *args):
+        self.size = self.calculate_size()
+
 
 
 class SnakeApp(App):

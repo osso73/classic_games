@@ -19,6 +19,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Changed speed options to 11, 15, 19, 23, to have better visual on some levels
 
 
+## Unreleased
+
+### Fixed
+- Popup window now has a button to dismiss it, to avoid accidentally moving to the next level (iss. #59)
+
+
+
 ## v1.2 - 2021-04-01
 
 ### Changed

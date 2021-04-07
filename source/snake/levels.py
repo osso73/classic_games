@@ -52,8 +52,8 @@ class Level():
             8: {'pos_ini': (0.5, 0.5), 'dir': 'DOWN'},
             9: {'pos_ini': (0.25, 0.5), 'dir': 'DOWN'},
             10: {'pos_ini': (0.5, 0.5), 'dir': 'RIGHT'},
-            11: {'pos_ini': (0.25, 0.5), 'dir': 'DOWN'},
-            12: {'pos_ini': (0.25, 0.5), 'dir': 'DOWN'},
+            11: {'pos_ini': (0.2, 0.5), 'dir': 'DOWN'},
+            12: {'pos_ini': (0.2, 0.5), 'dir': 'DOWN'},
             }
 
     
@@ -82,6 +82,7 @@ class Level():
                       self.build_walls11, self.build_walls12]
         return build_func[self.num_level-1]()
 
+
     def get_start_position(self):
         n, m = self.grid
         n_factor, m_factor = self.level_parameters[self.num_level]['pos_ini']
@@ -96,12 +97,14 @@ class Level():
         if n > m:  # swap direction in case of landscape layout
             d = 'RIGHT' if d == 'DOWN' else 'DOWN'
         return d
+
     
     def set_level(self, num):
         self.num_level = num
         self.level_max_score = self.get_max_score()
         self.level_curr_score = 0
         self.level_pct = self.level_curr_score / self.level_max_score
+
         
     def inc_score(self, num):
         self.level_curr_score += num

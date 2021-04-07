@@ -160,14 +160,27 @@
             size: self.size
 
 ############################## Popup ########################################
-<PopupWin>
+<PopupButton>:
     size_hint: None, None
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        
+        Label:
+            text: root.msg
+            padding: sp(20), sp(20)
+            font_size: '20sp'
+            size_hint: None, None
+            size: self.texture_size
+        Button:
+            text: 'Ok'
+            font_size: '20sp'
+            padding: sp(20), sp(10)
+            size_hint: None, None
+            size: self.texture_size
+            on_release: root.dismiss()
+            pos_hint: {'center_x': 0.5}
 
-<PopupMsg>
-    padding: sp(20), sp(20)
-    font_size: '20sp'
-    size_hint_x: None
-    size: self.texture_size
 
 ############################## Menu ########################################
 
