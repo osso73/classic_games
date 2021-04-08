@@ -176,13 +176,36 @@ class GameBoard(Widget):
         None.
 
         '''
+        # print('parent size:', *self.parent.size)
+        # factor = 0.95
+        # side = factor * min(*self.parent.size)
+        # print('side:', side)
+        # self.size_pixels = int(side / self.size_snake)
+        # print('size_pixels:', self.size_pixels)
+        # w = int(factor*self.parent.width / self.size_pixels)
+        # h = int(factor*self.parent.height / self.size_pixels)
+        # print('w, h:', w, h)
+        # print('-'*25)
+        # self.size = (w*self.size_pixels, h*self.size_pixels)
+        # self.size_grid = w-1, h-1
+        # self.active = False
+        
         factor = 0.95
-        side = factor * min(*self.parent.size)
-        self.size_pixels = int(side / self.size_snake)
-        w = int(factor*self.parent.width / self.size_pixels)
-        h = int(factor*self.parent.height / self.size_pixels)
-        self.size = (w*self.size_pixels, h*self.size_pixels)
-        self.size_grid = w-1, h-1
+        w_pixels, h_pixels = self.parent.size
+        w_pixels_reduced = factor * w_pixels
+        h_pixels_reduced = factor * h_pixels
+
+        if w_pixels_reduced < h_pixels_reduced:
+            self.size_pixels = int(w_pixels_reduced / self.size_snake)
+            w_grid = self.size_snake
+            h_grid = int(h_pixels_reduced / self.size_pixels)
+        else:
+            self.size_pixels = int(h_pixels_reduced / self.size_snake)
+            h_grid = self.size_snake
+            w_grid = int(w_pixels_reduced / self.size_pixels)
+
+        self.size = w_grid*self.size_pixels, h_grid*self.size_pixels
+        self.size_grid = w_grid-1, h_grid-1
         self.active = False
 
 
