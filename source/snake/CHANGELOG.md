@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
+## Unreleased
+
+### changed
+- Different types of food, having different behaviours (iss. #46)
+
+## Fixed
+- Fixed error when sizing the grid, in some specific window / grid configurations, as per iss. #60
+- Popup messages now have a button to close the message. This avoids accidental closing of the window, and moving to next level (iss. #59)
+
+
 ## v1.3 - 2021-04-06
 
 ### Added

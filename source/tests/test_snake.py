@@ -7,8 +7,12 @@ Created on Mon Dec 28 16:45:54 2020
 """
 
 import os
-import pytest
+import sys
 import time
+import pytest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'snake')))
 
 from snake import main
 
@@ -35,6 +39,32 @@ class TestGameBoard():
         for n in main.SPEED_FACTORS[idx:] + main.SPEED_FACTORS[:idx]:
             assert game.speed_factor == n
             game.button_speed()
+    
+    
+    
+    @pytest.fixture(params=[(320, 240), (820, 540), (300, 300)])
+    def screen_fixture(request):
+        return request.param
+    
+    @pytest.fixture(params=[*main.GRID_SIZES])
+    def snake_fixture(request):
+        return request.param
+    
+    def test_set_size2(self, screen_fixture, snake_fixture):
+        parent = main.Widget()
+        game = main.GameBoard()
+        parent.add_widget(game)
+        parent.size = screen_fixture
+        game.size_snake = snake_fixture
+        game.set_size()
+        
+        pix = int(0.9 * min(*screen_fixture) / snake_fixture)
+        n = int(0.9 * screen_fixture[0] / pix)
+        m = int(0.9 * screen_fixture[1] / pix)
+        
+        # assert game.size_grid == [n-1, m-1]
+        assert game.size_pixels == pix
+        assert game.size == [n*pix, m*pix]
     
     
     @pytest.mark.parametrize('x, y, j', [

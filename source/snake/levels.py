@@ -68,7 +68,7 @@ class Level():
             Maximum score of the level.
 
         '''
-        MAX = {11: 20, 15:25, 19:30, 23:35}
+        MAX = {11: 30, 15:40, 19:50, 23:60}
         num = min(*self.grid) + 1
         return MAX[num]
 

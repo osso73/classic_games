@@ -36,6 +36,8 @@ SPEED_FACTORS = [0.5, 0.8, 1, 1.5, 2, 3]
 MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
 HELP_URL = 'https://osso73.github.io/classic_games/games/snake/'
+FOOD_SPEED = 1.5
+FOOD_SPEED_TIME = 30
 
 
 class MainScreen(BoxLayout):
@@ -72,6 +74,10 @@ class GameBoard(Widget):
     snake_parts : list
         Contains all the widgets that form the snake: one SnakeHead, the
         rest SnakePart
+    speed : NumericProperty
+        The actual speed of the snake, defined as the interval between 
+        updates. The result of the base speed, divided by the speed_factor 
+        and by the food speed.
     speed_factor : NumericProperty
         This defines the speed of the snake. This factor divides the
         interval between updates, so the higher the value the higher the
@@ -108,7 +114,8 @@ class GameBoard(Widget):
     size_grid = ListProperty()
     size_snake = NumericProperty(GRID_SIZES[0])
     snake_parts = ListProperty([])
-    speed_factor = NumericProperty(1)
+    speed_factor = NumericProperty()
+    speed = NumericProperty()
     mute = BooleanProperty(False)
     pause = BooleanProperty(False)
     num_level = NumericProperty(1)
@@ -118,8 +125,9 @@ class GameBoard(Widget):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.wall = []
         self.active = False
+        self.speed_factor = 1
+        self.speed = SPEED/self.speed_factor
         self.sounds = self.load_sounds()
-        self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
 
 
     def button_size(self):
@@ -142,8 +150,7 @@ class GameBoard(Widget):
         msg = f'Size set to {self.size_snake}\nRestart the game to take it into effect'
         PopupButton(title='Size change', msg=msg)
         self.set_size()
-
-
+            
 
     def button_speed(self):
         '''
@@ -161,8 +168,16 @@ class GameBoard(Widget):
         idx = speeds.index(self.speed_factor)
         idx = (idx + 1) % len(speeds)
         self.speed_factor = speeds[idx]
-        self.event.cancel()
-        self.event = Clock.schedule_interval(self.update, SPEED/self.speed_factor)
+        self.speed = SPEED/self.speed_factor
+    
+    
+    def on_speed(self, *args):
+        # first time event does not need to be cancelled
+        if hasattr(self, 'event'):
+            self.event.cancel()
+        
+        self.event = Clock.schedule_interval(self.update, self.speed)
+        
 
 
     def set_size(self):
@@ -176,20 +191,6 @@ class GameBoard(Widget):
         None.
 
         '''
-        # print('parent size:', *self.parent.size)
-        # factor = 0.95
-        # side = factor * min(*self.parent.size)
-        # print('side:', side)
-        # self.size_pixels = int(side / self.size_snake)
-        # print('size_pixels:', self.size_pixels)
-        # w = int(factor*self.parent.width / self.size_pixels)
-        # h = int(factor*self.parent.height / self.size_pixels)
-        # print('w, h:', w, h)
-        # print('-'*25)
-        # self.size = (w*self.size_pixels, h*self.size_pixels)
-        # self.size_grid = w-1, h-1
-        # self.active = False
-        
         factor = 0.95
         w_pixels, h_pixels = self.parent.size
         w_pixels_reduced = factor * w_pixels
@@ -346,12 +347,17 @@ class GameBoard(Widget):
 
         # check if food is found
         if head.pos_nm == self.food.pos_nm:
-            self.score += 1
             self.play('eat')
-            new_part = SnakePart()
-            self.add_widget(new_part)
-            new_part.pos_nm = old_positions[-1]
-            self.snake_parts.append(new_part)
+            self.score += self.food.current['score']
+            if self.food.current['speed'] > 1:
+                self.food.speed_counter += FOOD_SPEED_TIME
+
+            self.speed_food = self.food.current['speed']
+            for _ in range(self.food.current['length']):
+                new_part = SnakePart()
+                self.add_widget(new_part)
+                new_part.pos_nm = old_positions[-1]
+                self.snake_parts.append(new_part)
             self.food.spawn(self.snake_parts + self.wall)
             head.mouth_open = False
         
@@ -368,7 +374,14 @@ class GameBoard(Widget):
                 direction = 'UP'
             else:
                 direction = 'DOWN'
-        self.snake_parts[-1].direction = direction 
+        self.snake_parts[-1].direction = direction
+        
+        # adjust speed, and speed countdown
+        if self.food.speed_counter == 0:
+            self.speed = SPEED/self.speed_factor
+        else:
+            self.speed = SPEED/self.speed_factor/FOOD_SPEED
+            self.food.speed_counter -= 1
             
     
     def on_snake_parts(self, *args):
@@ -421,7 +434,7 @@ class GameBoard(Widget):
             return
         
         # self.level.level_curr_score += 1
-        self.level.inc_score(+1)
+        self.level.inc_score(self.food.current['score'])
         app = App.get_running_app()
         app.root.level_progress_bar = self.level.level_pct
         if self.level.level_pct >= 1:
@@ -629,6 +642,13 @@ class Food(GridElement):
     def __init__(self, *args, **kwargs):
         super(Food, self).__init__(*args, **kwargs)
         self.images = os.listdir(os.path.join(IMAGES, 'food'))
+        self.food_parameters = {
+            'fruit': {'speed': 1, 'score': 2, 'length': 1},
+            'junk':  {'speed': FOOD_SPEED, 'score': 1, 'length': 2},
+            'sweet': {'speed': 1, 'score': 1, 'length': 3},
+            }
+        self.current = self.food_parameters['fruit']
+        self.speed_counter = 0
 
 
     def spawn(self, snake):
@@ -640,10 +660,14 @@ class Food(GridElement):
         self.pos_nm = p
         self.image = os.path.join(IMAGES, 'food', random.choice(self.images))
 
-
     def _get_pos(self):
         return [random.choice(range(self.grid[0]+1)),
                 random.choice(range(self.grid[1]+1))]
+    
+    def on_image(self, *args):
+        name = os.path.basename(self.image)
+        food_type = name.split('-')[0]
+        self.current = self.food_parameters[food_type]
 
 
 class Wall(GridElement):
@@ -689,6 +713,7 @@ class SnakeHead(GridElement):
     def __init__(self, *args, **kwargs):
         super(SnakeHead, self).__init__(*args, **kwargs)
         self.counter = 0
+        self.original_size = self.size
         self.head_images = dict()
         self.head_images['LEFT'] = dict()
         self.head_images['LEFT'][True] = os.path.join(IMAGES, 'snake', 'open_left.png')
