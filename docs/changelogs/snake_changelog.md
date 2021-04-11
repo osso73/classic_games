@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Different types of food, having different behaviours (iss. #46)
 - All configuration options now set through a settings screen, instead of buttons
 
-## Fixed
+### Fixed
 - Fixed error when sizing the grid, in some specific window / grid configurations, as per iss. #60
 - Popup messages now have a button to close the message. This avoids accidental closing of the window, and moving to next level (iss. #59)
 
