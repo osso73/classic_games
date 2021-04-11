@@ -80,47 +80,57 @@
                     </li>
                     <li class="toctree-l1 current"><a class="reference internal current" href="./">Snake changelog</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#v13-2021-04-06">v1.3 - 2021-04-06</a>
+    <li class="toctree-l2"><a class="reference internal" href="#v14-2021-04-11">v1.4 - 2021-04-11</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#added">Added</a>
     </li>
-    <li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#changed">Changed</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixed">Fixed</a>
+    </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#v12-2021-04-01">v1.2 - 2021-04-01</a>
+    <li class="toctree-l2"><a class="reference internal" href="#v13-2021-04-06">v1.3 - 2021-04-06</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#changed_1">Changed</a>
-    </li>
     <li class="toctree-l3"><a class="reference internal" href="#added_1">Added</a>
     </li>
-        </ul>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#v11-2021-03-28">v1.1 - 2021-03-28</a>
-        <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#changed_2">Changed</a>
-    </li>
-    <li class="toctree-l3"><a class="reference internal" href="#added_2">Added</a>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_1">Changed</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#fixed_1">Fixed</a>
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#v10-2021-03-21">v1.0 - 2021-03-21</a>
+    <li class="toctree-l2"><a class="reference internal" href="#v12-2021-04-01">v1.2 - 2021-04-01</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#changed_3">Changed</a>
+    <li class="toctree-l3"><a class="reference internal" href="#added_2">Added</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_2">Changed</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v11-2021-03-28">v1.1 - 2021-03-28</a>
+        <ul>
     <li class="toctree-l3"><a class="reference internal" href="#added_3">Added</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_3">Changed</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#fixed_2">Fixed</a>
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#v10-2021-03-21">v1.0 - 2021-03-21</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#added_4">Added</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#changed_4">Changed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fixed_3">Fixed</a>
+    </li>
+        </ul>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#01-2021-03-19">0.1 - 2021-03-19</a>
         <ul>
-    <li class="toctree-l3"><a class="reference internal" href="#added_4">Added:</a>
+    <li class="toctree-l3"><a class="reference internal" href="#added_5">Added:</a>
     </li>
         </ul>
     </li>
@@ -173,34 +183,57 @@
                 <h1 id="snake-changelog">Snake changelog</h1>
 <p>All notable changes to this project will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>. For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder <code>releases</code>.</p>
-<h2 id="v13-2021-04-06">v1.3 - 2021-04-06</h2>
+<h2 id="v14-2021-04-11">v1.4 - 2021-04-11</h2>
 <h3 id="added">Added</h3>
+<ul>
+<li>Option to select starting level, as per iss. #57</li>
+<li>Option to play story (e.g. one level after the other), or just one level endless, as per iss #58</li>
+</ul>
+<h3 id="changed">Changed</h3>
+<ul>
+<li>Different types of food, having different behaviours (iss. #46)</li>
+<li>All configuration options now set through a settings screen, instead of buttons</li>
+</ul>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li>Fixed error when sizing the grid, in some specific window / grid configurations, as per iss. #60</li>
+<li>Popup messages now have a button to close the message. This avoids accidental closing of the window, and moving to next level (iss. #59)</li>
+</ul>
+<h2 id="v13-2021-04-06">v1.3 - 2021-04-06</h2>
+<h3 id="added_1">Added</h3>
 <ul>
 <li>Tail: last part of the snake is a tail, instead of a regular part (iss. #56)</li>
 <li>Created 12 different levels (iss. #44). Now game move to the next level after a certain score.</li>
 </ul>
-<h3 id="fixed">Fixed</h3>
-<ul>
-<li>When change of size, the grid is not well aligned. Now the change of size button will stop the game, and change screen size. (iss. #52).</li>
-</ul>
-<h3 id="changed">Changed</h3>
+<h3 id="changed_1">Changed</h3>
 <ul>
 <li>End of game: instead of popup, now the colour of head will change to multiple colours, to indicate game over (iss. #55)</li>
 <li>Changed speed options to 11, 15, 19, 23, to have better visual on some levels</li>
 </ul>
-<h2 id="v12-2021-04-01">v1.2 - 2021-04-01</h2>
-<h3 id="changed_1">Changed</h3>
+<h3 id="fixed_1">Fixed</h3>
 <ul>
-<li>Snake doesn't die when hitting the end of screen: it pops out at the opposite end. Only hitting the wall or hitting the snake will kill the snake.</li>
-<li>Screen sizes adapted, to accomodate the wall</li>
+<li>When change of size, the grid is not well aligned. Now the change of size button will stop the game, and change screen size. (iss. #52).</li>
 </ul>
-<h3 id="added_1">Added</h3>
+<h2 id="v12-2021-04-01">v1.2 - 2021-04-01</h2>
+<h3 id="added_2">Added</h3>
 <ul>
 <li>Walls around the edges of the screen (iss. #38)</li>
 <li>Menu buttons for pause and mute (iss. #51)</li>
 </ul>
-<h2 id="v11-2021-03-28">v1.1 - 2021-03-28</h2>
 <h3 id="changed_2">Changed</h3>
+<ul>
+<li>Snake doesn't die when hitting the end of screen: it pops out at the opposite end. Only hitting the wall or hitting the snake will kill the snake.</li>
+<li>Screen sizes adapted, to accomodate the wall</li>
+</ul>
+<h2 id="v11-2021-03-28">v1.1 - 2021-03-28</h2>
+<h3 id="added_3">Added</h3>
+<ul>
+<li>Implemented speed button, as per iss. #37</li>
+<li>Implemented size button, as per iss. #50</li>
+<li>Added help button</li>
+<li>Snake opens mouth when close to the food (#47)</li>
+</ul>
+<h3 id="changed_3">Changed</h3>
 <ul>
 <li>Changed graphic of head</li>
 <li>Menu buttons updated, and now using scale-independent pixels (#49)</li>
@@ -210,23 +243,12 @@
 <li>Increased base speed of the snake</li>
 <li>App icon changed</li>
 </ul>
-<h3 id="added_2">Added</h3>
-<ul>
-<li>Implemented speed button, as per iss. #37</li>
-<li>Implemented size button, as per iss. #50</li>
-<li>Added help button</li>
-<li>Snake opens mouth when close to the food (#47)</li>
-</ul>
-<h3 id="fixed_1">Fixed</h3>
+<h3 id="fixed_2">Fixed</h3>
 <ul>
 <li>Several internal fixes, improving the detection of collisions and end of screen</li>
 </ul>
 <h2 id="v10-2021-03-21">v1.0 - 2021-03-21</h2>
-<h3 id="changed_3">Changed</h3>
-<ul>
-<li>Increased size of snake and food, as per iss. #36</li>
-</ul>
-<h3 id="added_3">Added</h3>
+<h3 id="added_4">Added</h3>
 <ul>
 <li>Spash screen, as per iss. #41</li>
 <li>Snake opens mouth before eating (iss. #47)</li>
@@ -235,13 +257,17 @@
 <li>Added end of game message and sound (iss. #42)</li>
 <li>Menu at the top, with options for start game, end application (iss. #37)</li>
 </ul>
-<h3 id="fixed_2">Fixed</h3>
+<h3 id="changed_4">Changed</h3>
+<ul>
+<li>Increased size of snake and food, as per iss. #36</li>
+</ul>
+<h3 id="fixed_3">Fixed</h3>
 <ul>
 <li>Food to check window limits at the start of a game, so it spawns correctly inside the window (iss. #43)</li>
 <li>Check collision with top and right have been fixed</li>
 </ul>
 <h2 id="01-2021-03-19">0.1 - 2021-03-19</h2>
-<h3 id="added_4">Added:</h3>
+<h3 id="added_5">Added:</h3>
 <ul>
 <li>Initial version of the game.</li>
 <li>Basic functionality of snake game</li>
