@@ -19,25 +19,7 @@
         MenuButton:
             text: 'Start'
             on_release: game.start_game()
-
-        MenuButton:
-            text: 'Size: ' + str(game.size_snake)
-            on_release: game.button_size()
-
-        MenuButton:
-            text: 'Speed: ' + str(game.speed_factor)
-            on_release: game.button_speed()
         
-#        MenuButtonImage:
-#            image: 'icons/level_up.png', 'icons/level_up.png'
-#            on_release: game.num_level = 1 if game.num_level==12 else game.num_level+1
-
-#        MenuButtonImage:
-#            image: 'icons/level_down.png', 'icons/level_down.png'
-#            on_release: game.num_level = 12 if game.num_level==1 else game.num_level-1
-
-        Label:
-
         MenuButtonImage:
             image: 'icons/mute_off.png', 'icons/mute_on.png'
             on_release: game.mute = not game.mute
@@ -49,9 +31,15 @@
                             
 
         MenuButtonImage:
+            image: 'icons/settings.png', 'icons/settings.png'
+            on_release: app.open_settings()
+                            
+
+        Label:
+
+        MenuButtonImage:
             image: 'icons/help.png', 'icons/help.png'
             on_release: root.help()
-
 
         MenuButtonImage:
             image: 'icons/power.png', 'icons/power.png'

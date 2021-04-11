@@ -16,6 +16,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
+from kivy.uix.settings import SettingsWithSpinner
 
 from kivy.properties import (
     NumericProperty, StringProperty, ListProperty,
@@ -107,6 +108,8 @@ class GameBoard(Widget):
     num_level : NumericProperty
         Current level. This can be set by menu buttons, or automatically at 
         the end of the level, moving to next level.
+    story : boolean
+        Define if the game mode is story (True) or single-level (False)
     '''
 
     score = NumericProperty(0)
@@ -128,6 +131,8 @@ class GameBoard(Widget):
         self.speed_factor = 1
         self.speed = SPEED/self.speed_factor
         self.sounds = self.load_sounds()
+        app = App.get_running_app()
+        self.story = bool(int(app.config.get('General', 'mode')))
 
 
     def button_size(self):
@@ -224,7 +229,8 @@ class GameBoard(Widget):
         '''
         self.play('start')
         self.score = 0
-        self.num_level = 1
+        app = App.get_running_app()
+        self.num_level = int(app.config.get('General', 'level_start'))
         self.level = Level(self.size_grid, self.num_level)
         self.new_level()
 
@@ -433,15 +439,15 @@ class GameBoard(Widget):
         if self.score == 0:
             return
         
-        # self.level.level_curr_score += 1
-        self.level.inc_score(self.food.current['score'])
-        app = App.get_running_app()
-        app.root.level_progress_bar = self.level.level_pct
-        if self.level.level_pct >= 1:
-            if self.num_level == 12:
-                self.game_over(win=True)
-            else:
-                self.change_level()
+        if self.story:
+            self.level.inc_score(self.food.current['score'])
+            app = App.get_running_app()
+            app.root.level_progress_bar = self.level.level_pct
+            if self.level.level_pct >= 1:
+                if self.num_level == 12:
+                    self.game_over(win=True)
+                else:
+                    self.change_level()
     
     
     def change_level(self):
@@ -459,7 +465,7 @@ class GameBoard(Widget):
         app.root.level_progress_bar = self.level.level_pct
         self.new_level()
         
-            
+    
     
     def collision(self):
         # collision with body
@@ -800,8 +806,49 @@ class PopupButton(Popup):
 class SnakeApp(App):
     def build(self):
         self.icon = os.path.join(IMAGES, 'icon.png')
+        self.settings_cls = SettingsWithSpinner        
+        self.use_kivy_settings = False
         main = MainScreen()
         return main
+
+    def build_config(self, config):
+        config.setdefaults('General', {
+            'speed': '1',
+            'size': '11',
+            'mode': '1',
+            'level_start': 1,
+            })    
+    
+    def build_settings(self, settings):
+        settings.add_json_panel("Snake settings", 
+                                self.config,
+                                filename='settings.json')
+    
+    def on_config_change(self, config, section, key, value):
+        speeds = {'11':'1', '15':'1.5', '19':'2', '23':'3' }
+        sizes = {v:k for k,v in speeds.items()}
+        
+        if key == 'speed':
+            self.root.ids.game.speed_factor = float(value)
+            self.root.ids.game.speed = SPEED/self.root.ids.game.speed_factor
+        
+        elif key == 'size':
+            self.root.ids.game.size_snake = int(value)
+            self.root.ids.game.set_size()
+        
+        elif key == 'mode':
+            self.root.ids.game.story = bool(int(value))
+        
+        elif key == 'level_start':
+            num = int(value)
+            if num < 1:
+                num = 1
+            elif num > 12:
+                num = 12
+            config.set('General', 'level_start', num)
+        
+        config.write()
+
 
 
 if __name__ == '__main__':
