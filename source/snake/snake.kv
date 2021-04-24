@@ -1,5 +1,6 @@
 #:set COLOUR_IMAGE [1, 1, 1, 1]
 #:set COLOUR_SNAKE [140/255, 198/255, 62/255, 1]
+#:set SPEED 0.25
 
 <MainScreen>:
     orientation: 'vertical'
@@ -86,6 +87,12 @@
             GameBoard:
                 id: game
                 size_hint: None, None
+                story: bool(int(app.config.get('General', 'mode')))
+                size_snake: int(app.config.get('General', 'size'))
+                speed_factor: int(app.config.get('General', 'speed'))
+                speed: SPEED/self.speed_factor
+
+
                 canvas.before:
                     Color:
                         rgba: 250/255, 248/255, 239/255, 1

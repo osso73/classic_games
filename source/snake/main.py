@@ -38,10 +38,21 @@ MINIMUM_SWIPE = 50
 IMAGES = os.path.join(os.path.dirname(__file__), 'images')  # path of images
 HELP_URL = 'https://osso73.github.io/classic_games/games/snake/'
 FOOD_SPEED = 1.5
-FOOD_SPEED_TIME = 30
+FOOD_SPEED_TIME = 20
 
 
 class MainScreen(BoxLayout):
+    '''
+    This is the main screen, to organize the menu and the board area. Almost
+    no logic here, as everything is happening on the GameBoard class.
+    
+    Attributes
+    ----------
+    level_progress_bar : NumericProperty
+        Used to show the progress inside one level. This is updated according
+        to the level.score.
+    '''
+    
     level_progress_bar = NumericProperty(0)
 
     def help(self):
@@ -55,67 +66,67 @@ class GameBoard(Widget):
     be located. It controls the movement of the snake, checking if there
     is any collision, and when food is eaten, spawning a new food. Keeps
     track of the score.
-    
+
     Attributes
     ----------
+    active : boolean
+        If True, the update function will move the snake; if False, it will
+        do nothing. This is set to False when the game finishes, and set
+        to active when a new game starts.
+    level : Level class
+        Object that keeps record of the current level, and has all properties
+        associated to the level: wall, maximum score, level score.
+    move_x : int
+        Defines the move of the snake: value that the position x is
+        incremented/decremented at each step. The unit is the square of the
+        grid, not the pixels. Can be 1, -1 or 0.
+    move_y : int
+        Defines the move of the snake: value that the position y is
+        incremented/decremented at each step. The unit is the square of the
+        grid, not the pixels. Can be 1, -1 or 0.
+    mute : boolean
+        If True, the sounds will not play; otherwise, they will play. Set
+        to False by default. This is triggered by button in toolbar.
+    num_level : NumericProperty
+        Current level. This can be set by menu buttons, or automatically at
+        the end of the level, moving to next level.
+    pause : boolean
+        When True, the game will pause (i.e. the update function will not
+        update). Set to False by default. This is triggered by button in
+        toolbar.
     score : NumericProperty
         Score of the game (+1 for every food)
-    size_pixels : NumericProperty
-        Each square of the grid has size_pixels x size_pixels pixels.
     size_grid : ListProperty
         This is a 2-values list with the number of squares of the grid, in
         the form of [n, m]. So in fact the number of squares are n+1 x m+1.
+    size_pixels : NumericProperty
+        Each square of the grid has size_pixels x size_pixels pixels.
     size_snake : NumericProperty
         This defines the number of squares that exist in the shortest window
         side. So the higher the number, the smaller will be the squares, and
         therefore the snake and food. It cycles through a number of
         pre-defined values: GRID_SIZES
-    wall : list
-        Contains all the widgets that form the wall, of type Wall
     snake_parts : list
         Contains all the widgets that form the snake: one SnakeHead, the
         rest SnakePart
     speed : NumericProperty
-        The actual speed of the snake, defined as the interval between 
-        updates. The result of the base speed, divided by the speed_factor 
+        The actual speed of the snake, defined as the interval between
+        updates. The result of the base speed, divided by the speed_factor
         and by the food speed.
     speed_factor : NumericProperty
         This defines the speed of the snake. This factor divides the
         interval between updates, so the higher the value the higher the
         speed of the snake.
-    move_x : int
-        Defines the move of the snake: value that the position x is 
-        incremented/decremented at each step. The unit is the square of the 
-        grid, not the pixels. Can be 1, -1 or 0.
-    move_y : int
-        Defines the move of the snake: value that the position y is 
-        incremented/decremented at each step. The unit is the square of the 
-        grid, not the pixels. Can be 1, -1 or 0.
-    active : boolean
-        If True, the update function will move the snake; if False, it will
-        do nothing. This is set to False when the game finishes, and set
-        to active when a new game starts.
-    pause : boolean
-        When True, the game will pause (i.e. the update function will not
-        update). Set to False by default. This is triggered by button in 
-        toolbar.
-    mute : boolean
-        If True, the sounds will not play; otherwise, they will play. Set
-        to False by default. This is triggered by button in toolbar.
-    level : Level class
-        Object that keeps record of the current level, and has all properties
-        associated to the level: wall, maximum score, level score.
-    num_level : NumericProperty
-        Current level. This can be set by menu buttons, or automatically at 
-        the end of the level, moving to next level.
     story : boolean
         Define if the game mode is story (True) or single-level (False)
+    wall : list
+        Contains all the widgets that form the wall, of type Wall
     '''
 
     score = NumericProperty(0)
     size_pixels = NumericProperty(0)
     size_grid = ListProperty()
-    size_snake = NumericProperty(GRID_SIZES[0])
+    size_snake = NumericProperty()
     snake_parts = ListProperty([])
     speed_factor = NumericProperty()
     speed = NumericProperty()
@@ -128,11 +139,12 @@ class GameBoard(Widget):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.wall = []
         self.active = False
-        self.speed_factor = 1
-        self.speed = SPEED/self.speed_factor
         self.sounds = self.load_sounds()
-        app = App.get_running_app()
-        self.story = bool(int(app.config.get('General', 'mode')))
+        # app = App.get_running_app()
+        # self.story = bool(int(app.config.get('General', 'mode')))
+        # self.size_snake = int(app.config.get('General', 'size'))
+        # self.speed_factor = int(app.config.get('General', 'speed'))
+        # self.speed = SPEED/self.speed_factor
 
 
     def button_size(self):
@@ -140,7 +152,7 @@ class GameBoard(Widget):
         Cycle self.size_snake through a set of pre-defined sizes (GRID_SIZES).
         Show an informative message of the new speed, and to restart
         the game to take into account.
-        
+
         This is called when button "size" is pressed.
 
         Returns
@@ -155,13 +167,13 @@ class GameBoard(Widget):
         msg = f'Size set to {self.size_snake}\nRestart the game to take it into effect'
         PopupButton(title='Size change', msg=msg)
         self.set_size()
-            
+
 
     def button_speed(self):
         '''
-        Cycle self.speed_factor through a set of pre-defined sizes 
+        Cycle self.speed_factor through a set of pre-defined sizes
         (SPEED_FACTORS).
-        
+
         This is called when button "speed" is pressed.
 
         Returns
@@ -174,21 +186,21 @@ class GameBoard(Widget):
         idx = (idx + 1) % len(speeds)
         self.speed_factor = speeds[idx]
         self.speed = SPEED/self.speed_factor
-    
-    
+
+
     def on_speed(self, *args):
         # first time event does not need to be cancelled
         if hasattr(self, 'event'):
             self.event.cancel()
-        
+
         self.event = Clock.schedule_interval(self.update, self.speed)
-        
+
 
 
     def set_size(self):
         '''
         Define the size of the GameBoard widget. Based on the size of the
-        grid, self.size_snake, it calculates the number of pixels of each 
+        grid, self.size_snake, it calculates the number of pixels of each
         square of the grid, and stores it in self.size_pixels.
 
         Returns
@@ -230,6 +242,7 @@ class GameBoard(Widget):
         self.play('start')
         self.score = 0
         app = App.get_running_app()
+        app.root.level_progress_bar = 0
         self.num_level = int(app.config.get('General', 'level_start'))
         self.level = Level(self.size_grid, self.num_level)
         self.new_level()
@@ -263,11 +276,11 @@ class GameBoard(Widget):
         # activate game
         self.active = True
         self.change_direction(self.level.get_start_direction())
-    
-    
-    def build_wall(self):        
+
+
+    def build_wall(self):
         positions = self.level.get_walls()
-        
+
         for p in positions:
             brick = Wall()
             self.add_widget(brick)
@@ -285,9 +298,11 @@ class GameBoard(Widget):
             self.add_widget(new_part)
             new_part.pos_nm = head.pos_nm
             self.snake_parts.append(new_part)
-            
+
 
     def clear_screen(self):
+        if len(self.snake_parts) > 0 and hasattr(self.snake_parts[0], 'event'):
+            self.snake_parts[0].event.cancel()
         self.snake_parts = []
         self.wall = []
         self.move_x = 0
@@ -299,8 +314,8 @@ class GameBoard(Widget):
         parts = [p for p in self.children if isinstance(p, instances)]
         for p in parts:
             self.remove_widget(p)
-       
-        
+
+
     def update(self, *args):
         '''
         Make the move of the snake. This callback is called periodically to
@@ -366,7 +381,7 @@ class GameBoard(Widget):
                 self.snake_parts.append(new_part)
             self.food.spawn(self.snake_parts + self.wall)
             head.mouth_open = False
-        
+
         # change direction of tail based on previous part
         n_prev, m_prev = self.snake_parts[-2].pos_nm
         n_last, m_last = self.snake_parts[-1].pos_nm
@@ -381,15 +396,15 @@ class GameBoard(Widget):
             else:
                 direction = 'DOWN'
         self.snake_parts[-1].direction = direction
-        
+
         # adjust speed, and speed countdown
         if self.food.speed_counter == 0:
             self.speed = SPEED/self.speed_factor
         else:
             self.speed = SPEED/self.speed_factor/FOOD_SPEED
             self.food.speed_counter -= 1
-            
-    
+
+
     def on_snake_parts(self, *args):
         '''
         When the snake_parts changes (i.e. a new part is added), it flags the
@@ -408,11 +423,11 @@ class GameBoard(Widget):
         # if only head, return
         if len(self.snake_parts) < 2:
             return
-        
+
         # remove tail flag from all parts
         for p in self.snake_parts[1:]:
             p.is_tail = False
-        
+
 
         # change flag
         self.snake_parts[-1].is_tail = True
@@ -428,7 +443,7 @@ class GameBoard(Widget):
         parent : object
             Argument passed by the event. Not used.
         value : number
-            Argument passed by the event. The value that has changed, i.e. 
+            Argument passed by the event. The value that has changed, i.e.
             the new score.
 
         Returns
@@ -438,7 +453,7 @@ class GameBoard(Widget):
         '''
         if self.score == 0:
             return
-        
+
         if self.story:
             self.level.inc_score(self.food.current['score'])
             app = App.get_running_app()
@@ -448,8 +463,8 @@ class GameBoard(Widget):
                     self.game_over(win=True)
                 else:
                     self.change_level()
-    
-    
+
+
     def change_level(self):
         self.play('next_level')
         self.active = False
@@ -457,16 +472,16 @@ class GameBoard(Widget):
         p = PopupButton(title='End of level', msg=msg)
         p.bind(on_dismiss=self.start_next_level)
 
-    
+
     def start_next_level(self, *args):
         self.level.set_level(self.level.num_level+1)
         self.num_level = self.level.num_level
         app = App.get_running_app()
         app.root.level_progress_bar = self.level.level_pct
         self.new_level()
-        
-    
-    
+
+
+
     def collision(self):
         # collision with body
         head = self.snake_parts[0]
@@ -475,7 +490,7 @@ class GameBoard(Widget):
                 self.remove_widget(head)
                 self.add_widget(head)
                 return True
-        
+
         # collision with wall
         for element in self.wall:
             if head.pos_nm == element.pos_nm:
@@ -597,7 +612,7 @@ class GameBoard(Widget):
         '''
         if self.mute:
             return
-        
+
         if sound in self.sounds:
             self.sounds[sound].play()
         else:
@@ -649,7 +664,7 @@ class Food(GridElement):
         super(Food, self).__init__(*args, **kwargs)
         self.images = os.listdir(os.path.join(IMAGES, 'food'))
         self.food_parameters = {
-            'fruit': {'speed': 1, 'score': 2, 'length': 1},
+            'fruit': {'speed': 1, 'score': 3, 'length': 1},
             'junk':  {'speed': FOOD_SPEED, 'score': 1, 'length': 2},
             'sweet': {'speed': 1, 'score': 1, 'length': 3},
             }
@@ -669,7 +684,7 @@ class Food(GridElement):
     def _get_pos(self):
         return [random.choice(range(self.grid[0]+1)),
                 random.choice(range(self.grid[1]+1))]
-    
+
     def on_image(self, *args):
         name = os.path.basename(self.image)
         food_type = name.split('-')[0]
@@ -684,7 +699,7 @@ class SnakePart(GridElement):
     image = StringProperty('')
     is_tail = BooleanProperty()
     direction = StringProperty('RIGHT')
-    
+
     def __init__(self, *args, **kwargs):
         super(SnakePart, self).__init__(*args, **kwargs)
         self.tail_image = dict()
@@ -692,14 +707,14 @@ class SnakePart(GridElement):
         self.tail_image['RIGHT'] = os.path.join(IMAGES, 'snake', 'tail_right.png')
         self.tail_image['UP'] = os.path.join(IMAGES, 'snake', 'tail_up.png')
         self.tail_image['DOWN'] = os.path.join(IMAGES, 'snake', 'tail_down.png')
-    
-    
+
+
     def on_is_tail(self, *args):
         if self.is_tail:
             self.image = self.tail_image[self.direction]
         else:
             self.image = ''
-        
+
     def on_direction(self, *args):
         if self.is_tail:
             self.image = self.tail_image[self.direction]
@@ -718,7 +733,6 @@ class SnakeHead(GridElement):
 
     def __init__(self, *args, **kwargs):
         super(SnakeHead, self).__init__(*args, **kwargs)
-        self.counter = 0
         self.original_size = self.size
         self.head_images = dict()
         self.head_images['LEFT'] = dict()
@@ -737,7 +751,7 @@ class SnakeHead(GridElement):
         self.head_images['DOWN'][True] = os.path.join(IMAGES, 'snake', 'open_down.png')
         self.head_images['DOWN'][False] = os.path.join(IMAGES, 'snake', 'head_down.png')
         self.list_colours = [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1],
-                             [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1], 
+                             [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1],
                              [1, 1, 1, 1]]
 
 
@@ -756,17 +770,14 @@ class SnakeHead(GridElement):
 
     def change_image(self):
         self.image = self.head_images[self.direction][self.mouth_open]
-    
+
     def on_crashed(self, *args):
         self.event = Clock.schedule_interval(self.change_colour, 0.2)
-    
+
     def change_colour(self, *args):
         idx = self.list_colours.index(self.colour)
         idx = (idx +1) % len(self.list_colours)
         self.colour = self.list_colours[idx]
-        self.counter += 1
-        if self.counter == 10:
-            return False
 
 
 class MenuButton(Button):
@@ -781,18 +792,18 @@ class MenuLabel(Label):
 
 class PopupButton(Popup):
     msg = StringProperty()
-    
+
     def __init__(self, *args, **kwargs):
         super(PopupButton, self).__init__(*args, **kwargs)
         Clock.schedule_once(self.open)
         Clock.schedule_once(self.set_size)
-    
+
     def calculate_size(self):
         width = height = 0
         for child in self.content.children:
             x, y = child.size
             width = max(width, x)
-            height += y 
+            height += y
         width += metrics.sp(50)
         height += metrics.sp(60)
 
@@ -806,7 +817,7 @@ class PopupButton(Popup):
 class SnakeApp(App):
     def build(self):
         self.icon = os.path.join(IMAGES, 'icon.png')
-        self.settings_cls = SettingsWithSpinner        
+        self.settings_cls = SettingsWithSpinner
         self.use_kivy_settings = False
         main = MainScreen()
         return main
@@ -817,28 +828,28 @@ class SnakeApp(App):
             'size': '11',
             'mode': '1',
             'level_start': 1,
-            })    
-    
+            })
+
     def build_settings(self, settings):
-        settings.add_json_panel("Snake settings", 
+        settings.add_json_panel("Snake settings",
                                 self.config,
                                 filename='settings.json')
-    
+
     def on_config_change(self, config, section, key, value):
         speeds = {'11':'1', '15':'1.5', '19':'2', '23':'3' }
         sizes = {v:k for k,v in speeds.items()}
-        
+
         if key == 'speed':
             self.root.ids.game.speed_factor = float(value)
             self.root.ids.game.speed = SPEED/self.root.ids.game.speed_factor
-        
+
         elif key == 'size':
             self.root.ids.game.size_snake = int(value)
             self.root.ids.game.set_size()
-        
+
         elif key == 'mode':
             self.root.ids.game.story = bool(int(value))
-        
+
         elif key == 'level_start':
             num = int(value)
             if num < 1:
@@ -846,7 +857,7 @@ class SnakeApp(App):
             elif num > 12:
                 num = 12
             config.set('General', 'level_start', num)
-        
+
         config.write()
 
 

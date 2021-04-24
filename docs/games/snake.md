@@ -6,11 +6,11 @@ These instructions are for version 1.4. You can find [here](../changelogs/snake_
 
 Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.
 
-In here, the player controls a snake that goes on the screen. There is a piece of food in a random location of the screen. When the snake eats the food, it grows the length by one unit, and a new piece of food appears. The player has to avoid that the snake hits a wall or the body of the snake: this will kill the snake.
+In here, the player controls a snake that goes on the screen. There is a piece of food at a random location of the screen. When the snake eats the food, it grows the length, and a new piece of food appears (note that each type of food will have slightly different effects). The player has to avoid that the snake hits a wall or its own body: this will kill the snake. Reaching the end of the screen will not kill the snake, it will just pop up at the opposite end.
 
-The game has different levels of difficulty, each of them has a certain amount of walls that the snake has to avoid. Once you reach a partial score of the level (which depends on the grid size), you move to the next level.
+The game has different levels, each of them has a certain amount of walls that the snake has to avoid. Once you reach a partial score of the level (which depends on the grid size), you move to the next level.
 
-Turning the snake can be done by swiping on the screen. The snake can turn 90 degrees in any direction.
+Swipe on the screen to change the direction of the snake. The snake can turn 90 degrees in any direction.
 
 The screen can be either portrait or landscape. If the screen changes, you should start a new game to take the dimensions into account.
 
