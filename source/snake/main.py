@@ -140,52 +140,6 @@ class GameBoard(Widget):
         self.wall = []
         self.active = False
         self.sounds = self.load_sounds()
-        # app = App.get_running_app()
-        # self.story = bool(int(app.config.get('General', 'mode')))
-        # self.size_snake = int(app.config.get('General', 'size'))
-        # self.speed_factor = int(app.config.get('General', 'speed'))
-        # self.speed = SPEED/self.speed_factor
-
-
-    def button_size(self):
-        '''
-        Cycle self.size_snake through a set of pre-defined sizes (GRID_SIZES).
-        Show an informative message of the new speed, and to restart
-        the game to take into account.
-
-        This is called when button "size" is pressed.
-
-        Returns
-        -------
-        None.
-
-        '''
-        sizes = GRID_SIZES
-        idx = sizes.index(self.size_snake)
-        idx = (idx + 1) % len(sizes)
-        self.size_snake = sizes[idx]
-        msg = f'Size set to {self.size_snake}\nRestart the game to take it into effect'
-        PopupButton(title='Size change', msg=msg)
-        self.set_size()
-
-
-    def button_speed(self):
-        '''
-        Cycle self.speed_factor through a set of pre-defined sizes
-        (SPEED_FACTORS).
-
-        This is called when button "speed" is pressed.
-
-        Returns
-        -------
-        None.
-
-        '''
-        speeds = SPEED_FACTORS
-        idx = speeds.index(self.speed_factor)
-        idx = (idx + 1) % len(speeds)
-        self.speed_factor = speeds[idx]
-        self.speed = SPEED/self.speed_factor
 
 
     def on_speed(self, *args):

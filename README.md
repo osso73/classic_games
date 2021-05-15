@@ -29,6 +29,8 @@ python main.py
 
 If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `buildozer.spec` file that I use to compile it for android. You can adjust the parameters from there to your liking.
 
+Alternatively, you can download the .apk image of the games and install it directly on your phone. The images are under folder [releases](https://github.com/osso73/classic_games/tree/main/releases).
+
 You can find information about how to play these games in this page: https://osso73.github.io/classic_games/.
 
 
@@ -47,3 +49,5 @@ I am using resources from the following sites:
 - [Perfect Icons](http://www.perfect-icons.com/index.htm)
 - [Free Sound](https://freesound.org/)
 - [GoodFon.com](https://www.goodfon.com/)
+
+More information about the assets used in each of the games can be found in the [documentation](https://osso73.github.io/classic_games/) page, under the _Credits_ section in each game.
