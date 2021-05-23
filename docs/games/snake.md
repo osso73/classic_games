@@ -60,7 +60,7 @@ The buttons give you access to the following functions:
 
 ## Settings
 
-All settings are grouped under a settings panel, as shown in this screenshot, and can be accessed through the :
+All settings are grouped under a settings panel, as shown in this screenshot, and can be accessed through the menu button ![][b_settings]:
 
 ![Settings](../img/snake/settings_screen.jpg "Settings")
 
@@ -83,13 +83,13 @@ I found the snake head in [here](https://www.iconfinder.com/icons/3015218/danger
 The sounds I found on [Free Sound](https://freesound.org/), and some of them I had found over Internet. I'm not aware of any copyright or limitation to use these.
 
 
-[b_mute_on]: ../img/snake/btn_mute_on.png "Mute on"
-[b_mute_off]: ../img/snake/btn_mute_on.png "Mute off"
-[b_pause]: ../img/snake/btn_pause.png "Pause"
-[b_play]: ../img/snake/btn_play.png "Play"
-[b_settings]: ../img/snake/btn_settings.png "Settings"
-[b_help]: ../img/snake/btn_help.png "Help"
-[b_exit]: ../img/snake/btn_power.png "Exit"
+[b_mute_on]: ../img/snake/btn_mute_on.png "Mute on button"
+[b_mute_off]: ../img/snake/btn_mute_off.png "Mute off button"
+[b_pause]: ../img/snake/btn_pause.png "Pause button"
+[b_play]: ../img/snake/btn_play.png "Play button"
+[b_settings]: ../img/snake/btn_settings.png "Settings button"
+[b_help]: ../img/snake/btn_help.png "Help button"
+[b_exit]: ../img/snake/btn_power.png "Exit button"
 
 [apple]: ../img/snake/fruit-apple.png "Apple"
 [apple2]: ../img/snake/fruit-apple2.png "Apple"
