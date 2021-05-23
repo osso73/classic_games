@@ -1,0 +1,40 @@
+[
+    {
+      "type": "title",
+      "title": "Speed and size of the grid"
+    },
+    {
+      "type": "options",
+      "title": "Speed",
+      "desc": "Speed of the snake.",
+      "options": ["0.5", "0.8", "1","1.5", "2", "3"],
+      "section": "Snake",
+      "key": "speed"
+    },
+    {
+      "type": "options",
+      "title": "Size",
+      "desc": "Size of the grid: number of squares in the shortest window size",
+      "options": ["11", "15", "19", "23"],
+      "section": "Snake",
+      "key": "size"
+    },
+    {
+      "type": "title",
+      "title": "Story vs level"
+    },
+    {
+      "type": "bool",
+      "title": "Play story",
+      "desc": "Select True to play in story mode, or False to play only one level. Story mode will start at the level selected below, and single-level will play the level below.",
+      "section": "Snake",
+      "key": "mode"
+    },
+    {
+      "type": "numeric",
+      "title": "Start level",
+      "desc": "Select the level you want to start. This is valid for both single-level or story mode.",
+      "section": "Snake",
+      "key": "level_start"
+    }
+]

@@ -1,0 +1,197 @@
+#:set COLOUR_IMAGE [1, 1, 1, 1]
+#:set COLOUR_SNAKE [140/255, 198/255, 62/255, 1]
+#:set SPEED 0.25
+
+<MainScreen>:
+    orientation: 'vertical'
+
+    BoxLayout:
+        size_hint_y: None
+        height: '40sp'
+        padding: sp(5)
+        spacing: sp(5)
+        canvas:
+            Color:
+                rgba: 1, 0, 0, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        MenuButton:
+            text: 'Start'
+            on_release: game.start_game()
+        
+        MenuButtonImage:
+            image: 'icons/mute_off.png', 'icons/mute_on.png'
+            on_release: game.mute = not game.mute
+
+
+        MenuButtonImage:
+            image: 'icons/pause.png', 'icons/play.png'
+            on_release: game.pause = not game.pause
+                            
+
+        MenuButtonImage:
+            image: 'icons/settings.png', 'icons/settings.png'
+            on_release: app.open_settings()
+                            
+
+        Label:
+
+        MenuButtonImage:
+            image: 'icons/help.png', 'icons/help.png'
+            on_release: root.help()
+
+        MenuButtonImage:
+            image: 'icons/power.png', 'icons/power.png'
+            on_release:
+                game.bye()
+                app.stop()
+
+    BoxLayout:
+        orientation: 'vertical'
+        canvas:
+            Color:
+                rgba: 0, 1, 1, 0.2
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: score.texture_size[1]
+            Label:
+                id: score
+                text: 'Score: ' + str(game.score)
+                font_size: '36sp'
+            Label:
+                text: 'Level: ' + str(game.num_level)
+                font_size: '36sp'
+                canvas.before:
+                    Color:
+                        rgba: 1, 0, 0, 0.5
+                    Rectangle:
+                        size: self.width * root.level_progress_bar, self.height
+                        pos: self.pos
+
+        GridLayout:
+            cols: 3
+            on_size: game.set_size()
+    
+            Label:
+            Label:
+            Label:
+    
+            Label:
+            GameBoard:
+                id: game
+                size_hint: None, None
+                story: bool(int(app.config.get('General', 'mode')))
+                size_snake: int(app.config.get('General', 'size'))
+                speed_factor: int(app.config.get('General', 'speed'))
+                speed: SPEED/self.speed_factor
+
+
+                canvas.before:
+                    Color:
+                        rgba: 250/255, 248/255, 239/255, 1
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+    
+            Label:
+            Label:
+            Label:
+        
+
+########################### Snake parts #####################################
+
+<GridElement>:
+    size_pixels: app.root.ids.game.size_pixels
+    grid: app.root.ids.game.size_grid
+    size: self.size_pixels, self.size_pixels
+
+
+<SnakePart>:
+    canvas.before:
+        Color:
+            rgba: COLOUR_IMAGE if self.image else COLOUR_SNAKE
+        Rectangle:
+            source: self.image
+            pos: self.pos
+            size: self.size
+
+<SnakeHead>:
+    colour: COLOUR_IMAGE
+    canvas.before:
+        Color:
+            rgba: self.colour
+        Rectangle:
+            source: self.image
+            pos: self.pos
+            size: self.size
+
+############################## Food ########################################
+<Food>:
+    canvas.before:
+        Color:
+            rgba: COLOUR_IMAGE
+        Rectangle:
+            source: self.image
+            pos: self.pos
+            size: self.size
+
+
+############################## Food ########################################
+<Wall>:
+    canvas.before:
+        Color:
+            rgba: COLOUR_IMAGE
+        Rectangle:
+            source: 'images/wall.jpg'
+            pos: self.pos
+            size: self.size
+
+############################## Popup ########################################
+<PopupButton>:
+    size_hint: None, None
+    auto_dismiss: False
+    BoxLayout:
+        orientation: 'vertical'
+        
+        Label:
+            text: root.msg
+            padding: sp(20), sp(20)
+            font_size: '20sp'
+            size_hint: None, None
+            size: self.texture_size
+        Button:
+            text: 'Ok'
+            font_size: '20sp'
+            padding: sp(20), sp(10)
+            size_hint: None, None
+            size: self.texture_size
+            on_release: root.dismiss()
+            pos_hint: {'center_x': 0.5}
+
+
+############################## Menu ########################################
+
+<MenuButton>:
+    font_size: '18sp'
+    size_hint_x: None
+    size: self.texture_size
+    padding: sp(5), sp(5)
+
+<MenuButtonImage>:
+    size_hint_x: None
+    width: self.parent.height * 0.7
+    padding: sp(10), sp(10)
+    canvas:
+        Rectangle:
+            source: self.image[0]
+            size: self.size
+            pos: self.pos
+    on_press: self.image = self.image[1], self.image[0]

@@ -1,0 +1,61 @@
+<MyTile>:
+    size_hint_y: None
+    height: self.width
+    on_release: app.root.ids.my_drawer.screen = root.screen
+    text: '[size=18]' + self.txt
+    
+    
+<Menu>:
+    name: 'menu'
+    
+    BoxLayout:
+        orientation: 'vertical'
+    
+        MDToolbar:
+            title: 'Classic Games'
+            elevation: 10
+            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
+            
+        ScrollView:
+        
+            MDGridLayout:
+                cols: 2
+                adaptive_height: True
+                padding: dp(25), dp(25)
+                spacing: dp(25)
+                
+                MyTile:
+                    txt: 'snake'
+                    source: 'snake/images/icon.png'
+                    screen: 'snake'
+    
+                MyTile:
+                    txt: '15 puzzle'
+                    source: 'game_15puzzle/images/icon.png'
+                    screen: 'fifteen'
+    
+                MyTile:
+                    txt: '2048'
+                    source: 'game_2048/images/icon.png'
+                    screen: '2048'
+    
+                MyTile:
+                    txt: 'memory'
+                    source: 'memory/images/icon.png'
+                    screen: 'memory'
+                                
+                MyTile:
+                    txt: 'pong'
+                    source: 'pong/images/icon.jpg'
+                    screen: 'pong'
+    
+                MyTile:
+                    txt: 'ahorcado'
+                    source: 'ahorcado/images/icon.jpg'
+                    screen: 'ahorcado'
+                                
+                MyTile:
+                    txt: 'buscaminas'
+                    source: 'buscaminas/images/icon.png'
+                    screen: 'buscaminas'
+

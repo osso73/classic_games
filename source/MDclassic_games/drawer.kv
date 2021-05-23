@@ -1,0 +1,100 @@
+<MyDrawer>:
+    screen: 'menu'
+    
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: '8dp'
+        padding: '8dp'
+
+        MDIconButton:
+            icon: 'arrow-collapse-left'
+            halign: 'left'
+            on_press: root.set_state("close")
+
+        
+        Image:
+            source: 'images/icon.png'
+            size_hint_y: None
+            height: '150dp'
+            
+        
+        ScrollView:
+            MDList:
+                OneLineIconListItem:
+                    text: 'main menu'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'menu'
+                    IconLeftWidget:
+                        icon: 'menu'
+                    
+                OneLineIconListItem:
+                    text: 'settings'
+                    on_release:
+                        root.set_state("close")
+                        app.open_settings()
+                    IconLeftWidget:
+                        icon: 'cog'
+                    
+                OneLineIconListItem:
+                    text: 'Exit'
+                    on_release: app.stop()
+                    IconLeftWidget:
+                        icon: 'logout'
+            
+                OneLineAvatarListItem:
+                    text: 'snake'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'snake'
+                    ImageLeftWidget:
+                        source: 'snake/images/icon.png'
+                    
+                OneLineAvatarListItem:
+                    text: '15 puzzle'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'fifteen'
+                    ImageLeftWidget:
+                        source: 'game_15puzzle/images/icon.png'
+                    
+                OneLineAvatarListItem:
+                    text: '2048'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = '2048'
+                    ImageLeftWidget:
+                        source: 'game_2048/images/icon.png'
+                    
+                OneLineAvatarListItem:
+                    text: 'memory'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'memory'
+                    ImageLeftWidget:
+                        source: 'memory/images/icon.png'
+                    
+                OneLineAvatarListItem:
+                    text: 'pong'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'pong'
+                    ImageLeftWidget:
+                        source: 'pong/images/icon.jpg'
+                                        
+                OneLineAvatarListItem:
+                    text: 'ahorcado'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'ahorcado'
+                    ImageLeftWidget:
+                        source: 'ahorcado/images/icon.jpg'
+                    
+                OneLineAvatarListItem:
+                    text: 'buscaminas'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'buscaminas'
+                    ImageLeftWidget:
+                        source: 'buscaminas/images/icon.png'
+                        
