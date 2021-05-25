@@ -11,7 +11,7 @@ This is a temporary script file.
 # non-std libraries
 from kivymd.app import MDApp
 from kivy.core.window import Window
-from kivy.uix.settings import SettingsWithSpinner
+from kivy.uix.settings import SettingsWithTabbedPanel
 from kivy.utils import platform
 from kivy.lang import Builder
 
@@ -79,7 +79,7 @@ class MainApp(MDApp):
         screen = Builder.load_string(KV)
         self.icon = 'images/icon.png'
         self.theme_cls.primary_palette = 'DeepPurple'
-        self.settings_cls = SettingsWithSpinner
+        self.settings_cls = SettingsWithTabbedPanel
         self.use_kivy_settings = False
         return screen       
 
@@ -91,36 +91,26 @@ class MainApp(MDApp):
             'level_start': 1,
             })
 
-    def build_settings(self, settings):
-        settings.add_json_panel("Snake settings",
-                                self.config,
-                                filename='snake/settings.json')
+        config.setdefaults('Ahorcado', {
+            'man': 'hombre1',
+            'keyboard': 'teclado2',
+            })
 
+    def build_settings(self, settings):
+        settings.add_json_panel("Snake", self.config,
+                                filename='snake/settings.json')
+        settings.add_json_panel("Ahorcado", self.config,
+                                filename='ahorcado/settings.json')
 
 
     def on_config_change(self, config, section, key, value):
-        speeds = {'11':'1', '15':'1.5', '19':'2', '23':'3' }
-        sizes = {v:k for k,v in speeds.items()}
 
-        if key == 'speed':
-            self.root.ids.snake.ids.game.speed_factor = float(value)
-
-        elif key == 'size':
-            self.root.ids.snake.ids.game.size_snake = int(value)
-            self.root.ids.snake.ids.game.set_size()
-
-        elif key == 'mode':
-            self.root.ids.snake.ids.game.story = bool(int(value))
-
-        elif key == 'level_start':
-            num = int(value)
-            if num < 1:
-                num = 1
-            elif num > 12:
-                num = 12
-            config.set('Snake', 'level_start', num)
-
-        config.write()
+        if section == 'Snake':
+            self.root.ids.snake.config_change(config, section, key, value)
+        
+        elif section == 'Ahorcado':
+            self.root.ids.ahorcado.config_change(config, section, key, value)
+        
 
 
 if __name__ == '__main__':

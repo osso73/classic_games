@@ -51,6 +51,14 @@
                         source: 'snake/images/icon.png'
                     
                 OneLineAvatarListItem:
+                    text: 'ahorcado'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'ahorcado'
+                    ImageLeftWidget:
+                        source: 'ahorcado/images/icon.jpg'
+                    
+                OneLineAvatarListItem:
                     text: '15 puzzle'
                     on_release:
                         root.set_state("close")
@@ -82,14 +90,6 @@
                     ImageLeftWidget:
                         source: 'pong/images/icon.jpg'
                                         
-                OneLineAvatarListItem:
-                    text: 'ahorcado'
-                    on_release:
-                        root.set_state("close")
-                        root.screen = 'ahorcado'
-                    ImageLeftWidget:
-                        source: 'ahorcado/images/icon.jpg'
-                    
                 OneLineAvatarListItem:
                     text: 'buscaminas'
                     on_release:

@@ -1,0 +1,18 @@
+[
+    {
+      "type": "options",
+      "title": "Man",
+      "desc": "Skin on the man hanged.",
+      "options": ["hombre1", "hombre2"],
+      "section": "Ahorcado",
+      "key": "man"
+    },
+    {
+      "type": "options",
+      "title": "Keyboard",
+      "desc": "Skin of the keyboard.",
+      "options": ["teclado1", "teclado2", "teclado3", "teclado4", "teclado5", "teclado6"],
+      "section": "Ahorcado",
+      "key": "keyboard"
+    }
+]

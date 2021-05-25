@@ -89,7 +89,8 @@ Builder.load_string(
 class ScreenSnake(MDScreen):
     '''
     This is the main screen, to organize the menu and the board area. Almost
-    no logic here, as everything is happening on the GameBoard class.
+    no logic here, as everything is happening on the GameBoard class. Only
+    handles the settings changes for snake.
     
     Attributes
     ----------
@@ -99,3 +100,24 @@ class ScreenSnake(MDScreen):
     '''
     
     level_progress_bar = NumericProperty(0)
+    
+    def config_change(self, config, section, key, value):
+        if key == 'speed':
+            self.ids.game.speed_factor = float(value)
+
+        elif key == 'size':
+            self.ids.game.size_snake = int(value)
+            self.ids.game.set_size()
+
+        elif key == 'mode':
+            self.ids.game.story = bool(int(value))
+
+        elif key == 'level_start':
+            num = int(value)
+            if num < 1:
+                num = 1
+            elif num > 12:
+                num = 12
+            config.set('Snake', 'level_start', num)
+
+        config.write()

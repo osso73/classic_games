@@ -21,7 +21,7 @@ from kivy import metrics
 Builder.load_string(
     r"""
 
-<PopupButton>:
+<PopupButtonAhorcado>:
     size_hint: None, None
     auto_dismiss: False
     BoxLayout:
@@ -46,11 +46,11 @@ Builder.load_string(
 
 
 
-class PopupButton(Popup):
+class PopupButtonAhorcado(Popup):
     msg = StringProperty()
 
-    def __init__(self, **kwargs):
-        super(PopupButton, self).__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(PopupButtonAhorcado, self).__init__(*args, **kwargs)
         Clock.schedule_once(self.open)
         Clock.schedule_once(self.set_size)
 
