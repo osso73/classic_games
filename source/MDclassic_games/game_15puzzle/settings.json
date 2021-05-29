@@ -1,0 +1,20 @@
+[
+    {
+      "type": "options",
+      "title": "Level",
+      "desc": "Level of dificulty",
+      "options": ["1", "2", "3"],
+      "section": "fifteen",
+      "key": "level"
+    },
+    {
+      "type": "options",
+      "title": "Theme",
+      "desc": "Picture displayed.",
+      "options": ["arbol", "ardilla", "barco", "bombilla", "carnaval", "costa", 
+      "cyberpunk", "desayuno", "dibujo", "elefante", "eva", "luna", "mono",
+      "mortal_kombat", "moto", "muneca", "numeros", "paisaje", "pez", "via_lactea"],
+      "section": "fifteen",
+      "key": "theme"
+    }
+]

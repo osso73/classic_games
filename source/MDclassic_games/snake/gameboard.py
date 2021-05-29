@@ -548,7 +548,7 @@ class GameBoard(Widget):
         '''
         sound = dict()
         folder = os.path.join(os.path.dirname(__file__),'audio')
-        for s in ['bye', 'eat', 'start', 'next_level', 'game_over', 'win']:
+        for s in ['eat', 'start', 'next_level', 'game_over', 'win']:
             sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
 
         return sound

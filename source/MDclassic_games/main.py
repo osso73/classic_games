@@ -11,7 +11,7 @@ This is a temporary script file.
 # non-std libraries
 from kivymd.app import MDApp
 from kivy.core.window import Window
-from kivy.uix.settings import SettingsWithTabbedPanel
+from kivy.uix.settings import SettingsWithSpinner
 from kivy.utils import platform
 from kivy.lang import Builder
 
@@ -27,7 +27,7 @@ from memory.screen import ScreenMemory
 from pong.screen import ScreenPong
 
 
-__version__ = '0.1'
+__version__ = '0.3'
 
 
 KV = r"""
@@ -79,7 +79,7 @@ class MainApp(MDApp):
         screen = Builder.load_string(KV)
         self.icon = 'images/icon.png'
         self.theme_cls.primary_palette = 'DeepPurple'
-        self.settings_cls = SettingsWithTabbedPanel
+        self.settings_cls = SettingsWithSpinner
         self.use_kivy_settings = False
         return screen       
 
@@ -96,11 +96,18 @@ class MainApp(MDApp):
             'keyboard': 'teclado2',
             })
 
+        config.setdefaults('fifteen', {
+            'level': '1',
+            'theme': 'numeros',
+            })
+
     def build_settings(self, settings):
         settings.add_json_panel("Snake", self.config,
                                 filename='snake/settings.json')
         settings.add_json_panel("Ahorcado", self.config,
                                 filename='ahorcado/settings.json')
+        settings.add_json_panel("15 puzzle", self.config,
+                                filename='game_15puzzle/settings.json')
 
 
     def on_config_change(self, config, section, key, value):
@@ -110,6 +117,9 @@ class MainApp(MDApp):
         
         elif section == 'Ahorcado':
             self.root.ids.ahorcado.config_change(config, section, key, value)
+        
+        elif section == 'fifteen':
+            self.root.ids.fifteen.config_change(config, section, key, value)
         
 
 

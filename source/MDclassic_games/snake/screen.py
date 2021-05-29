@@ -75,14 +75,6 @@ Builder.load_string(
             Label:
             Label:
             Label:
-            
-        # MDLabel:
-        #     text: 'Work in progress'
-        #     font_style: 'H3'
-        #     pos_hint: { 'center_x': 0.5, 'center_y': 0.5 }
-        #     halign: 'center'
-        
-        
 
 """)
 

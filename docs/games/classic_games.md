@@ -29,7 +29,7 @@ The following options are available from the side menu:
 - help: link to these instructions
 
 
-
+* * *
 
 ## Game of snake
 
@@ -94,7 +94,7 @@ Fig. 3 shows a screenshot of the settings.
 
 **Figure 3**. Settings window for game snake.
 
-The following options are availble:
+The following options are available:
 
   - **Size**: to change the size of the head and food. They can be larger or smaller. You can select from a number of pre-defined sizes: 11, 15, 19, 23. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.
 
@@ -107,10 +107,129 @@ The following options are availble:
 The settings are saved, so next time you start the game it will maintain the same settings defined.
 
 
+* * *
 
-[b_start]: ../img/MD/snake/btn_play.png "Start button"
-[b_mute_on]: ../img/MD/snake/btn_mute_on.png "Mute on button"
-[b_pause]: ../img/MD/snake/btn_pause.png "Pause button"
+## Game of snake
+
+### Rules of the game
+
+This is the game _hanged_, or _ahorcado_ in Spanish. It is pretty simple: given a word (where you can only see its length), you have to guess it by proposing letters:
+
+  - Every letter proposed that exists in the word will appear in its correct position.
+  - Every letter proposed that does not exist will contribute to building your gallows.
+
+If you guess all letters, you win. If the gallows is finished before gessing all letters, you loose and you are hanged.
+
+The words are in Spanish, taken from a Spanish book taken from [Project Guttenberg](http://www.gutenberg.org/).
+
+
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![ahorcado_screen](../img/MD/MD_ahorcado_screen.png "Screenshot of the ahorcado")
+
+
+It is divided in several areas:
+
+- _top row_: it shows a toolbar with some buttons that will allow you different functions
+
+- _desert picture_: this is where your gallows will start to build
+
+- _red strip_: the missed letters will show up here
+
+- _green strip_: this will show the word being guessed. The letters that have not been guessed yet are shown as '-'.
+
+- _bottom_: this is a keyboard, with a spanish layout (i.e. showing letter **Ñ**). Note that keys are alphabetically sorted.
+
+
+### Buttons in toolbar
+
+The buttons give you access to the following functions:
+
+  - ![][b_start]: to start a new game. It will erase whatever is on the screen, and provide a new word and reset the keyboard.
+
+  - ![][b_help]: this will give you a hint, i.e. show you one of the missing letters. You can only use this once in a game.
+
+  - ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+
+### Settings
+
+The following options are available to be set for this game:
+
+  - **Man**: to change the skin of the hanged man. There are 2 different skins.
+
+  - **Keyboard**: to change the skin of the keyboard. There are 6 different skins available.
+
+The settings are saved, so next time you start the game it will maintain the same settings defined.
+
+
+* * *
+
+## Game of 15 puzzle
+
+### Rules of the game
+
+This is the classic game where you have 15 tiles in a 4x4 grid, and you need to put them in the right order by using the empty tile to move the others. The image below shows an example of such a puzzle (almost solved):
+
+![example 15puzzle](../img/15puzzle_example.png)
+
+The game offers different levels of difficulty (3x3, 4x4 or 5x5 game), and different themes besides the classical numbers: each theme is a square image, that has been cut into pieces.
+
+You move the tiles by touching a tile adjacent to the empty space. This tile will move then to the empty space.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![15puzzle_screen](../img/MD/MD_15puzzle_screen.png "Screenshot of the 15 puzzle")
+
+It is divided in several areas:
+
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions, and give the score.
+
+- _score_: the score is shown by the number of moves you made. The higher the worse. The goal is to achieve a complete image with the minimum number of moves.
+
+- _main square_: this is where you have the tiles that you need to move, to complete the picture. They are randomly sorted at the beginning.
+
+- _bottom_: here is where you choose the theme and level. You can see an example of the current theme image complete below. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). The buttons allow you to change the level and the theme. Several themes are provided, the button will cycle through them.
+
+
+### Buttons in toolbar
+
+The buttons give you access to the following functions:
+
+- ![][b_start]: to start a new game. It will reset the score of moves, and start a new board with tiles randomly ordered, using the current theme and level.
+
+- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+
+On the bottom screen, you find 2 buttons:
+
+- **Theme**: this is to change the theme. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.
+
+- **Level n**: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.
+
+These options can be set also through the settings panel.
+
+
+### Solvable puzzles
+
+Note that not all puzzles of this kind (e.g. a puzzle of n x n squares with an empty space, randomly sorted) can be solved. I quickly realized that when I was doing the first tests. Fortunately, there is a way to find if a particular puzzle is solved, as explained in this page: [How to check if an instance of 15 puzzle is solvable?](https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/).
+
+So I implemented a function based on this methodology to find if the puzzle that was randomly sorted was solvable; if not, I shuffle again and test again. This way I can ensure that all puzzles are solvable.
+
+
+
+
+[b_start]: ../img/MD/icons/btn_play.png "Start button"
+[b_mute_on]: ../img/MD/icons/btn_mute_on.png "Mute on button"
+[b_pause]: ../img/MD/icons/btn_pause.png "Pause button"
+[b_help]: ../img/MD/icons/btn_help.png "Pause button"
 
 [apple]: ../img/MD/snake/fruit-apple.png "Apple"
 [apple2]: ../img/MD/snake/fruit-apple2.png "Apple"
