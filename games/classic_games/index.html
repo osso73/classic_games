@@ -75,6 +75,40 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-snake_1">Game of snake</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_1">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_1">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#buttons-in-toolbar_1">Buttons in toolbar</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#settings_1">Settings</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-15-puzzle">Game of 15 puzzle</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_2">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_2">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#buttons-in-toolbar_2">Buttons in toolbar</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#solvable-puzzles">Solvable puzzles</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2048">2048</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_3">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_3">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#buttons-in-toolbar_3">Buttons in toolbar</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pong/">Pong</a>
@@ -170,6 +204,7 @@
 <li>about: display information about the application and the author</li>
 <li>help: link to these instructions</li>
 </ul>
+<hr />
 <h2 id="game-of-snake">Game of snake</h2>
 <h3 id="rules-of-the-game">Rules of the game</h3>
 <p>Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.</p>
@@ -226,20 +261,20 @@
 <p>The buttons give you access to the following functions:</p>
 <ul>
 <li>
-<p><img alt="" src="../../img/MD/snake/btn_play.png" title="Start button" />: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.</p>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.</p>
 </li>
 <li>
-<p><img alt="" src="../../img/MD/snake/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
 </li>
 <li>
-<p><img alt="" src="../../img/MD/snake/btn_pause.png" title="Pause button" />: this button will pause the game. Another click will continue the game where it was.</p>
+<p><img alt="" src="../../img/MD/icons/btn_pause.png" title="Pause button" />: this button will pause the game. Another click will continue the game where it was.</p>
 </li>
 </ul>
 <h3 id="settings">Settings</h3>
 <p>Fig. 3 shows a screenshot of the settings.</p>
 <p><img alt="Settings" src="../../img/snake/settings_screen.jpg" title="Settings" /></p>
 <p><strong>Figure 3</strong>. Settings window for game snake.</p>
-<p>The following options are availble:</p>
+<p>The following options are available:</p>
 <ul>
 <li>
 <p><strong>Size</strong>: to change the size of the head and food. They can be larger or smaller. You can select from a number of pre-defined sizes: 11, 15, 19, 23. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.</p>
@@ -255,6 +290,148 @@
 </li>
 </ul>
 <p>The settings are saved, so next time you start the game it will maintain the same settings defined.</p>
+<hr />
+<h2 id="game-of-snake_1">Game of snake</h2>
+<h3 id="rules-of-the-game_1">Rules of the game</h3>
+<p>This is the game <em>hanged</em>, or <em>ahorcado</em> in Spanish. It is pretty simple: given a word (where you can only see its length), you have to guess it by proposing letters:</p>
+<ul>
+<li>Every letter proposed that exists in the word will appear in its correct position.</li>
+<li>Every letter proposed that does not exist will contribute to building your gallows.</li>
+</ul>
+<p>If you guess all letters, you win. If the gallows is finished before gessing all letters, you loose and you are hanged.</p>
+<p>The words are in Spanish, taken from a Spanish book taken from <a href="http://www.gutenberg.org/">Project Guttenberg</a>.</p>
+<h3 id="main-screen_1">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="ahorcado_screen" src="../../img/MD/MD_ahorcado_screen.png" title="Screenshot of the ahorcado" /></p>
+<p>It is divided in several areas:</p>
+<ul>
+<li>
+<p><em>top row</em>: it shows a toolbar with some buttons that will allow you different functions</p>
+</li>
+<li>
+<p><em>desert picture</em>: this is where your gallows will start to build</p>
+</li>
+<li>
+<p><em>red strip</em>: the missed letters will show up here</p>
+</li>
+<li>
+<p><em>green strip</em>: this will show the word being guessed. The letters that have not been guessed yet are shown as '-'.</p>
+</li>
+<li>
+<p><em>bottom</em>: this is a keyboard, with a spanish layout (i.e. showing letter <strong>Ñ</strong>). Note that keys are alphabetically sorted.</p>
+</li>
+</ul>
+<h3 id="buttons-in-toolbar_1">Buttons in toolbar</h3>
+<p>The buttons give you access to the following functions:</p>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game. It will erase whatever is on the screen, and provide a new word and reset the keyboard.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_help.png" title="Pause button" />: this will give you a hint, i.e. show you one of the missing letters. You can only use this once in a game.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+</li>
+</ul>
+<h3 id="settings_1">Settings</h3>
+<p>The following options are available to be set for this game:</p>
+<ul>
+<li>
+<p><strong>Man</strong>: to change the skin of the hanged man. There are 2 different skins.</p>
+</li>
+<li>
+<p><strong>Keyboard</strong>: to change the skin of the keyboard. There are 6 different skins available.</p>
+</li>
+</ul>
+<p>The settings are saved, so next time you start the game it will maintain the same settings defined.</p>
+<hr />
+<h2 id="game-of-15-puzzle">Game of 15 puzzle</h2>
+<h3 id="rules-of-the-game_2">Rules of the game</h3>
+<p>This is the classic game where you have 15 tiles in a 4x4 grid, and you need to put them in the right order by using the empty tile to move the others. The image below shows an example of such a puzzle (almost solved):</p>
+<p><img alt="example 15puzzle" src="../../img/15puzzle_example.png" /></p>
+<p>The game offers different levels of difficulty (3x3, 4x4 or 5x5 game), and different themes besides the classical numbers: each theme is a square image, that has been cut into pieces.</p>
+<p>You move the tiles by touching a tile adjacent to the empty space. This tile will move then to the empty space.</p>
+<h3 id="main-screen_2">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="15puzzle_screen" src="../../img/MD/MD_15puzzle_screen.png" title="Screenshot of the 15 puzzle" /></p>
+<p>It is divided in several areas:</p>
+<ul>
+<li>
+<p><em>toolbar</em>: it shows a toolbar with some buttons that will allow you different functions, and give the score.</p>
+</li>
+<li>
+<p><em>score</em>: the score is shown by the number of moves you made. The higher the worse. The goal is to achieve a complete image with the minimum number of moves.</p>
+</li>
+<li>
+<p><em>main square</em>: this is where you have the tiles that you need to move, to complete the picture. They are randomly sorted at the beginning.</p>
+</li>
+<li>
+<p><em>bottom</em>: here is where you choose the theme and level. You can see an example of the current theme image complete below. This is to be used for reference, especially important in more difficult games (e.g. 4x4 and 5x5). The buttons allow you to change the level and the theme. Several themes are provided, the button will cycle through them.</p>
+</li>
+</ul>
+<h3 id="buttons-in-toolbar_2">Buttons in toolbar</h3>
+<p>The buttons give you access to the following functions:</p>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game. It will reset the score of moves, and start a new board with tiles randomly ordered, using the current theme and level.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+</li>
+</ul>
+<p>On the bottom screen, you find 2 buttons:</p>
+<ul>
+<li>
+<p><strong>Theme</strong>: this is to change the theme. The theme button will show the name of the theme, cycling through all available themes. By default, you start with the numbers.</p>
+</li>
+<li>
+<p><strong>Level n</strong>: this is to change the level. Level 1 is a board of 3x3, level 2 a board of 4x4, and level 3 a board of 5x5.</p>
+</li>
+</ul>
+<p>These options can be set also through the settings panel.</p>
+<h3 id="solvable-puzzles">Solvable puzzles</h3>
+<p>Note that not all puzzles of this kind (e.g. a puzzle of n x n squares with an empty space, randomly sorted) can be solved. I quickly realized that when I was doing the first tests. Fortunately, there is a way to find if a particular puzzle is solved, as explained in this page: <a href="https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/">How to check if an instance of 15 puzzle is solvable?</a>.</p>
+<p>So I implemented a function based on this methodology to find if the puzzle that was randomly sorted was solvable; if not, I shuffle again and test again. This way I can ensure that all puzzles are solvable.</p>
+<h2 id="2048">2048</h2>
+<h3 id="rules-of-the-game_3">Rules of the game</h3>
+<p>2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The objective of the game is to slide numbered tiles on a grid to combine them to create a tile with the number 2048; however, one can continue to play the game after reaching the goal, creating tiles with larger numbers.</p>
+<p><em>(extracted from Wikipedia)</em></p>
+<p>Each turn you can move all tiles in one of the 4 directions: up, down, left or right. All tiles move in that direction as much as possible, until they find the edge of the board or another tile. In case they find another tile of the same value, the two tiles will merge and create a tile of double value. At each move, one new tile appears at any point of the board. The goal of the game is to have one tile of 2048 value.</p>
+<h3 id="main-screen_3">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="2048_screenshot" src="../../img/MD/MD_2048_screen.jpg" title="Screenshot of the 2048" /></p>
+<p>It is divided in several areas:</p>
+<ul>
+<li>
+<p><em>toolbar</em>: it shows a toolbar with some buttons that will allow you different functions (see below)</p>
+</li>
+<li>
+<p><em>2048 button</em>: clicking this button you can change the score required to win. It will alternate between 256, 512, 1024 and 2048. When you reach this score, you win the game.</p>
+</li>
+<li>
+<p><em>score</em>: this label shows the score. The score is calculated by the value of merged cells: every time a cell merges, its value is added to the score.</p>
+</li>
+<li>
+<p><em>main board</em>: this is where you have the tiles that you need to move. You move all tiles in the same direction, either by swipping or by using the joystick below.</p>
+</li>
+<li>
+<p><em>joystick</em>: to move the tiles, instead of swipping.</p>
+</li>
+</ul>
+<h3 id="buttons-in-toolbar_3">Buttons in toolbar</h3>
+<p>The buttons give you access to the following functions:</p>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game, and reset the score.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_back.png" title="Back button" />: this button enables you to go back one move. Only one move is allowed.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+</li>
+</ul>
               
             </div>
           </div>
