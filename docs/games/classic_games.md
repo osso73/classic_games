@@ -225,11 +225,55 @@ So I implemented a function based on this methodology to find if the puzzle that
 
 
 
+## 2048
+
+### Rules of the game
+
+2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The objective of the game is to slide numbered tiles on a grid to combine them to create a tile with the number 2048; however, one can continue to play the game after reaching the goal, creating tiles with larger numbers.
+
+_(extracted from Wikipedia)_
+
+Each turn you can move all tiles in one of the 4 directions: up, down, left or right. All tiles move in that direction as much as possible, until they find the edge of the board or another tile. In case they find another tile of the same value, the two tiles will merge and create a tile of double value. At each move, one new tile appears at any point of the board. The goal of the game is to have one tile of 2048 value.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![2048_screenshot](../img/MD/MD_2048_screen.jpg "Screenshot of the 2048")
+
+It is divided in several areas:
+
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions (see below)
+
+- _2048 button_: clicking this button you can change the score required to win. It will alternate between 256, 512, 1024 and 2048. When you reach this score, you win the game.
+
+- _score_: this label shows the score. The score is calculated by the value of merged cells: every time a cell merges, its value is added to the score.
+
+- _main board_: this is where you have the tiles that you need to move. You move all tiles in the same direction, either by swipping or by using the joystick below.
+
+- _joystick_: to move the tiles, instead of swipping.
+
+
+### Buttons in toolbar
+
+The buttons give you access to the following functions:
+
+- ![][b_start]: to start a new game, and reset the score.
+
+- ![][b_back]: this button enables you to go back one move. Only one move is allowed.
+
+- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+
+
 
 [b_start]: ../img/MD/icons/btn_play.png "Start button"
 [b_mute_on]: ../img/MD/icons/btn_mute_on.png "Mute on button"
 [b_pause]: ../img/MD/icons/btn_pause.png "Pause button"
 [b_help]: ../img/MD/icons/btn_help.png "Pause button"
+[b_back]: ../img/MD/icons/btn_back.png "Back button"
+
 
 [apple]: ../img/MD/snake/fruit-apple.png "Apple"
 [apple2]: ../img/MD/snake/fruit-apple2.png "Apple"

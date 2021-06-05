@@ -56,16 +56,12 @@ Builder.load_string(
             FloatLayout:
                 MDChip:
                     text: 'Theme'
-                    font_style: 'H5'
-                    halign: 'center'
                     pos_hint: {'center_x': 0.5, 'center_y': 0.66}
                     on_release: muestra.cambiar_tema()
                     icon: ''
 
                 MDChip:
                     text: 'Level: ' + str(muestra.tamano - 2)
-                    font_style: 'H5'
-                    halign: 'center'
                     pos_hint: {'center_x': 0.5, 'center_y': 0.33}
                     on_release: muestra.cambiar_tamano()
                     icon: ''

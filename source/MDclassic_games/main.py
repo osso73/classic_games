@@ -27,7 +27,7 @@ from memory.screen import ScreenMemory
 from pong.screen import ScreenPong
 
 
-__version__ = '0.3'
+__version__ = '0.4'
 
 
 KV = r"""
