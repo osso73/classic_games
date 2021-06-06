@@ -576,11 +576,3 @@ class GameBoard(Widget):
         else:
             raise Exception("Bad sound")
 
-
-    def bye(self):
-        '''
-        Play a sound before closing the app, and wait a delay so the sound
-        can be heard (Trump saying 'thank you very much')
-        '''
-        self.play('bye')
-        sleep(1.5)

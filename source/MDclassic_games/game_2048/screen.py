@@ -27,8 +27,9 @@ Builder.load_string(
 <Screen2048>:
     name: '2048'
     
-    BoxLayout:
+    MDBoxLayout:
         orientation: 'vertical'
+        md_bg_color: app.theme_cls.primary_light
         on_size: board.initialize_grid()
     
         MDToolbar:

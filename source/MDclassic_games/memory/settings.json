@@ -1,0 +1,18 @@
+[
+    {
+      "type": "options",
+      "title": "Theme",
+      "desc": "Theme for the .",
+      "options": ["comida", "starwars", "banderas", "futbol", "varios", "tecnología", "dibujos", "animales"],
+      "section": "Memory",
+      "key": "theme"
+    },
+    {
+      "type": "numeric",
+      "title": "Level",
+      "desc": "Level of dificulty. This is the number of pairs to be discovered. Valid options between 2 and 20.",
+      "section": "Memory",
+      "key": "level"
+    }
+
+]

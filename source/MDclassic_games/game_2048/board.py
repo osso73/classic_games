@@ -93,9 +93,6 @@ class Board(RelativeLayout):
         played without delay.
         '''
         sound = dict()
-        # sound['move'] = SoundLoader.load('audio/move.ogg')
-        # sound['end_win'] = SoundLoader.load('audio/end_win.ogg')
-        # sound['end_lose'] = SoundLoader.load('audio/end_lose.ogg')
 
         folder = os.path.join(os.path.dirname(__file__),'audio')
         for s in ['move', 'end_win', 'end_lose']:

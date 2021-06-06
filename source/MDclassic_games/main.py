@@ -27,7 +27,7 @@ from memory.screen import ScreenMemory
 from pong.screen import ScreenPong
 
 
-__version__ = '0.4'
+__version__ = '0.5'
 
 
 KV = r"""
@@ -101,6 +101,12 @@ class MainApp(MDApp):
             'theme': 'numeros',
             })
 
+        config.setdefaults('Memory', {
+            'level': 6,
+            'theme': 'starwars',
+            })
+
+
     def build_settings(self, settings):
         settings.add_json_panel("Snake", self.config,
                                 filename='snake/settings.json')
@@ -108,6 +114,8 @@ class MainApp(MDApp):
                                 filename='ahorcado/settings.json')
         settings.add_json_panel("15 puzzle", self.config,
                                 filename='game_15puzzle/settings.json')
+        settings.add_json_panel("Memory", self.config,
+                                filename='memory/settings.json')
 
 
     def on_config_change(self, config, section, key, value):
@@ -120,6 +128,9 @@ class MainApp(MDApp):
         
         elif section == 'fifteen':
             self.root.ids.fifteen.config_change(config, section, key, value)
+        
+        elif section == 'Memory':
+            self.root.ids.memory.config_change(config, section, key, value)
         
 
 

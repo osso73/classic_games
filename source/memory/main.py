@@ -19,8 +19,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 
 from kivy.properties import (
-    NumericProperty, StringProperty, ListProperty,
-    ObjectProperty, BooleanProperty
+    NumericProperty, StringProperty, ListProperty, BooleanProperty
 )
 
 from random import sample
