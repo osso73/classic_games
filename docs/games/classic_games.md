@@ -266,6 +266,94 @@ The buttons give you access to the following functions:
 - ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
 
 
+## Memory
+
+### Rules of the game
+
+You have a number of cards turned down, they contain different images. Each image is hidden in two different cards. The objective of the game is to discover all the pairs of cards with the same image.
+
+At each turn, you flip 2 cards to show their image, and then:
+
+- if they show the same image, you guessed one pair, and the cards remain up.
+- if they show different images, the cards will turn down again after 2 seconds, giving you some time to memorize their position.
+
+Each time you turn a pair of cards, the moves score is incremented by one. The goal is to find all the pairs, with the minimum number of moves.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![memory_screenshot](../img/MD/MD_memory_screen.jpg "Screenshot of the Memory")
+
+
+It is divided in several areas:
+
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions (see below)
+
+- _mid row_: it contains two buttons, and the score of the game. The game is scored as the number of moves you made. The goal being to have as little as possible, i.e. to guess all the pairs with as few moves as possible.
+
+- _playing ground_: this is where the cards are.
+
+
+### Buttons in the game
+
+There are some buttons in the toolbar, and some in the mid-row. The buttons give you access to the following functions:
+
+- ![][b_start]: to start a new game. It will reset the score, and regenerate the images, using the current theme and level (number of pairs). Note that even if the set is the same as previous game, the images can be different, as they are picked randomly from a larger set of images.
+
+- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+- _theme button_: to change the theme used for hte images. The text of second button actually is the name of the theme. This will pick images from that particular theme. A number of themes are provided.
+
+- _level button_: it shows the number of pairs to be created when starting a new game.This means you will have the double of cards (e.g. 6 pairs means you play with 12 cards). The values possible are from 2 to 20. When clicked, its value will increase by 1, unless you are already at  20, in which case it will move down to 2.
+
+The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.
+
+
+
+## Pong
+
+### Rules of the game
+
+Classic game of pong. Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.
+
+If you miss the ball, your opponent gets a point. Game ends at 5 points.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![memory_screenshot](../img/MD/MD_pong_screen.jpg "Screenshot of the Pong")
+
+It is divided in two areas:
+
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions
+
+- _game board_: this is the field where you play
+
+
+
+### Buttons in the game
+
+Only two buttons show in the toolbar:
+
+- ![][b_start]: to start a new game. It will reset the score, and start from the beginning, at the chosen speed.
+
+- ![][b_pause]: this button will pause the game. Another click will continue the game where it was.
+
+
+### Settings
+
+The settings allow you to choose two parameters of the game:
+
+- **Initial speed**: this is the speed of the ball, when starting (the speed will increase at each bounce). It can take any integer value. Note that negative values will be treated as positive (e.g. ignoring the sign).
+
+- **Skin**: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.
+
+
+
 
 
 [b_start]: ../img/MD/icons/btn_play.png "Start button"

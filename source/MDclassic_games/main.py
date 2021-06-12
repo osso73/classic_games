@@ -8,12 +8,14 @@ This is a temporary script file.
 
 # std libraries
 
+
 # non-std libraries
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.uix.settings import SettingsWithSpinner
 from kivy.utils import platform
 from kivy.lang import Builder
+
 
 # my app imports
 from drawer import MyDrawer
@@ -27,7 +29,8 @@ from memory.screen import ScreenMemory
 from pong.screen import ScreenPong
 
 
-__version__ = '0.5'
+
+__version__ = '0.6'
 
 
 KV = r"""
@@ -106,6 +109,11 @@ class MainApp(MDApp):
             'theme': 'starwars',
             })
 
+        config.setdefaults('Pong', {
+            'speed': 10,
+            'skin': 'original',
+            })
+
 
     def build_settings(self, settings):
         settings.add_json_panel("Snake", self.config,
@@ -116,6 +124,9 @@ class MainApp(MDApp):
                                 filename='game_15puzzle/settings.json')
         settings.add_json_panel("Memory", self.config,
                                 filename='memory/settings.json')
+
+        settings.add_json_panel("Pong", self.config,
+                                filename='pong/settings.json')
 
 
     def on_config_change(self, config, section, key, value):
@@ -131,6 +142,9 @@ class MainApp(MDApp):
         
         elif section == 'Memory':
             self.root.ids.memory.config_change(config, section, key, value)
+        
+        elif section == 'Pong':
+            self.root.ids.pong.config_change(config, section, key, value)
         
 
 

@@ -1,0 +1,17 @@
+[
+    {
+      "type": "numeric",
+      "title": "Initial speed",
+      "desc": "Initial speed of the ball when serving. Default value is 10, can be any integer (even negative)",
+      "section": "Pong",
+      "key": "speed"
+    },
+    {
+      "type": "options",
+      "title": "Skin",
+      "desc": "Skin to be used for the ball and paddles.",
+      "options": ["original", "baseball", "futbol", "urano", "basket", "jupiter", "skin2", "saturno", "skin1", "billar", "golf", "tenis"],
+      "section": "Pong",
+      "key": "skin"
+    }
+]

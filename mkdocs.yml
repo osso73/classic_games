@@ -18,6 +18,7 @@ nav:
       - games/buscaminas.md
       - games/snake.md
   - Changelogs:
+      - changelogs/classic_games_changelog.md
       - changelogs/2048_changelog.md
       - changelogs/buscaminas_changelog.md
       - changelogs/snake_changelog.md
