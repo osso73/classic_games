@@ -99,7 +99,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2048">2048</a>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-2048">Game of 2048</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_3">Rules of the game</a>
     </li>
@@ -109,7 +109,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#memory">Memory</a>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-memory">Game of memory</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_4">Rules of the game</a>
     </li>
@@ -119,7 +119,7 @@
     </li>
         </ul>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#pong">Pong</a>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-pong">Game of pong</a>
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_5">Rules of the game</a>
     </li>
@@ -128,6 +128,16 @@
     <li class="toctree-l3"><a class="reference internal" href="#buttons-in-the-game_1">Buttons in the game</a>
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#settings_2">Settings</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#game-of-buscaminas-minesweeper">Game of buscaminas (Minesweeper)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_6">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_6">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#toolbar-buttons">Toolbar buttons</a>
     </li>
         </ul>
     </li>
@@ -206,27 +216,27 @@
 <p>This is the game designed with <a href="https://kivymd.readthedocs.io">KivyMD</a>, consolidating all the other games in a single application, with a nice menu and navigation.</p>
 <p>These instructions are for version 0.1. You can find <a href="../../changelogs/classic_games_changelog/">here</a> a changelog explaining the changes introduced in each version.</p>
 <h2 id="application-navigation">Application navigation</h2>
-<p>As shown in the fig. 1, the application will start with the main menu, showing an icon for each of the games. The icon will bring you directly to the game. For now, only Snake is implemented.</p>
+<p>As shown in the fig. 1, the application will start with the main menu, showing an icon for each of the games. The icon will bring you directly to the game.</p>
 <p><img alt="Side menu" src="../../img/MD/MD_drawer.jpg" title="Side menu" />
 <img alt="Main menu" src="../../img/MD/MD_menu.jpg" title="Main menu" /></p>
-<p><strong>Figure 1</strong>. Menu of the application.</p>
+<p><strong>Figure 1</strong>. Menu of the application. On the left showing the full menu, on the right showing the game menu screen.</p>
 <p>You can also open the menu on the left, to access some application options, and also links to the games. The menu on the left is accessible from any screen of the game.</p>
 <p>The following options are available from the side menu:</p>
 <ul>
 <li>
-<p>main menu: will bring you again to the main menu screen</p>
+<p><strong>main menu</strong>: will bring you again to the main menu screen</p>
 </li>
 <li>
-<p>settings: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.</p>
+<p><strong>settings</strong>: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.</p>
 </li>
 <li>
-<p>Exit: will leave the application.</p>
+<p><strong>Exit</strong>: will leave the application.</p>
 </li>
 </ul>
 <p>(to be added in future versions):</p>
 <ul>
-<li>about: display information about the application and the author</li>
-<li>help: link to these instructions</li>
+<li><strong>about</strong>: display information about the application and the author</li>
+<li><strong>help</strong>: link to these instructions</li>
 </ul>
 <hr />
 <h2 id="game-of-snake">Game of snake</h2>
@@ -417,7 +427,8 @@
 <h3 id="solvable-puzzles">Solvable puzzles</h3>
 <p>Note that not all puzzles of this kind (e.g. a puzzle of n x n squares with an empty space, randomly sorted) can be solved. I quickly realized that when I was doing the first tests. Fortunately, there is a way to find if a particular puzzle is solved, as explained in this page: <a href="https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/">How to check if an instance of 15 puzzle is solvable?</a>.</p>
 <p>So I implemented a function based on this methodology to find if the puzzle that was randomly sorted was solvable; if not, I shuffle again and test again. This way I can ensure that all puzzles are solvable.</p>
-<h2 id="2048">2048</h2>
+<hr />
+<h2 id="game-of-2048">Game of 2048</h2>
 <h3 id="rules-of-the-game_3">Rules of the game</h3>
 <p>2048 is a single-player sliding block puzzle game designed by Italian web developer Gabriele Cirulli. The objective of the game is to slide numbered tiles on a grid to combine them to create a tile with the number 2048; however, one can continue to play the game after reaching the goal, creating tiles with larger numbers.</p>
 <p><em>(extracted from Wikipedia)</em></p>
@@ -456,7 +467,8 @@
 <p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
 </li>
 </ul>
-<h2 id="memory">Memory</h2>
+<hr />
+<h2 id="game-of-memory">Game of memory</h2>
 <h3 id="rules-of-the-game_4">Rules of the game</h3>
 <p>You have a number of cards turned down, they contain different images. Each image is hidden in two different cards. The objective of the game is to discover all the pairs of cards with the same image.</p>
 <p>At each turn, you flip 2 cards to show their image, and then:</p>
@@ -497,7 +509,8 @@
 </li>
 </ul>
 <p>The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.</p>
-<h2 id="pong">Pong</h2>
+<hr />
+<h2 id="game-of-pong">Game of pong</h2>
 <h3 id="rules-of-the-game_5">Rules of the game</h3>
 <p>Classic game of pong. Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.</p>
 <p>If you miss the ball, your opponent gets a point. Game ends at 5 points.</p>
@@ -533,6 +546,53 @@
 <p><strong>Skin</strong>: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.</p>
 </li>
 </ul>
+<hr />
+<h2 id="game-of-buscaminas-minesweeper">Game of buscaminas (Minesweeper)</h2>
+<h3 id="rules-of-the-game_6">Rules of the game</h3>
+<p>There is a field of mines. The field is divided in areas, each area can contain a mine or not. If no mines, when uncovering it will show a number indicating the number of mines adjacent to the area. You have to use this information to discover where the mines are hiding. Your objective is to discover all mines, and uncover all areas without a mine.</p>
+<p>Flag the areas where you think the mines are. Use the button on the toolbar to enter in mode "flag", so when you click it will flag the area instead of uncovering. You can flag and unflag the area as many times as you want; but when you uncover the area, it remains uncovered.</p>
+<p>The size of the field depends on the level chosen through the toolbar button. See below how to change the level.</p>
+<h3 id="main-screen_6">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="memory_screenshot" src="../../img/MD/MD_buscaminas_screen.jpg" title="Screenshot of Buscaminas" /></p>
+<p>It is divided in three areas:</p>
+<ul>
+<li>
+<p><em>toolbar</em>: at the top. It contains some buttons to control behaviour of the game. See below for more details.</p>
+</li>
+<li>
+<p><em>playing ground</em>: at the bottom of the screen. This is the minefield, where all the action happens.</p>
+</li>
+<li>
+<p><em>status row</em>: between the toolbar and the minefield. It has some indicators, and the smiley. Left indicator is the number of mines left (i.e. each flag will you put decrease this number). The right indicator is the amount of seconds used. The smiley in the middle indicates the status of the game:</p>
+<ul>
+<li>smiling face is the standard</li>
+<li>wounded face when bomb explodes (e.g. you uncover a bomb). You lost the game.</li>
+<li>sunglasses smoking cigar when you discovered all mines, and uncovered non-mines. You won the game</li>
+</ul>
+</li>
+</ul>
+<h3 id="toolbar-buttons">Toolbar buttons</h3>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: start a new game. You can also start a new game by clicking on the smiley. It will redistribute the mines, using the size defined by the level.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_bomb.png" title="Bomb button" /> / <img alt="" src="../../img/MD/icons/btn_flag.png" title="Flag button" />: this button defines what action is triggered by the click: either flag an area, or uncover it.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_level.png" title="Level button" />: this button allows you to select different levels of the game, corresponding to different sizes:</p>
+<ul>
+<li>level 1: 9x9 board, with 10 mines</li>
+<li>level 2: 9x18 board, with 25 mines</li>
+<li>level 3: 18x36 board, with 125 mines</li>
+</ul>
+</li>
+</ul>
+<hr />
               
             </div>
           </div>
