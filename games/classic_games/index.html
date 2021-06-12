@@ -109,6 +109,28 @@
     </li>
         </ul>
     </li>
+    <li class="toctree-l2"><a class="reference internal" href="#memory">Memory</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_4">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_4">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#buttons-in-the-game">Buttons in the game</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pong">Pong</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rules-of-the-game_5">Rules of the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#main-screen_5">Main screen</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#buttons-in-the-game_1">Buttons in the game</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#settings_2">Settings</a>
+    </li>
+        </ul>
+    </li>
     </ul>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../pong/">Pong</a>
@@ -128,6 +150,8 @@
                 </ul>
                 <p class="caption"><span class="caption-text">Changelogs</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../changelogs/classic_games_changelog/">Classic games changelog</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../changelogs/2048_changelog/">2048 changelog</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../changelogs/buscaminas_changelog/">Buscaminas changelog</a>
@@ -430,6 +454,83 @@
 </li>
 <li>
 <p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+</li>
+</ul>
+<h2 id="memory">Memory</h2>
+<h3 id="rules-of-the-game_4">Rules of the game</h3>
+<p>You have a number of cards turned down, they contain different images. Each image is hidden in two different cards. The objective of the game is to discover all the pairs of cards with the same image.</p>
+<p>At each turn, you flip 2 cards to show their image, and then:</p>
+<ul>
+<li>if they show the same image, you guessed one pair, and the cards remain up.</li>
+<li>if they show different images, the cards will turn down again after 2 seconds, giving you some time to memorize their position.</li>
+</ul>
+<p>Each time you turn a pair of cards, the moves score is incremented by one. The goal is to find all the pairs, with the minimum number of moves.</p>
+<h3 id="main-screen_4">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="memory_screenshot" src="../../img/MD/MD_memory_screen.jpg" title="Screenshot of the Memory" /></p>
+<p>It is divided in several areas:</p>
+<ul>
+<li>
+<p><em>toolbar</em>: it shows a toolbar with some buttons that will allow you different functions (see below)</p>
+</li>
+<li>
+<p><em>mid row</em>: it contains two buttons, and the score of the game. The game is scored as the number of moves you made. The goal being to have as little as possible, i.e. to guess all the pairs with as few moves as possible.</p>
+</li>
+<li>
+<p><em>playing ground</em>: this is where the cards are.</p>
+</li>
+</ul>
+<h3 id="buttons-in-the-game">Buttons in the game</h3>
+<p>There are some buttons in the toolbar, and some in the mid-row. The buttons give you access to the following functions:</p>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game. It will reset the score, and regenerate the images, using the current theme and level (number of pairs). Note that even if the set is the same as previous game, the images can be different, as they are picked randomly from a larger set of images.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_mute_on.png" title="Mute on button" />: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).</p>
+</li>
+<li>
+<p><em>theme button</em>: to change the theme used for hte images. The text of second button actually is the name of the theme. This will pick images from that particular theme. A number of themes are provided.</p>
+</li>
+<li>
+<p><em>level button</em>: it shows the number of pairs to be created when starting a new game.This means you will have the double of cards (e.g. 6 pairs means you play with 12 cards). The values possible are from 2 to 20. When clicked, its value will increase by 1, unless you are already at  20, in which case it will move down to 2.</p>
+</li>
+</ul>
+<p>The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.</p>
+<h2 id="pong">Pong</h2>
+<h3 id="rules-of-the-game_5">Rules of the game</h3>
+<p>Classic game of pong. Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.</p>
+<p>If you miss the ball, your opponent gets a point. Game ends at 5 points.</p>
+<h3 id="main-screen_5">Main screen</h3>
+<p>This is the main screen of the game.</p>
+<p><img alt="memory_screenshot" src="../../img/MD/MD_pong_screen.jpg" title="Screenshot of the Pong" /></p>
+<p>It is divided in two areas:</p>
+<ul>
+<li>
+<p><em>toolbar</em>: it shows a toolbar with some buttons that will allow you different functions</p>
+</li>
+<li>
+<p><em>game board</em>: this is the field where you play</p>
+</li>
+</ul>
+<h3 id="buttons-in-the-game_1">Buttons in the game</h3>
+<p>Only two buttons show in the toolbar:</p>
+<ul>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_play.png" title="Start button" />: to start a new game. It will reset the score, and start from the beginning, at the chosen speed.</p>
+</li>
+<li>
+<p><img alt="" src="../../img/MD/icons/btn_pause.png" title="Pause button" />: this button will pause the game. Another click will continue the game where it was.</p>
+</li>
+</ul>
+<h3 id="settings_2">Settings</h3>
+<p>The settings allow you to choose two parameters of the game:</p>
+<ul>
+<li>
+<p><strong>Initial speed</strong>: this is the speed of the ball, when starting (the speed will increase at each bounce). It can take any integer value. Note that negative values will be treated as positive (e.g. ignoring the sign).</p>
+</li>
+<li>
+<p><strong>Skin</strong>: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.</p>
 </li>
 </ul>
               
