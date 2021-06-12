@@ -385,6 +385,7 @@ class Area(Label):
             elif self.parent.parent.ids.flag_button.option == 'covered':
                 self.uncover()
 
+
 class StartButton(Label):
     '''
     The button to start the game. This class controls the image to use, and

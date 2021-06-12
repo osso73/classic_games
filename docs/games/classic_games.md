@@ -6,30 +6,31 @@ These instructions are for version 0.1. You can find [here](../changelogs/classi
 
 ## Application navigation
 
-As shown in the fig. 1, the application will start with the main menu, showing an icon for each of the games. The icon will bring you directly to the game. For now, only Snake is implemented.
+As shown in the fig. 1, the application will start with the main menu, showing an icon for each of the games. The icon will bring you directly to the game.
 
 ![Side menu](../img/MD/MD_drawer.jpg "Side menu")
 ![Main menu](../img/MD/MD_menu.jpg "Main menu")
 
-**Figure 1**. Menu of the application.
+**Figure 1**. Menu of the application. On the left showing the full menu, on the right showing the game menu screen.
+
 
 You can also open the menu on the left, to access some application options, and also links to the games. The menu on the left is accessible from any screen of the game.
 
 The following options are available from the side menu:
 
-- main menu: will bring you again to the main menu screen
+- **main menu**: will bring you again to the main menu screen
 
-- settings: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.
+- **settings**: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.
 
-- Exit: will leave the application.
+- **Exit**: will leave the application.
 
 (to be added in future versions):
 
-- about: display information about the application and the author
-- help: link to these instructions
+- **about**: display information about the application and the author
+- **help**: link to these instructions
 
 
-* * *
+* * * * * * * * * * * * * * * * * * * * * * * *
 
 ## Game of snake
 
@@ -107,7 +108,8 @@ The following options are available:
 The settings are saved, so next time you start the game it will maintain the same settings defined.
 
 
-* * *
+* * * * * * * * * * * * * * * * * * * * * * * *
+
 
 ## Game of snake
 
@@ -167,7 +169,8 @@ The following options are available to be set for this game:
 The settings are saved, so next time you start the game it will maintain the same settings defined.
 
 
-* * *
+* * * * * * * * * * * * * * * * * * * * * * * *
+
 
 ## Game of 15 puzzle
 
@@ -224,8 +227,10 @@ Note that not all puzzles of this kind (e.g. a puzzle of n x n squares with an e
 So I implemented a function based on this methodology to find if the puzzle that was randomly sorted was solvable; if not, I shuffle again and test again. This way I can ensure that all puzzles are solvable.
 
 
+* * * * * * * * * * * * * * * * * * * * * * * *
 
-## 2048
+
+## Game of 2048
 
 ### Rules of the game
 
@@ -266,7 +271,10 @@ The buttons give you access to the following functions:
 - ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
 
 
-## Memory
+* * * * * * * * * * * * * * * * * * * * * * * *
+
+
+## Game of memory
 
 ### Rules of the game
 
@@ -311,8 +319,10 @@ There are some buttons in the toolbar, and some in the mid-row. The buttons give
 The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.
 
 
+* * * * * * * * * * * * * * * * * * * * * * * *
 
-## Pong
+
+## Game of pong
 
 ### Rules of the game
 
@@ -353,6 +363,54 @@ The settings allow you to choose two parameters of the game:
 - **Skin**: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.
 
 
+* * * * * * * * * * * * * * * * * * * * * * * *
+
+## Game of buscaminas (Minesweeper)
+
+### Rules of the game
+
+There is a field of mines. The field is divided in areas, each area can contain a mine or not. If no mines, when uncovering it will show a number indicating the number of mines adjacent to the area. You have to use this information to discover where the mines are hiding. Your objective is to discover all mines, and uncover all areas without a mine.
+
+Flag the areas where you think the mines are. Use the button on the toolbar to enter in mode "flag", so when you click it will flag the area instead of uncovering. You can flag and unflag the area as many times as you want; but when you uncover the area, it remains uncovered.
+
+The size of the field depends on the level chosen through the toolbar button. See below how to change the level.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![memory_screenshot](../img/MD/MD_buscaminas_screen.jpg "Screenshot of Buscaminas")
+
+It is divided in three areas:
+
+- _toolbar_: at the top. It contains some buttons to control behaviour of the game. See below for more details.
+
+- _playing ground_: at the bottom of the screen. This is the minefield, where all the action happens.
+
+- _status row_: between the toolbar and the minefield. It has some indicators, and the smiley. Left indicator is the number of mines left (i.e. each flag will you put decrease this number). The right indicator is the amount of seconds used. The smiley in the middle indicates the status of the game:
+    - smiling face is the standard
+    - wounded face when bomb explodes (e.g. you uncover a bomb). You lost the game.
+    - sunglasses smoking cigar when you discovered all mines, and uncovered non-mines. You won the game
+
+
+
+### Toolbar buttons
+
+- ![][b_start]: start a new game. You can also start a new game by clicking on the smiley. It will redistribute the mines, using the size defined by the level.
+
+- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute.
+
+- ![][b_bomb] / ![][b_flag]: this button defines what action is triggered by the click: either flag an area, or uncover it.
+
+- ![][b_level]: this button allows you to select different levels of the game, corresponding to different sizes:
+    - level 1: 9x9 board, with 10 mines
+    - level 2: 9x18 board, with 25 mines
+    - level 3: 18x36 board, with 125 mines
+
+
+
+* * * * * * * * * * * * * * * * * * * * * * * *
 
 
 
@@ -361,6 +419,9 @@ The settings allow you to choose two parameters of the game:
 [b_pause]: ../img/MD/icons/btn_pause.png "Pause button"
 [b_help]: ../img/MD/icons/btn_help.png "Pause button"
 [b_back]: ../img/MD/icons/btn_back.png "Back button"
+[b_bomb]: ../img/MD/icons/btn_bomb.png "Bomb button"
+[b_flag]: ../img/MD/icons/btn_flag.png "Flag button"
+[b_level]: ../img/MD/icons/btn_level.png "Level button"
 
 
 [apple]: ../img/MD/snake/fruit-apple.png "Apple"

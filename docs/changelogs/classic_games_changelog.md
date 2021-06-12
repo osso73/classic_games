@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
-## [v0.5] 2021-06-06
+## [v0.7] 2021-06-12
+
+### Added
+- Game of Buscaminas implemented.
+- Added mute button for Buscaminas
+- Buttons in toolbar change icon.
+
+
+
+## [v0.6] 2021-06-12
 
 ### Added
 - Game of Pong implemented. Still using some elements from kivy.
