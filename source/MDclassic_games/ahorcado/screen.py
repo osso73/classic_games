@@ -155,8 +155,9 @@ class ScreenAhorcado(MDScreen):
             # self.sound['lose'].play()
             self.play('lose')
 
-        p = PopupButtonAhorcado(title='Final', msg=msg)
+        PopupButtonAhorcado(title='Final', msg=msg)
         self.obj_palabra.actual = self.obj_palabra.palabra
+        self.active =  False
 
 
 

@@ -95,12 +95,14 @@ class MainScreen(BoxLayout):
     active = False
     sound = dict()
     pista = BooleanProperty(True)
+
     
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         self.sound['bye'] = SoundLoader.load('audio/thanks.ogg')
         self.sound['win'] = SoundLoader.load('audio/game-over-win.ogg')
         self.sound['lose'] = SoundLoader.load('audio/game-over-lost.ogg')
+
 
     def iniciar_juego(self):
         '''
@@ -109,6 +111,7 @@ class MainScreen(BoxLayout):
         self.obj_palabra.buscar_palabra()
         self.reset_juego()
     
+
     def reset_juego(self):
         '''
         Reset all the variables to start the game.
@@ -122,6 +125,7 @@ class MainScreen(BoxLayout):
         self.obj_dibujo.reset_dibujo()
         self.obj_palabra.reset_palabra()
         self.obj_teclado.reset_teclado()
+
 
     def final(self, win):
         '''
@@ -145,7 +149,7 @@ class MainScreen(BoxLayout):
                   content=PopupMsg(text=msg))
         p.open()
         self.obj_palabra.actual = self.obj_palabra.palabra
-        
+        self.active =  False
 
     
     def evaluar_letra(self, letra):
@@ -186,6 +190,7 @@ class MainScreen(BoxLayout):
             
             if self.fallos >= 10:
                 self.final(win=False)
+
     
     def thanks(self):
         '''
@@ -213,7 +218,6 @@ class MainScreen(BoxLayout):
                           content=PopupMsg(text='¡No puedes pedir más pistas!'))
                 p.open()
             
-
 
 
 class Dibujo(RelativeLayout):
@@ -317,6 +321,7 @@ class PalabraLetras(BoxLayout):
         '''
         self.actual = '-'*len(self.palabra)
         
+
     def buscar_palabra(self):
         '''
         Find a new word. First load a word from the file, and then reset 
@@ -325,6 +330,7 @@ class PalabraLetras(BoxLayout):
         '''
         self.palabra = self.cargar_palabra()
         self.reset_palabra()
+
     
     def cargar_palabra(self):
         '''
@@ -340,6 +346,7 @@ class PalabraLetras(BoxLayout):
             lista = [ line.rstrip('\n') for line in f ]
         
         return choice(lista)
+
     
     def anadir_letra(self, letra):
         '''
@@ -379,10 +386,12 @@ class Teclado(GridLayout):
     '''
     skin = 'teclado1'
     
+    
     def __init__(self, **kwargs):
         super(Teclado, self).__init__(**kwargs)
         self.crear_teclas()
     
+
     def crear_teclas(self):
         '''
         Create all keys for the keyboard
@@ -390,6 +399,7 @@ class Teclado(GridLayout):
         for letra in 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ':
             name = letra if letra != 'Ñ' else 'N2'
             self.add_widget(Tecla(letra=letra, filename=name))
+
 
     def cambiar_teclado(self):
         '''
@@ -403,12 +413,14 @@ class Teclado(GridLayout):
         for tecla in self.children:
             tecla.skin = self.skin
     
+    
     def reset_teclado(self):
         '''
         Reset all keys, putting their disabled attribute to False.
         '''
         for tecla in self.children:
             tecla.disabled = False
+    
     
     def pulsar_tecla(self, letra):
         '''
@@ -451,6 +463,7 @@ class Tecla(Button):
     filename = StringProperty()
     disabled = BooleanProperty(False)
     
+    
     def pulsar(self):
         '''
         Trigger the evaluar_letra method, and disable the letter, so it shows
@@ -460,6 +473,7 @@ class Tecla(Button):
         app = App.get_running_app()
         app.root.evaluar_letra(self.letra)
         self.disabled = True
+
 
 class PopupMsg(Label):
     pass

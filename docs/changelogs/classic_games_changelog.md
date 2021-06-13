@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
+## Unreleased [v1.0]
+
+### Changed
+- Made buttons on toolbar dynamic, e.g. changed the icon when clicked, as per iss. #68.
+
+
+### Fixed
+- Hint button in ahorcado, if clicked when game is not happening, it hanged the game. Now this is fixed, as per iss. #75.
+
+
 ## [v0.7] 2021-06-12
 
 ### Added
