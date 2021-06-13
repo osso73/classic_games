@@ -186,8 +186,9 @@ class PongBoard(Widget):
         PopupButtonPong(title='Final', msg=f'El jugador {num} gana!!')
 
 
-    def pause_button(self, *args):
+    def pause_button(self, button):
         self.active = not self.active
+        button.icon = 'pause' if self.active else 'play'
 
 
     def change_skin(self, skin, *args):
@@ -198,3 +199,4 @@ class PongBoard(Widget):
         self.ball.update_skin(skin)
         self.player1.update_skin(skin)
         self.player2.update_skin(skin)
+    

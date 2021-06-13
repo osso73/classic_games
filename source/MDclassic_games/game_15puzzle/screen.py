@@ -35,7 +35,7 @@ Builder.load_string(
             title: '15 Puzzle'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", puzzle.start_game], ["volume-off", root.mute_button]]
+            right_action_items: [["play-circle-outline", puzzle.start_game], ["volume-high", root.mute_button]]
             
         MDLabel:
             id: score
@@ -134,9 +134,10 @@ class Screen15Puzzle(MDScreen):
 
 
 
-    def mute_button(self, *args):
+    def mute_button(self, button):
         '''Toogle the mute on/off. Called from menu bar button.'''
         self.mute = not self.mute
+        button.icon = 'volume-off' if self.mute else 'volume-high'
         
         
     def config_change(self, config, section, key, value):

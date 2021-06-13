@@ -500,11 +500,12 @@ class Board(RelativeLayout):
             self.score = tile['score']
 
             
-    def mute_button(self, *args):
+    def mute_button(self, button):
         '''
         Toogle the mute button on / off.
         '''
         self.mute = not self.mute
-            
+        button.icon = 'volume-off' if self.mute else 'volume-high'
+        
 
 

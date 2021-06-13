@@ -36,7 +36,7 @@ Builder.load_string(
             title: '2048'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", board.start_game], ["backup-restore", board.back_button], ["volume-off", board.mute_button]]
+            right_action_items: [["play-circle-outline", board.start_game], ["backup-restore", board.back_button], ["volume-high", board.mute_button]]
             
         BoxLayout:
             orientation: 'horizontal'

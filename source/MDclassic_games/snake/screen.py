@@ -35,7 +35,7 @@ Builder.load_string(
             title: 'Snake'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", game.start_game], ["pause", game.pause_button], ["volume-off", game.mute_button]]
+            right_action_items: [["play-circle-outline", game.start_game], ["pause", game.pause_button], ["volume-high", game.mute_button]]
             
         BoxLayout:
             orientation: 'horizontal'

@@ -8,7 +8,7 @@ Created on Sat May 22 20:01:28 2021
 
 # std libraries
 import os
-from time import sleep
+
 
 # non-std libraries
 from kivy.lang import Builder
@@ -136,18 +136,18 @@ class GameBoard(Widget):
             self.event.cancel()
 
         self.event = Clock.schedule_interval(self.update, self.speed)
-        print('event created')
         
     
-    def pause_button(self, *args):
+    def pause_button(self, button):
         '''Toogle pause state of the game. Action triggered by toolbar button.'''
         self.pause = not self.pause
+        button.icon = 'play' if self.pause else 'pause'
 
 
-    def mute_button(self, *args):
+    def mute_button(self, button):
         '''Toogle mute. Action triggered by toolbar button.'''
         self.mute = not self.mute
-
+        button.icon = 'volume-off' if self.mute else 'volume-high'
 
 
     def set_size(self):

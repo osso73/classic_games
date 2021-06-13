@@ -46,7 +46,7 @@ Builder.load_string(
             title: 'Ahorcado'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", root.iniciar_juego], ["help", root.dar_pista], ["volume-off", root.mute_button]]
+            right_action_items: [["play-circle-outline", root.iniciar_juego], ["help", root.dar_pista], ["volume-high", root.mute_button]]
 
         BoxLayout:
             orientation: 'horizontal'
@@ -200,9 +200,10 @@ class ScreenAhorcado(MDScreen):
                 self.final(win=False)
 
 
-    def mute_button(self, *args):
+    def mute_button(self, button):
         '''Toogle mute. Action triggered by toolbar button.'''
-        self.mute = not self.mute
+        self.mute = not self.mute       
+        button.icon = 'volume-off' if self.mute else 'volume-high'
 
 
     def dar_pista(self, *args):
@@ -219,8 +220,8 @@ class ScreenAhorcado(MDScreen):
                 self.obj_teclado.pulsar_tecla(letra)
                 self.pista = False
             else:
-                p = PopupButtonAhorcado(title='Aviso',
-                                        msg='¡No puedes pedir más pistas!')
+                PopupButtonAhorcado(title='Aviso',
+                                    msg='¡No puedes pedir más pistas!')
 
 
 

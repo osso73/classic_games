@@ -33,7 +33,7 @@ Builder.load_string(
             title: 'Memory'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", obj_tapete.start_game], ["volume-off", obj_tapete.mute_button]]
+            right_action_items: [["play-circle-outline", obj_tapete.start_game], ["volume-high", obj_tapete.mute_button]]
             
         MDBoxLayout:
             orientation: 'horizontal'

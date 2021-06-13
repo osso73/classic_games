@@ -248,8 +248,10 @@ class Tapete(MDGridLayout):
                           msg='!Muy bien!\nHas encontrado todas las parejas')
 
 
-    def mute_button(self, *args):
+    def mute_button(self, button):
         '''Toogle mute. Action triggered by toolbar button.'''
         self.mute = not self.mute
+        button.icon = 'volume-off' if self.mute else 'volume-high'
+        
 
 
