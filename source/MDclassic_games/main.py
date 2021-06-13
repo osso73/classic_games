@@ -30,7 +30,7 @@ from pong.screen import ScreenPong
 
 
 
-__version__ = '0.7'
+__version__ = '1.0'
 
 
 KV = r"""
@@ -77,6 +77,7 @@ Screen:
 
 class MainApp(MDApp):
     """Main app"""
+    version = __version__
     
     def build(self):
         screen = Builder.load_string(KV)

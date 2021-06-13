@@ -1,9 +1,10 @@
 <MyDrawer>:
     screen: 'menu'
+    enable_swiping: False
     
     BoxLayout:
         orientation: 'vertical'
-        spacing: '8dp'
+        spacing: '10dp'
         padding: '8dp'
 
         MDIconButton:
@@ -11,45 +12,70 @@
             halign: 'left'
             on_press: root.set_state("close")
 
+        MDLabel:
+            text: 'Classic games'
+            halign: 'center'
+            font_style: 'H5'
+            size_hint_y: None
+            height: self.texture_size[1]
         
         Image:
             source: 'images/icon.png'
             size_hint_y: None
             height: '150dp'
             
+
+        MDList:
+            OneLineIconListItem:
+                text: 'Main menu'
+                on_release:
+                    root.set_state("close")
+                    root.screen = 'menu'
+                IconLeftWidget:
+                    icon: 'menu'
+                
+            OneLineIconListItem:
+                text: 'Settings'
+                on_release:
+                    root.set_state("close")
+                    app.open_settings()
+                IconLeftWidget:
+                    icon: 'cog'
+                
+            OneLineIconListItem:
+                text: 'Help'
+                on_release:
+                    root.set_state("close")
+                    root.open_help()
+                IconLeftWidget:
+                    icon: 'help-circle-outline'
+                
+            OneLineIconListItem:
+                text: 'About'
+                on_release:
+                    root.set_state("close")
+                    root.about()
+                IconLeftWidget:
+                    icon: 'information-outline'
+                
+            OneLineIconListItem:
+                text: 'Exit'
+                on_release: app.stop()
+                IconLeftWidget:
+                    icon: 'logout'
+        
+
         
         ScrollView:
             MDList:
-                OneLineIconListItem:
-                    text: 'main menu'
-                    on_release:
-                        root.set_state("close")
-                        root.screen = 'menu'
-                    IconLeftWidget:
-                        icon: 'menu'
-                    
-                OneLineIconListItem:
-                    text: 'settings'
-                    on_release:
-                        root.set_state("close")
-                        app.open_settings()
-                    IconLeftWidget:
-                        icon: 'cog'
-                    
-                OneLineIconListItem:
-                    text: 'Exit'
-                    on_release: app.stop()
-                    IconLeftWidget:
-                        icon: 'logout'
-            
                 OneLineAvatarListItem:
-                    text: 'snake'
+                    text: 'pong'
                     on_release:
                         root.set_state("close")
-                        root.screen = 'snake'
+                        root.screen = 'pong'
                     ImageLeftWidget:
-                        source: 'snake/images/icon.png'
-                    
+                        source: 'pong/images/icon.jpg'
+                                        
                 OneLineAvatarListItem:
                     text: 'ahorcado'
                     on_release:
@@ -57,6 +83,14 @@
                         root.screen = 'ahorcado'
                     ImageLeftWidget:
                         source: 'ahorcado/images/icon.jpg'
+                    
+                OneLineAvatarListItem:
+                    text: 'memory'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'memory'
+                    ImageLeftWidget:
+                        source: 'memory/images/icon.png'
                     
                 OneLineAvatarListItem:
                     text: '15 puzzle'
@@ -75,26 +109,18 @@
                         source: 'game_2048/images/icon.png'
                     
                 OneLineAvatarListItem:
-                    text: 'memory'
-                    on_release:
-                        root.set_state("close")
-                        root.screen = 'memory'
-                    ImageLeftWidget:
-                        source: 'memory/images/icon.png'
-                    
-                OneLineAvatarListItem:
-                    text: 'pong'
-                    on_release:
-                        root.set_state("close")
-                        root.screen = 'pong'
-                    ImageLeftWidget:
-                        source: 'pong/images/icon.jpg'
-                                        
-                OneLineAvatarListItem:
                     text: 'buscaminas'
                     on_release:
                         root.set_state("close")
                         root.screen = 'buscaminas'
                     ImageLeftWidget:
                         source: 'buscaminas/images/icon.png'
-                        
+             
+                OneLineAvatarListItem:
+                    text: 'snake'
+                    on_release:
+                        root.set_state("close")
+                        root.screen = 'snake'
+                    ImageLeftWidget:
+                        source: 'snake/images/icon.png'
+                    

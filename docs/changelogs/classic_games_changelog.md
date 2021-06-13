@@ -5,15 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
 
 
-## Unreleased [v1.0]
+## [v1.0] 2021-06-13
 
 ### Added
 - Spash screen, as per iss. #71.
+- Options in main menu for help, and about, as per iss. #69.
 
 
 ### Changed
 - Made buttons on toolbar dynamic, e.g. changed the icon when clicked, as per iss. #68.
-
+- Changed order of the menu, to reflect the order in which programs were written.
+- Changed drawer menu, adding title, and scroll only for games, as per iss. #72.
 
 ### Fixed
 - Hint button in ahorcado, if clicked when game is not happening, it hanged the game. Now this is fixed, as per iss. #75.
