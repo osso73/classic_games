@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## Unreleased [v1.0]
 
+### Added
+- Spash screen, as per iss. #71.
+
+
 ### Changed
 - Made buttons on toolbar dynamic, e.g. changed the icon when clicked, as per iss. #68.
 
