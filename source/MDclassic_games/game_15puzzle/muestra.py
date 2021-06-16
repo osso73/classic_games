@@ -12,7 +12,7 @@ import os
 # non-std libraries
 from kivy.lang import Builder
 from kivy.properties import StringProperty, NumericProperty
-from kivy.uix.gridlayout import GridLayout
+from kivymd.uix.gridlayout import MDGridLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.uix.image import Image
@@ -36,17 +36,19 @@ Builder.load_string(
 
 <FichaMuestra>:
     source: f'game_15puzzle/images/temas/{self.tema}/{self.tamano}/{self.name}.jpg'
+    allow_stretch: True
 
 """)
 
 
-class Muestra(GridLayout):
+class Muestra(MDGridLayout):
     '''
     Control the bottom part of screen, showing the complete picture, so it 
     can be used as a reference. The picture is divided in tiles as well, to
     show the image of each tile.
     
-    Use a GridLa
+    Use a GridLayout
+    
     Attributes
     ----------
     tema : StringProperty

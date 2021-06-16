@@ -44,7 +44,8 @@ class Ficha(Label):
     Attributes
     ----------    
     name : StringProperty
-        Name of the tile, a number between 1 and the size of board -1.
+        Name of the tile, a number between 1 and the size of board -1. It can
+        be '' as well, for the empty tile.
     tamano : NumericProperty
         Size of the board: 3 for 3x3, 4 for 4x4, 5 for 5x5.
     lado : NumericProperty
