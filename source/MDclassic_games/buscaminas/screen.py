@@ -7,6 +7,7 @@ Created on Wed May 19 20:21:28 2021
 
 
 # std libraries
+import webbrowser
 
 # non-std libraries
 from kivy.lang import Builder
@@ -34,7 +35,7 @@ Builder.load_string(
             title: 'Buscaminas'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", field.start_game], ['bomb', field.entry_mode], ['numeric-1-box', field.set_level], ['volume-high', field.mute_button]]
+            right_action_items: [["play-circle-outline", field.start_game], ['bomb', field.entry_mode], ['numeric-1-box', field.set_level], ['volume-high', field.mute_button], ["help-circle-outline", root.help_button]]
             
 
         BoxLayout:
@@ -78,4 +79,6 @@ Builder.load_string(
 """)
 
 class ScreenBuscaminas(MDScreen):
-    pass
+    def help_button(self, button):
+        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-buscaminas-minesweeper')
+

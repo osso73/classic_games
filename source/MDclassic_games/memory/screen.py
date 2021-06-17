@@ -7,6 +7,7 @@ Created on Wed May 19 20:21:28 2021
 
 
 # std libraries
+import webbrowser
 
 
 # non-std libraries
@@ -33,7 +34,7 @@ Builder.load_string(
             title: 'Memory'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", obj_tapete.start_game], ["volume-high", obj_tapete.mute_button]]
+            right_action_items: [["play-circle-outline", obj_tapete.start_game], ["volume-high", obj_tapete.mute_button], ["help-circle-outline", root.help_button]]
             
         MDBoxLayout:
             orientation: 'horizontal'
@@ -83,3 +84,6 @@ class ScreenMemory(MDScreen):
 
         config.write()
 
+
+    def help_button(self, button):
+        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-memory')

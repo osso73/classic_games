@@ -8,6 +8,7 @@ Created on Wed May 19 20:21:28 2021
 
 # std libraries
 import os
+import webbrowser
 
 
 # non-std libraries
@@ -35,7 +36,7 @@ Builder.load_string(
             title: 'Pong'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", pong.start_game], ["pause", pong.pause_button]]
+            right_action_items: [["play-circle-outline", pong.start_game], ["pause", pong.pause_button], ["help-circle-outline", root.help_button]]
             
         PongBoard:
             id: pong
@@ -62,4 +63,7 @@ class ScreenPong(MDScreen):
             self.ids.pong.change_skin(value)
 
         config.write()
-        
+
+
+    def help_button(self, button):
+        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-pong')

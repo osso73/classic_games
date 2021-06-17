@@ -9,6 +9,8 @@ Created on Wed May 19 20:21:28 2021
 
 # std libraries
 from random import choice
+import webbrowser
+
 
 # non-std libraries
 from kivy.lang import Builder
@@ -46,7 +48,7 @@ Builder.load_string(
             title: 'Ahorcado'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", root.iniciar_juego], ["help", root.dar_pista], ["volume-high", root.mute_button]]
+            right_action_items: [["play-circle-outline", root.iniciar_juego], ["help", root.dar_pista], ["volume-high", root.mute_button], ["help-circle-outline", root.help_button]]
 
         BoxLayout:
             orientation: 'horizontal'
@@ -259,3 +261,6 @@ class ScreenAhorcado(MDScreen):
 
 
         config.write()
+    
+    def help_button(self, button):
+        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-ahorcado-hanged')

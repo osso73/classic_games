@@ -32,86 +32,51 @@ The following options are available from the side menu:
 
 * * * * * * * * * * * * * * * * * * * * * * * *
 
-## Game of snake
+## Game of pong
 
 ### Rules of the game
 
-Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.
+Classic game of pong. Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.
 
-In here, the player controls a snake that goes on the screen. There is a piece of food at a random location of the screen. When the snake eats the food, it grows the length, and a new piece of food appears (note that each type of food will have slightly different effects). The player has to avoid that the snake hits a wall or its own body: this will kill the snake. Reaching the end of the screen will not kill the snake, it will just pop up at the opposite end.
-
-The game has different levels, each of them has a certain amount of walls that the snake has to avoid. Once you reach a partial score of the level (which depends on the grid size), you move to the next level.
-
-Swipe on the screen to change the direction of the snake. The snake can turn 90 degrees in any direction.
-
-The screen can be either portrait or landscape. If the screen changes, you should start a new game to take the dimensions into account.
+If you miss the ball, your opponent gets a point. Game ends at 5 points.
 
 
 ### Main screen
 
 This is the main screen of the game.
 
-![snake_screen](../img/MD/MD_snake_screen.jpg "Screenshot of the snake")
+![memory_screenshot](../img/MD/MD_pong_screen.jpg "Screenshot of the Pong")
 
-**Figure 2**. Screenshot of the snake game.
+It is divided in two areas:
 
-It is divided in three areas:
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions
 
-- _top row_: it shows a toolbar with some buttons that will allow you different functions, described in section [Buttons in toolbar](#buttons-in-toolbar).
-
-- _results row_: display the score and the current level, with a progress bar on the level. When the progress bar reaches 100%, you move to the next level.
-
-- _playing ground_: this is where the snake will run. Here you can see as well the current score of the game, which is the number of fruits you have eaten.
+- _game board_: this is the field where you play
 
 
-### Types of food
 
-There are different types of food, and when eating them you will see a different behaviour:
+### Buttons in the game
 
-| Type      | Behaviour                                                                                       | Examples                                                                                  |
-| --------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Fruit     | Adds one snake part, and 2 points to the score. This is the healthy food!                       | ![][apple] ![][apple2] ![][bananas] ![][cherry] ![][kiwi] ![][strawberry] ![][watermelon] |
-| Fast-food | Increases the speed of the snake by 50% for a while, adds 2 snake parts, and one point of score | ![][fries] ![][hamburger] ![][pizza]                                                      |
-| Sweet     | adds 3 parts of the snake, one point of score.                                                  | ![][cake] ![][flan] ![][ice]                                                                |
+Only two buttons show in the toolbar:
 
-Fruit is what you get most often. But watch out when eating other food, as you will suffer the consequences!
+- ![][b_start]: to start a new game. It will reset the score, and start from the beginning, at the chosen speed.
 
-### Buttons in toolbar
-
-The buttons give you access to the following functions:
-
-  - ![][b_start]: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.
-
-  - ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
-
-  - ![][b_pause]: this button will pause the game. Another click will continue the game where it was.
+- ![][b_pause]: this button will pause the game. Another click will continue the game where it was.
 
 
 ### Settings
 
-Fig. 3 shows a screenshot of the settings.
+The settings allow you to choose two parameters of the game:
 
-![Settings](../img/snake/settings_screen.jpg "Settings")
+- **Initial speed**: this is the speed of the ball, when starting (the speed will increase at each bounce). It can take any integer value. Note that negative values will be treated as positive (e.g. ignoring the sign).
 
-**Figure 3**. Settings window for game snake.
-
-The following options are available:
-
-  - **Size**: to change the size of the head and food. They can be larger or smaller. You can select from a number of pre-defined sizes: 11, 15, 19, 23. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.
-
-  - **Speed**: to change the speed of the snake. You can select from a number of pre-defined speed factors: 0.5, 0.8, 1, 1.5, 2, 3. The game starts with a factor of 1 by default. The factor will be dividing the interval between updates of the game. Therefore, the higher the factor the smaller is the interval between updates, producing a higher speed.
-
-  - **Play story**: this flag allows you to select the game mode: True to play in story mode, or False to play only one level. Story mode will start at the level selected below, and single-level will play the selected level endless.
-
-  - **Start level**: You can select the level to start your story, from 1 to 12. If the game mode is single-level, this will be the level you play; if the game mode is story, you will start at this level.
-
-The settings are saved, so next time you start the game it will maintain the same settings defined.
+- **Skin**: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.
 
 
 * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-## Game of snake
+## Game of ahorcado (hanged)
 
 ### Rules of the game
 
@@ -167,6 +132,54 @@ The following options are available to be set for this game:
   - **Keyboard**: to change the skin of the keyboard. There are 6 different skins available.
 
 The settings are saved, so next time you start the game it will maintain the same settings defined.
+
+
+* * * * * * * * * * * * * * * * * * * * * * * *
+
+
+## Game of memory
+
+### Rules of the game
+
+You have a number of cards turned down, they contain different images. Each image is hidden in two different cards. The objective of the game is to discover all the pairs of cards with the same image.
+
+At each turn, you flip 2 cards to show their image, and then:
+
+- if they show the same image, you guessed one pair, and the cards remain up.
+- if they show different images, the cards will turn down again after 2 seconds, giving you some time to memorize their position.
+
+Each time you turn a pair of cards, the moves score is incremented by one. The goal is to find all the pairs, with the minimum number of moves.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![memory_screenshot](../img/MD/MD_memory_screen.jpg "Screenshot of the Memory")
+
+
+It is divided in several areas:
+
+- _toolbar_: it shows a toolbar with some buttons that will allow you different functions (see below)
+
+- _mid row_: it contains two buttons, and the score of the game. The game is scored as the number of moves you made. The goal being to have as little as possible, i.e. to guess all the pairs with as few moves as possible.
+
+- _playing ground_: this is where the cards are.
+
+
+### Buttons in the game
+
+There are some buttons in the toolbar, and some in the mid-row. The buttons give you access to the following functions:
+
+- ![][b_start]: to start a new game. It will reset the score, and regenerate the images, using the current theme and level (number of pairs). Note that even if the set is the same as previous game, the images can be different, as they are picked randomly from a larger set of images.
+
+- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+- _theme button_: to change the theme used for hte images. The text of second button actually is the name of the theme. This will pick images from that particular theme. A number of themes are provided.
+
+- _level button_: it shows the number of pairs to be created when starting a new game.This means you will have the double of cards (e.g. 6 pairs means you play with 12 cards). The values possible are from 2 to 20. When clicked, its value will increase by 1, unless you are already at  20, in which case it will move down to 2.
+
+The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.
 
 
 * * * * * * * * * * * * * * * * * * * * * * * *
@@ -274,97 +287,6 @@ The buttons give you access to the following functions:
 * * * * * * * * * * * * * * * * * * * * * * * *
 
 
-## Game of memory
-
-### Rules of the game
-
-You have a number of cards turned down, they contain different images. Each image is hidden in two different cards. The objective of the game is to discover all the pairs of cards with the same image.
-
-At each turn, you flip 2 cards to show their image, and then:
-
-- if they show the same image, you guessed one pair, and the cards remain up.
-- if they show different images, the cards will turn down again after 2 seconds, giving you some time to memorize their position.
-
-Each time you turn a pair of cards, the moves score is incremented by one. The goal is to find all the pairs, with the minimum number of moves.
-
-
-### Main screen
-
-This is the main screen of the game.
-
-![memory_screenshot](../img/MD/MD_memory_screen.jpg "Screenshot of the Memory")
-
-
-It is divided in several areas:
-
-- _toolbar_: it shows a toolbar with some buttons that will allow you different functions (see below)
-
-- _mid row_: it contains two buttons, and the score of the game. The game is scored as the number of moves you made. The goal being to have as little as possible, i.e. to guess all the pairs with as few moves as possible.
-
-- _playing ground_: this is where the cards are.
-
-
-### Buttons in the game
-
-There are some buttons in the toolbar, and some in the mid-row. The buttons give you access to the following functions:
-
-- ![][b_start]: to start a new game. It will reset the score, and regenerate the images, using the current theme and level (number of pairs). Note that even if the set is the same as previous game, the images can be different, as they are picked randomly from a larger set of images.
-
-- ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
-
-- _theme button_: to change the theme used for hte images. The text of second button actually is the name of the theme. This will pick images from that particular theme. A number of themes are provided.
-
-- _level button_: it shows the number of pairs to be created when starting a new game.This means you will have the double of cards (e.g. 6 pairs means you play with 12 cards). The values possible are from 2 to 20. When clicked, its value will increase by 1, unless you are already at  20, in which case it will move down to 2.
-
-The theme and level of the game can also be chosen from the settings panel. In this case, their value will be saved, remembered the next time you start the application.
-
-
-* * * * * * * * * * * * * * * * * * * * * * * *
-
-
-## Game of pong
-
-### Rules of the game
-
-Classic game of pong. Rules are pretty simple: two-player game, each player has a paddle and needs to use it to avoid that the ball touches his edge of the screen. The ball speeds up at each bounce.
-
-If you miss the ball, your opponent gets a point. Game ends at 5 points.
-
-
-### Main screen
-
-This is the main screen of the game.
-
-![memory_screenshot](../img/MD/MD_pong_screen.jpg "Screenshot of the Pong")
-
-It is divided in two areas:
-
-- _toolbar_: it shows a toolbar with some buttons that will allow you different functions
-
-- _game board_: this is the field where you play
-
-
-
-### Buttons in the game
-
-Only two buttons show in the toolbar:
-
-- ![][b_start]: to start a new game. It will reset the score, and start from the beginning, at the chosen speed.
-
-- ![][b_pause]: this button will pause the game. Another click will continue the game where it was.
-
-
-### Settings
-
-The settings allow you to choose two parameters of the game:
-
-- **Initial speed**: this is the speed of the ball, when starting (the speed will increase at each bounce). It can take any integer value. Note that negative values will be treated as positive (e.g. ignoring the sign).
-
-- **Skin**: it allows you to change the skin of the game. This will change the picture of the ball and the two paddles.
-
-
-* * * * * * * * * * * * * * * * * * * * * * * *
-
 ## Game of buscaminas (Minesweeper)
 
 ### Rules of the game
@@ -408,6 +330,84 @@ It is divided in three areas:
     - level 2: 9x18 board, with 25 mines
     - level 3: 18x36 board, with 125 mines
 
+
+* * * * * * * * * * * * * * * * * * * * * * * *
+
+
+## Game of snake
+
+### Rules of the game
+
+Very classic game, exists in most of the platforms, one of the first games ever built on a phone (old Nokia phones). There are many variants of the game.
+
+In here, the player controls a snake that goes on the screen. There is a piece of food at a random location of the screen. When the snake eats the food, it grows the length, and a new piece of food appears (note that each type of food will have slightly different effects). The player has to avoid that the snake hits a wall or its own body: this will kill the snake. Reaching the end of the screen will not kill the snake, it will just pop up at the opposite end.
+
+The game has different levels, each of them has a certain amount of walls that the snake has to avoid. Once you reach a partial score of the level (which depends on the grid size), you move to the next level.
+
+Swipe on the screen to change the direction of the snake. The snake can turn 90 degrees in any direction.
+
+The screen can be either portrait or landscape. If the screen changes, you should start a new game to take the dimensions into account.
+
+
+### Main screen
+
+This is the main screen of the game.
+
+![snake_screen](../img/MD/MD_snake_screen.jpg "Screenshot of the snake")
+
+**Figure 2**. Screenshot of the snake game.
+
+It is divided in three areas:
+
+- _top row_: it shows a toolbar with some buttons that will allow you different functions, described in section [Buttons in toolbar](#buttons-in-toolbar).
+
+- _results row_: display the score and the current level, with a progress bar on the level. When the progress bar reaches 100%, you move to the next level.
+
+- _playing ground_: this is where the snake will run. Here you can see as well the current score of the game, which is the number of fruits you have eaten.
+
+
+### Types of food
+
+There are different types of food, and when eating them you will see a different behaviour:
+
+| Type      | Behaviour                                                                                       | Examples                                                                                  |
+| --------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Fruit     | Adds one snake part, and 2 points to the score. This is the healthy food!                       | ![][apple] ![][apple2] ![][bananas] ![][cherry] ![][kiwi] ![][strawberry] ![][watermelon] |
+| Fast-food | Increases the speed of the snake by 50% for a while, adds 2 snake parts, and one point of score | ![][fries] ![][hamburger] ![][pizza]                                                      |
+| Sweet     | adds 3 parts of the snake, one point of score.                                                  | ![][cake] ![][flan] ![][ice]                                                                |
+
+Fruit is what you get most often. But watch out when eating other food, as you will suffer the consequences!
+
+### Buttons in toolbar
+
+The buttons give you access to the following functions:
+
+  - ![][b_start]: to start a new game. It will reset the score, and remove the snake and food. It will create a new snake with the head only, and spawn a new food.
+
+  - ![][b_mute_on]: mute the sounds of the game. Another click will unmmute. Note the icon will not change (this may be introduced in a future version).
+
+  - ![][b_pause]: this button will pause the game. Another click will continue the game where it was.
+
+
+### Settings
+
+Fig. 3 shows a screenshot of the settings.
+
+![Settings](../img/snake/settings_screen.jpg "Settings")
+
+**Figure 3**. Settings window for game snake.
+
+The following options are available:
+
+  - **Size**: to change the size of the head and food. They can be larger or smaller. You can select from a number of pre-defined sizes: 11, 15, 19, 23. This is the number of squares that has the shortest side of the window. So the higher the number, the smaller the square will be, and hence the smaller the snake parts and food.
+
+  - **Speed**: to change the speed of the snake. You can select from a number of pre-defined speed factors: 0.5, 0.8, 1, 1.5, 2, 3. The game starts with a factor of 1 by default. The factor will be dividing the interval between updates of the game. Therefore, the higher the factor the smaller is the interval between updates, producing a higher speed.
+
+  - **Play story**: this flag allows you to select the game mode: True to play in story mode, or False to play only one level. Story mode will start at the level selected below, and single-level will play the selected level endless.
+
+  - **Start level**: You can select the level to start your story, from 1 to 12. If the game mode is single-level, this will be the level you play; if the game mode is story, you will start at this level.
+
+The settings are saved, so next time you start the game it will maintain the same settings defined.
 
 
 * * * * * * * * * * * * * * * * * * * * * * * *

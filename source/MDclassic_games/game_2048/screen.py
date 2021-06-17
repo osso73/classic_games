@@ -7,6 +7,7 @@ Created on Wed May 19 20:21:28 2021
 
 
 # std libraries
+import webbrowser
 
 
 # non-std libraries
@@ -36,7 +37,7 @@ Builder.load_string(
             title: '2048'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", board.start_game], ["backup-restore", board.back_button], ["volume-high", board.mute_button]]
+            right_action_items: [["play-circle-outline", board.start_game], ["backup-restore", board.back_button], ["volume-high", board.mute_button], ["help-circle-outline", root.help_button]]
             
         BoxLayout:
             orientation: 'horizontal'
@@ -116,7 +117,9 @@ Builder.load_string(
 
 
 class Screen2048(MDScreen):
-    pass
+    def help_button(self, button):
+        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-2048')
+
 
 
 class ButtonJoystick(Button):
