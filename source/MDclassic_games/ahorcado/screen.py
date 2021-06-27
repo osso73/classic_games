@@ -15,7 +15,7 @@ import webbrowser
 # non-std libraries
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, ObjectProperty, StringProperty, BooleanProperty
-from kivy.core.audio import SoundLoader
+from kivy.app import App
 
 from kivymd.uix.screen import MDScreen
 
@@ -24,7 +24,7 @@ from ahorcado.dibujo import Dibujo
 from ahorcado.letras import LetrasFalladas
 from ahorcado.palabra import PalabraLetras
 from ahorcado.teclado import Teclado
-from ahorcado.popup import PopupButtonAhorcado
+from popup import PopupButton
 import ahorcado.constants as AHORCADO
 
 
@@ -94,8 +94,6 @@ class ScreenAhorcado(MDScreen):
         Name of the skin to be used for keyboard
     active : boolean
         Defines whether the game is active or not
-    sounds : dictionary
-        Contains all the sounds of the game (except the key)
     pista : boolean
         Variable to track if a hint is available or not. Only one hint
         per game is allowed.
@@ -108,14 +106,9 @@ class ScreenAhorcado(MDScreen):
     obj_teclado = ObjectProperty(None)
     teclado = StringProperty('teclado1')
     active = False
-    sounds = dict()
     pista = BooleanProperty(True)
     mute = BooleanProperty(False)
 
-    def __init__(self, **kwargs):
-        super(ScreenAhorcado, self).__init__(**kwargs)
-        self.sounds['win'] = SoundLoader.load('ahorcado/audio/game-over-win.ogg')
-        self.sounds['lose'] = SoundLoader.load('ahorcado/audio/game-over-lost.ogg')
 
     def iniciar_juego(self, *args):
         '''
@@ -123,6 +116,7 @@ class ScreenAhorcado(MDScreen):
         '''
         self.obj_palabra.buscar_palabra()
         self.reset_juego()
+
 
     def reset_juego(self):
         '''
@@ -138,6 +132,7 @@ class ScreenAhorcado(MDScreen):
         self.obj_palabra.reset_palabra()
         self.obj_teclado.reset_teclado()
 
+
     def final(self, win):
         '''
         Launch a popup a the end of the game.
@@ -150,17 +145,14 @@ class ScreenAhorcado(MDScreen):
         '''
         if win:
             msg = '¡¡Has ganado!!\n¡¡ENHORABUENA!!'
-            # self.sound['win'].play()
             self.play('win')
         else:
             msg = 'Lo siento,\nte han colgado...'
-            # self.sound['lose'].play()
             self.play('lose')
 
-        PopupButtonAhorcado(title='Final', msg=msg)
+        PopupButton(title='Final', msg=msg)
         self.obj_palabra.actual = self.obj_palabra.palabra
         self.active =  False
-
 
 
     def evaluar_letra(self, letra):
@@ -223,10 +215,8 @@ class ScreenAhorcado(MDScreen):
                 self.obj_teclado.pulsar_tecla(letra)
                 self.pista = False
             else:
-                PopupButtonAhorcado(title='Aviso',
+                PopupButton(title='Aviso',
                                     msg='¡No puedes pedir más pistas!')
-
-
 
 
     def play(self, sound):
@@ -246,10 +236,8 @@ class ScreenAhorcado(MDScreen):
         if self.mute:
             return
 
-        if sound in self.sounds:
-            self.sounds[sound].play()
-        else:
-            raise Exception("Bad sound")
+        app = App.get_running_app()
+        app.play(sound)
 
 
     def config_change(self, config, section, key, value):
@@ -261,6 +249,7 @@ class ScreenAhorcado(MDScreen):
 
 
         config.write()
+
     
     def help_button(self, button):
         webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-ahorcado-hanged')

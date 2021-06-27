@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Sample picture for 15puzzle was too separated (iss. #70). Now fixed.
 
+
 ### Added
 - Help button for each of the games, pointing to the game instructions (iss. #78)
 
 
 ### Changed
 - Icon and splash screen
+- Order of the games in the main menu, side menu and settings, to be aligned with the order they were created.
 
 
 ## [v1.0] 2021-06-13

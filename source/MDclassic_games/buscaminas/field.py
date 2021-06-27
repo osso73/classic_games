@@ -8,16 +8,16 @@ Created on Sat Jun 12 10:09:16 2021
 
 
 # std libraries
-import os
 from time import time
 from random import shuffle
+
 
 # non-std libraries
 from kivy.lang import Builder
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import NumericProperty
 from kivy.clock import Clock
-from kivy.core.audio import SoundLoader
+from kivy.app import App
 
 # my app imports
 import buscaminas.constants as MINAS
@@ -72,30 +72,14 @@ class Field(GridLayout):
     level = 1
     mode = 'covered'
     mute = False
+
     
     def __init__(self, **kwargs):
         super(Field, self).__init__(**kwargs)
         self._start_time = 0
         Clock.schedule_interval(self.tick, 0.1)
-        self.sounds = self.load_sounds()
+
         
-    def load_sounds(self):
-        '''
-        Load all sounds of the game, and put them into the dictionary.
-
-        Returns
-        -------
-        sound : dict
-            The dictionary of sounds that have been loaded
-
-        '''
-        sound = dict()
-        folder = os.path.join(os.path.dirname(__file__),'sounds')
-        for s in ['lose', 'win']:
-            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
-        
-        return sound
-
     def play(self, sound):
         '''
         Play a sound from the dictionary of sounds.
@@ -114,10 +98,9 @@ class Field(GridLayout):
         if self.mute:
             return
         
-        if sound in self.sounds:
-            self.sounds[sound].play()
-        else:
-            raise Exception("Bad sound")
+        app = App.get_running_app()
+        app.play(sound)
+
 
     def start_game(self, *args):
         '''
@@ -162,6 +145,7 @@ class Field(GridLayout):
             for j in range(self.columnas):
                 self.add_widget(Area(posicion=[j, i], value=areas[n]))
                 n += 1
+
     
     def find_adjacent_mines(self):
         '''
@@ -174,6 +158,7 @@ class Field(GridLayout):
                 for n in neighbours:
                     if n.value == 9:
                         area.value += 1
+
     
     def find_neighbours(self, p):
         '''
@@ -198,6 +183,7 @@ class Field(GridLayout):
                     ret.append(child)
         
         return ret
+
     
     def check_uncover(self, area):
         '''
@@ -252,12 +238,13 @@ class Field(GridLayout):
         '''
         self.game_active = False
         self.parent.parent.ids.start_button.change_face('lost')
-        self.play('lose')
+        self.play('lose-explode')
         for area in self.children:
             if area.flag and area.value != 9:
                 area.set_show(name='wrong')
             elif area.value == 9 and not area.flag:
                 area.uncovered = True
+
     
     def game_won(self):
         '''
@@ -265,7 +252,8 @@ class Field(GridLayout):
         '''
         self.game_active = False
         self.parent.parent.ids.start_button.change_face('won')
-        self.play('win')
+        self.play('win-Ateam')
+
     
     def no_adjacent_mines(self, area):
         '''
@@ -308,10 +296,12 @@ class Field(GridLayout):
         else:
             self.mode = 'bandera'
             button.icon  = 'flag'
+
         
     def set_level(self, button):
         self.level = self.level % 3 + 1
         button.icon = f'numeric-{self.level}-box'
+
         
     def mute_button(self, button):
         '''Toogle mute flag'''

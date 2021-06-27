@@ -10,7 +10,6 @@ Created on Tue May 25 15:09:31 2021
 
 # non-std libraries
 from kivy.lang import Builder
-from kivy.core.audio import SoundLoader
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.properties import  StringProperty, BooleanProperty
@@ -116,8 +115,6 @@ class Tecla(Button):
     ----------
     letra : string (char)
         This is the letter that corresponds to the key
-    sound : SoundLoader
-        Sound to be played when key is pressed
     skin : string
         skin to be used
     filename : string
@@ -129,7 +126,6 @@ class Tecla(Button):
 
     '''
     letra = StringProperty()
-    sound = SoundLoader.load('ahorcado/audio/tecla.ogg')
     skin = StringProperty()
     filename = StringProperty()
     disabled = BooleanProperty(False)
@@ -149,4 +145,4 @@ class Tecla(Button):
         if app.root.ids.ahorcado.mute:
             return
 
-        self.sound.play()
+        app.play('tecla')

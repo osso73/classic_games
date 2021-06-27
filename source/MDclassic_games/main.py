@@ -7,11 +7,13 @@ This is a temporary script file.
 
 
 # std libraries
+import os
 
 
 # non-std libraries
 from kivymd.app import MDApp
 from kivy.core.window import Window
+from kivy.core.audio import SoundLoader
 from kivy.uix.settings import SettingsWithSpinner
 from kivy.utils import platform
 from kivy.lang import Builder
@@ -76,7 +78,18 @@ Screen:
 """
 
 class MainApp(MDApp):
-    """Main app"""
+    """
+    Main app
+    
+    Parameters
+    ----------
+    sounds: list
+        Dictionary of sounds to be played. Loaded at the init time, and used
+        with the play() method throughout the program.
+    
+    """
+
+
     version = __version__
     
     def build(self):
@@ -85,7 +98,12 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = 'DeepPurple'
         self.settings_cls = SettingsWithSpinner
         self.use_kivy_settings = False
-        return screen       
+        return screen
+    
+    
+    def on_start(self):
+        self.sounds = self.load_sounds()
+        
 
     def build_config(self, config):
         config.setdefaults('Snake', {
@@ -117,17 +135,16 @@ class MainApp(MDApp):
 
 
     def build_settings(self, settings):
-        settings.add_json_panel("Snake", self.config,
-                                filename='snake/settings.json')
-        settings.add_json_panel("Ahorcado", self.config,
-                                filename='ahorcado/settings.json')
-        settings.add_json_panel("15 puzzle", self.config,
-                                filename='game_15puzzle/settings.json')
-        settings.add_json_panel("Memory", self.config,
-                                filename='memory/settings.json')
-
         settings.add_json_panel("Pong", self.config,
                                 filename='pong/settings.json')
+        settings.add_json_panel("Ahorcado", self.config,
+                                filename='ahorcado/settings.json')
+        settings.add_json_panel("Memory", self.config,
+                                filename='memory/settings.json')
+        settings.add_json_panel("15 puzzle", self.config,
+                                filename='game_15puzzle/settings.json')
+        settings.add_json_panel("Snake", self.config,
+                                filename='snake/settings.json')
 
 
     def on_config_change(self, config, section, key, value):
@@ -147,6 +164,46 @@ class MainApp(MDApp):
         elif section == 'Pong':
             self.root.ids.pong.config_change(config, section, key, value)
         
+
+    def load_sounds(self):
+        '''
+        Load all sounds of the game, and put them into the dictionary.
+
+        Returns
+        -------
+        sound : dict
+            The dictionary of sounds that have been loaded
+        '''
+        sound = dict()
+        folder = os.path.join(os.path.dirname(__file__),'audio')
+        soundlist = os.listdir(folder)
+        for s in soundlist:
+            sound[s] = SoundLoader.load(os.path.join(folder, s))
+
+        return sound
+
+
+    def play(self, sound):
+        '''
+        Play a sound from the dictionary of sounds.
+
+        Parameters
+        ----------
+        sound : string
+            Key of the dictionary corresponding to the sound to be played.
+
+        Raises
+        ------
+        Exception
+            If string passed is not in the dictionary.
+        '''
+        sound_name = sound + '.ogg'
+        
+        if sound_name in self.sounds:
+            self.sounds[sound_name].play()
+        else:
+            raise Exception("Bad sound")
+
 
 
 if __name__ == '__main__':

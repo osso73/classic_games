@@ -20,7 +20,7 @@ from kivy.app import App
 
 # my app imports
 from pong.elements import PongBall, PongPaddle
-from pong.popup import PopupButtonPong
+from popup import PopupButton
 
 
 
@@ -183,7 +183,7 @@ class PongBoard(Widget):
         self.active = False
         num = 1 if self.player1.score >= 5 else 2
         
-        PopupButtonPong(title='Final', msg=f'El jugador {num} gana!!')
+        PopupButton(title='Final', msg=f'El jugador {num} gana!!')
 
 
     def pause_button(self, button):

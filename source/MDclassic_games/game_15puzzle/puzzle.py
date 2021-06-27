@@ -61,11 +61,13 @@ class Puzzle(RelativeLayout):
         # defined, to ensure it has height and width
         Clock.schedule_once(self.initialize_grid)
     
+
     def initialize_grid(self, *args):
         '''
         Establish the width and height of the widget, based on parent's size
         '''
         self.ventana = min(self.parent.height, self.parent.width)
+
     
     def start_game(self, *args):
         '''
@@ -101,6 +103,7 @@ class Puzzle(RelativeLayout):
         # load theme
         self.parent.parent.ids.muestra.load_tema()
 
+
     def find_empty(self):
         '''
         Find the empty tile in the board.
@@ -115,6 +118,7 @@ class Puzzle(RelativeLayout):
             if not child.name:
                 return child       
         return False
+
 
     def check_win(self):
         '''
@@ -134,13 +138,14 @@ class Puzzle(RelativeLayout):
                 return False        
         return True
     
+    
     def end_of_game(self):
         '''
         Check if the picture is complete. If so, convert empty tile to the 
         last piece of the puzzle, and show it with an animation
         '''
         if self.check_win():
-            self.parent.parent.play('end_game')
+            self.parent.parent.play('win-short')
             lado = int(self.ventana / self.tamano)
             for child in self.children:
                 if not child.name:

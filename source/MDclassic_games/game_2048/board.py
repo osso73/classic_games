@@ -10,19 +10,20 @@ Created on Wed Jun  2 19:37:19 2021
 # std libraries
 from random import choice
 from functools import partial
-import os
+
 
 # non-std libraries
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.properties import NumericProperty, ListProperty
-from kivy.core.audio import SoundLoader
+
+from kivymd.app import MDApp
 
 # my app imports
 import game_2048.constants as G2048
 from game_2048.tile import Tile
-from game_2048.popup import PopupButton2048
+from popup import PopupButton
 
 
 
@@ -64,9 +65,6 @@ class Board(RelativeLayout):
     last_move: list
         Stores the position and value of all tiles before starting the move. 
         Used to enable go_back method.
-    sounds: list
-        Dictionary of sounds to be played. Loaded at the init time, and used
-        with the play() method throughout the program.
     mute: boolean
         Controls if sounds should play or not. If True, sounds don't play.
     
@@ -82,24 +80,6 @@ class Board(RelativeLayout):
     _moved_tile = False
 
     
-    def __init__(self, **kwargs):
-        super(Board, self).__init__(**kwargs)
-        self.sounds = self.load_sounds()
-
-
-    def load_sounds(self):
-        '''
-        Load sounds in memory at the sstart of the program, so they can be
-        played without delay.
-        '''
-        sound = dict()
-
-        folder = os.path.join(os.path.dirname(__file__),'audio')
-        for s in ['move', 'end_win', 'end_lose']:
-            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
-
-        return sound
-
     
     def play(self, sound):
         '''
@@ -109,10 +89,8 @@ class Board(RelativeLayout):
         if self.mute:
             return
         
-        if sound in self.sounds:
-            self.sounds[sound].play()
-        else:
-            raise Exception("Bad sound")
+        app = MDApp.get_running_app()
+        app.play(sound)
 
 
     def initialize_grid(self, *args):
@@ -315,17 +293,17 @@ class Board(RelativeLayout):
         if [child for child in self.children if child.value >= self.win_score]:
             # win game
             msg = 'Has ganado!'
-            self.play('end_win')
+            self.play('win')
         
         elif not self.available_moves():
             # no empty tiles --> lose game
             msg = 'Has perdido\nYa no puedes mover!'
-            self.play('end_lose')
+            self.play('game_over')
         
         else:
             return False
         
-        PopupButton2048(title='Final', msg=msg)
+        PopupButton(title='Final', msg=msg)
         self.active_game = False
         return True
     

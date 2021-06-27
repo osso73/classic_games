@@ -71,7 +71,7 @@ class Carta(Button):
         '''
         if not self.shown:
             self.turn()
-            self.parent.play('turn')
+            self.parent.play('move')
             Clock.schedule_once(self.add_card_to_current)
             
     def add_card_to_current(self, *args):

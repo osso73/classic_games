@@ -23,7 +23,7 @@ from kivymd.app import MDApp
 
 # my app imports
 from memory.carta import Carta
-from memory.popup import PopupButtonMemory
+from popup import PopupButton
 
 
 
@@ -84,7 +84,6 @@ class Tapete(MDGridLayout):
         super(Tapete, self).__init__(**kwargs)
         self.lista_temas = os.listdir(TEMAS)
         self.cambiar_tema()
-        self.sounds = self.load_sounds()
         
         app = MDApp.get_running_app()
         self.tema_actual = app.config.get('Memory', 'theme')
@@ -110,22 +109,6 @@ class Tapete(MDGridLayout):
         self.tamano = self.tamano + 1 if self.tamano < 20 else 2
 
     
-    def load_sounds(self):
-        '''
-        Load all sounds of the game, and put them into the dictionary.
-        
-        Returns
-        -------
-        sound : dict
-            The dictionary of sounds that have been loaded
-        '''
-        sound = dict()        
-        folder = os.path.join(os.path.dirname(__file__),'audio')
-        for s in ['bye', 'ok', 'start', 'turn', 'end_game']:
-            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
-            
-        return sound
-    
 
     def play(self, sound):
         '''
@@ -144,10 +127,10 @@ class Tapete(MDGridLayout):
         if self.mute:
             return
 
-        if sound in self.sounds:
-            self.sounds[sound].play()
-        else:
-            raise Exception("Bad sound")
+        app = MDApp.get_running_app()
+        app.play(sound)
+
+
 
 
     def load_images(self):
@@ -243,8 +226,8 @@ class Tapete(MDGridLayout):
             if not carta.shown:
                 return
         
-        self.play('end_game')
-        PopupButtonMemory(title='Final', 
+        self.play('win-short')
+        PopupButton(title='Final', 
                           msg='!Muy bien!\nHas encontrado todas las parejas')
 
 

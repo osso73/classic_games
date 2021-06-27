@@ -113,7 +113,7 @@ class Ficha(Label):
             if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
                 (ey==py and ex==px+1) or (ey==py and ex==px-1):
                     empty.posicion, self.posicion = self.posicion, empty.posicion
-                    self.parent.parent.parent.play('move')
+                    self.parent.parent.parent.play('move2')
                     self.parent.movimientos += 1
             self.parent.end_of_game()
     

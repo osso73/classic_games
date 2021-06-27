@@ -16,14 +16,13 @@ from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty, ListProperty, BooleanProperty
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.core.audio import SoundLoader
 
 
 # my app imports
 import snake.constants as SNAKE
 from snake.levels import Level
 from snake.grid_elements import Food, Wall, SnakePart, SnakeHead
-from snake.popup import PopupButton
+from popup import PopupButton
 
 
 Builder.load_string(
@@ -120,7 +119,6 @@ class GameBoard(Widget):
         super(GameBoard, self).__init__(*args, **kwargs)
         self.wall = []
         self.active = False
-        self.sounds = self.load_sounds()
         self.size_hint = None, None
         app = App.get_running_app()
         self.story = bool(int(app.config.get('Snake', 'mode')))
@@ -197,7 +195,7 @@ class GameBoard(Widget):
         None.
 
         '''
-        self.play('start')
+        self.play('start-mario')
         self.score = 0
         app = App.get_running_app()
         app.root.ids.snake.level_progress_bar = 0.0
@@ -537,22 +535,6 @@ class GameBoard(Widget):
 
             return direction
 
-    def load_sounds(self):
-        '''
-        Load all sounds of the game, and put them into the dictionary.
-
-        Returns
-        -------
-        sound : dict
-            The dictionary of sounds that have been loaded
-        '''
-        sound = dict()
-        folder = os.path.join(os.path.dirname(__file__),'audio')
-        for s in ['eat', 'start', 'next_level', 'game_over', 'win']:
-            sound[s] = SoundLoader.load(os.path.join(folder, f'{s}.ogg'))
-
-        return sound
-
 
     def play(self, sound):
         '''
@@ -571,8 +553,5 @@ class GameBoard(Widget):
         if self.mute:
             return
 
-        if sound in self.sounds:
-            self.sounds[sound].play()
-        else:
-            raise Exception("Bad sound")
-
+        app = App.get_running_app()
+        app.play(sound)
