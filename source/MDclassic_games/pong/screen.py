@@ -59,6 +59,13 @@ class ScreenPong(MDScreen):
                 config.set('Pong', 'speed', val)
             self.ids.pong.initial_vel = val
 
+        elif key == 'max-speed':
+            val = int(value)
+            if val < 0:
+                val = abs(val)
+                config.set('Pong', 'max-speed', val)
+            self.ids.pong.ids.pong_ball.max_vel = val
+
         elif key == 'skin':
             self.ids.pong.change_skin(value)
 

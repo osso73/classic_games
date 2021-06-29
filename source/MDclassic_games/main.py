@@ -106,11 +106,10 @@ class MainApp(MDApp):
         
 
     def build_config(self, config):
-        config.setdefaults('Snake', {
-            'speed': '1',
-            'size': '11',
-            'mode': '1',
-            'level_start': 1,
+        config.setdefaults('Pong', {
+            'speed': 10,
+            'max-speed': 50,
+            'skin': 'original',
             })
 
         config.setdefaults('Ahorcado', {
@@ -118,19 +117,21 @@ class MainApp(MDApp):
             'keyboard': 'teclado2',
             })
 
-        config.setdefaults('fifteen', {
-            'level': '1',
-            'theme': 'numeros',
-            })
-
         config.setdefaults('Memory', {
             'level': 6,
             'theme': 'starwars',
             })
 
-        config.setdefaults('Pong', {
-            'speed': 10,
-            'skin': 'original',
+        config.setdefaults('fifteen', {
+            'level': '1',
+            'theme': 'numeros',
+            })
+
+        config.setdefaults('Snake', {
+            'speed': '1',
+            'size': '11',
+            'mode': '1',
+            'level_start': 1,
             })
 
 

@@ -94,7 +94,7 @@ class PongBoard(Widget):
     initial_vel : int
         Defines the speed when the ball starts. This speed can be changed from
         the menu of the app.
-    
+        
     '''
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)

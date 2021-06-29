@@ -2,9 +2,16 @@
     {
       "type": "numeric",
       "title": "Initial speed",
-      "desc": "Initial speed of the ball when serving. Default value is 10, can be any integer (even negative)",
+      "desc": "Initial speed of the ball when serving. Default value is 10, can be any integer.",
       "section": "Pong",
       "key": "speed"
+    },
+    {
+      "type": "numeric",
+      "title": "Maximum speed",
+      "desc": "Maximum speed of the ball. Default value is 50, can be any integer.",
+      "section": "Pong",
+      "key": "max-speed"
     },
     {
       "type": "options",
