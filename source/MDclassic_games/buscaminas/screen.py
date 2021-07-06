@@ -18,7 +18,7 @@ from kivymd.uix.screen import MDScreen
 from buscaminas.indicator import Indicator
 from buscaminas.startbutton import StartButton
 from buscaminas.field import Field
-
+import buscaminas.constants as MINES
 
 
 Builder.load_string(
@@ -38,19 +38,14 @@ Builder.load_string(
             right_action_items: [["play-circle-outline", field.start_game], ['bomb', field.entry_mode], ['numeric-1-box', field.set_level], ['volume-high', field.mute_button], ["help-circle-outline", root.help_button]]
             
 
-        BoxLayout:
+        MDBoxLayout:
             id: menu
             orientation: 'horizontal'
             size_hint_y: None
             height: toolbar.height
             padding: '10dp'
             spacing: '5dp'
-            canvas:
-                Color:
-                    rgba: 0.7, 0.7, 0.7, 1
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
+            md_bg_color: 0.7, 0.7, 0.7, 1
                     
             Indicator:
                 text: '{:03}'.format(field.mines)
@@ -80,5 +75,5 @@ Builder.load_string(
 
 class ScreenBuscaminas(MDScreen):
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-buscaminas-minesweeper')
+        webbrowser.open(MINES.URL_HELP)
 

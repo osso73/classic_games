@@ -18,7 +18,7 @@ from kivy.properties import NumericProperty, ListProperty, StringProperty, Boole
 
 
 # my app imports
-import buscaminas.constants as MINAS
+import buscaminas.constants as MINES
 
 
 
@@ -47,7 +47,7 @@ class Area(Label):
     value : NumericProperty
         Value of the area. Usually a number showing the mines adjacent to this
         tile. A value of -1 means there is a bomb in the area.
-    posicion : ListProperty
+    location : ListProperty
         Coordinates (i, j) of the tile in the field.
     show : StringProperty
         Name of the image that is shown by the tile
@@ -59,15 +59,17 @@ class Area(Label):
 
     '''
     value = NumericProperty(0)
-    posicion = ListProperty()
+    location = ListProperty()
     show = StringProperty()
     uncovered = BooleanProperty(False)
     flag = BooleanProperty(False)
     _current_touch = None
+
     
     def __init__(self, **kwargs):
         super(Area, self).__init__(**kwargs)
         self.set_show()
+
     
     def set_show(self, name=None):
         '''
@@ -82,12 +84,13 @@ class Area(Label):
                 file = f'{self.value}.jpg'
             else:
                 if self.flag:
-                    file = 'bandera.jpg'
+                    file = 'flag.jpg'
                 else:
                     file = 'covered.jpg'
         
-        self.show = os.path.join(MINAS.IMAGES, file)
+        self.show = os.path.join(MINES.IMAGES, file)
     
+
     def on_uncovered(self, *args):
         '''
         Any change on the flag triggers the re-evaluation of the flags to 
@@ -96,6 +99,7 @@ class Area(Label):
         self.set_show()
         self.parent.check_uncover(self)
     
+
     def on_flag(self, *args):
         '''
         Any change on the flag triggers the re-evaluation of the flags to 
@@ -107,12 +111,14 @@ class Area(Label):
         if self.parent.all_discovered():
             self.parent.game_won()
     
+
     def switch_flag(self, *args):
         '''
         Switch the flag boolean, and decrease mines counter.
         '''
         self.flag = not self.flag
         
+
     def uncover(self, *args):
         '''
         Uncover mine, if not uncovered. And check if end of game or 0 bombs, 
@@ -132,7 +138,7 @@ class Area(Label):
                 self.parent.open_adjacent(self)
             elif hasattr(touch, 'button') and touch.button == 'right':
                 self.switch_flag()
-            elif self.parent.mode == 'bandera':
+            elif self.parent.mode == 'flag':
                 self.switch_flag()
             elif self.parent.mode == 'covered':
                 self.uncover()

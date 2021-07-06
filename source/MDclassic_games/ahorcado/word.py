@@ -12,8 +12,10 @@ from random import choice
 
 # non-std libraries
 from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import  StringProperty
+
+from kivymd.uix.boxlayout import MDBoxLayout
+
 
 # my app imports
 from ahorcado.general import replace_letter
@@ -23,18 +25,13 @@ import ahorcado.constants as AHORCADO
 Builder.load_string(
     r"""
 
-<PalabraLetras>:
+<Word>:
     size_hint_y: None
     padding: 5
-    canvas:
-        Color:
-            rgba: 0, 0.5, 0, 1
-        Rectangle:
-            size: self.size
-            pos: self.pos
+    md_bg_color: 0, 0.5, 0, 1
     
     Label:
-        text: root.actual
+        text: root.current
         font_size: 120
         texture_size: self.size
         size: self.texture_size
@@ -44,37 +41,39 @@ Builder.load_string(
 
 """)
 
-class PalabraLetras(BoxLayout):
+class Word(MDBoxLayout):
     '''
     This is the area of the screen that shows the word to be found.
     
     Attributes
     ----------
-    actual : string
+    current : string
         this is the word showing the letters found and not found
-    palabra : string
+    word : string
         this is the word that needs to be found
     '''
-    actual = StringProperty(' ')
-    palabra = ' '
+    current = StringProperty(' ')
+    word = ' '
     
     
-    def reset_palabra(self):
+    def reset_word(self):
         '''
-        Reset self.actual to all letters as '-'
+        Reset self.current to all letters as '-'
         '''
-        self.actual = '-'*len(self.palabra)
+        self.current = '-'*len(self.word)
+
         
-    def buscar_palabra(self):
+    def find_word(self):
         '''
         Find a new word. First load a word from the file, and then reset 
-        self.actual to show all '-'.
+        self.current to show all '-'.
 
         '''
-        self.palabra = self.cargar_palabra()
-        self.reset_palabra()
+        self.word = self.load_word()
+        self.reset_word()
     
-    def cargar_palabra(self):
+
+    def load_word(self):
         '''
         Find a word in form a file, an return it.
 
@@ -83,26 +82,27 @@ class PalabraLetras(BoxLayout):
         string
             Word chosen
         ''' 
-        fullname = os.path.join(os.path.dirname(__file__), AHORCADO.FICHERO_PALABRAS)
+        fullname = os.path.join(os.path.dirname(__file__), AHORCADO.WORDS_FILE)
         with open(fullname, 'rt') as f:
-            lista = [ line.rstrip('\n') for line in f ]
+            words_list = [ line.rstrip('\n') for line in f ]
         
-        return choice(lista)
+        return choice(words_list)
+
     
-    def anadir_letra(self, letra):
+    def add_letter(self, letter):
         '''
-        Add a correct letter to the self.actual string. Find all appearences
-        of the letter in self.palabra, and replace the character '-' by 
+        Add a correct letter to the self.current string. Find all appearences
+        of the letter in self.word, and replace the character '-' by 
         the letter.
 
         Parameters
         ----------
-        letra : string (char)
+        letter : string (char)
             Letter to be added
         '''
         pos = 0
-        pos = self.palabra.find(letra)
+        pos = self.word.find(letter)
         while pos != -1:
-            self.actual = replace_letter(
-                self.actual, pos, letra)
-            pos = self.palabra.find(letra, pos+1)
+            self.current = replace_letter(
+                self.current, pos, letter)
+            pos = self.word.find(letter, pos+1)

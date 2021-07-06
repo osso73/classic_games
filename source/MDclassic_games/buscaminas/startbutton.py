@@ -18,6 +18,7 @@ from kivy.properties import StringProperty
 
 
 # my app imports
+import buscaminas.constants as MINES
 
 
 
@@ -30,7 +31,7 @@ Builder.load_string(
             rgba: 1, 1, 1, 1
         Ellipse:
             size: self.height, self.height
-            pos: self.x + self.width / 2 - 0.5*self.height, self.y
+            pos: self.x + self.width / 2 - self.height / 2 , self.y
             source: self.button_face
 
 """)
@@ -48,11 +49,13 @@ class StartButton(Label):
         Name of the image to be shown
     '''
     button_face = StringProperty()
+
     
     def __init__(self, **kwargs):
         super(StartButton, self).__init__(**kwargs)
         self.change_face('standard')
-    
+
+
     def on_touch_down(self, touch):
         '''
         Change the face of button when it's pressed.
@@ -108,6 +111,5 @@ class StartButton(Label):
             raise ValueError("Face incorrect")
         
         filename = f'{face}.png'
-        self.button_face = os.path.join(os.path.dirname(__file__), 
-                                        'images', filename)
+        self.button_face = os.path.join(MINES.IMAGES, filename)
 

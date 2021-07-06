@@ -7,7 +7,7 @@ Created on Tue May 25 13:38:34 2021
 """
 
 
-FICHERO_PALABRAS = 'lista_palabras.txt'
-CARACTERES_VALIDOS = 'abcdefghijoklmnñoprstuvwxyz\
-ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'
+URL_HELP = 'https://osso73.github.io/classic_games/games/classic_games/#game-of-ahorcado-hanged'
+WORDS_FILE = 'lista_palabras.txt'
+VALID_CHARACTERS = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'
 

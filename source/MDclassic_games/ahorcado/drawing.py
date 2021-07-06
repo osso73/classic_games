@@ -25,7 +25,7 @@ Builder.load_string(
 #:set COLOUR_ACTIVE [0,0,1,1]
 #:set COLOUR_DISABLED [0,0,1,0]
 
-<Dibujo>:
+<Drawing>:
     skin: int(app.config.get('Ahorcado', 'man')[-1])
     canvas:
         Color:
@@ -136,7 +136,7 @@ Builder.load_string(
 """)
 
 
-class Dibujo(RelativeLayout):
+class Drawing(RelativeLayout):
     '''
     Area of the screen with the picture of the hangman. Most of the logic
     here is defined in .kv file.
@@ -152,27 +152,30 @@ class Dibujo(RelativeLayout):
     '''
     status = StringProperty('D'*10)
     skin = NumericProperty()
+
     
-    def anadir_dibujo(self, fallos):
+    def add_piece(self, num_errors):
         '''
         Change self.status, so a new portion of the drawing is
         shown
 
         Parameters
         ----------
-        fallos : int
+        num_errors : int
             Number of errors
         '''
-        self.status = replace_letter(self.status, fallos-1, 'A')
+        self.status = replace_letter(self.status, num_errors-1, 'A')
+
     
-    def reset_dibujo(self):
+    def reset_drawing(self):
         '''
         Reset status to everything de-activated, to start a
         new game.
         '''
         self.status = 'D'*10
+
     
-    def cambiar_hombre(self, value):
+    def change_man(self, value):
         '''
         Change the skin used for the man (2 options possible).
         '''

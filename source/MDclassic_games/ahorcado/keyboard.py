@@ -7,142 +7,142 @@ Created on Tue May 25 15:09:31 2021
 """
 
 # std libraries
+import os
+
 
 # non-std libraries
 from kivy.lang import Builder
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.properties import  StringProperty, BooleanProperty
 
 from kivymd.app import MDApp
+from kivymd.uix.gridlayout import MDGridLayout
+
 
 # my app imports
+import ahorcado.constants as AHORCADO
 
 
 
 Builder.load_string(
     r"""
 
-<Teclado>:
+<Keyboard>:
     skin: app.config.get('Ahorcado', 'keyboard')
     size_hint_y: None
     rows: 3
     padding: '5dp'
     spacing: '5dp'
-    canvas.before:
-        Color:
-            rgba: 0, 0, 0, 1
-        Rectangle:
-            size: root.size
-            pos: root.pos
+    md_bg_color: 0, 0, 0, 1
 
-<Tecla>:
+<Key>:
     on_press: if not self.disabled: self.play()
-    on_release: self.pulsar()
-    skin: app.config.get('Ahorcado', 'keyboard')
+    on_release: self.push()
     canvas:
         Color:
             rgba: [1, 1, 1, 0.2] if self.disabled else COLOUR_IMAGE
         Rectangle:
             size: root.size
             pos: root.pos
-            source: 'ahorcado/images/'+root.skin+'/' + root.filename + '.png'
+            # source: 'ahorcado/images/'+root.skin+'/' + root.filename + '.png'
+            source: root.skin
 
 """)
 
-class Teclado(GridLayout):
+class Keyboard(MDGridLayout):
     '''
     The keyboard area, showing all the keys. It controls when keys are
     pressed, and the skin to use for keyboard.
 
-    Attributes
-    ----------
-    skin : string
-        Skin to be used.
     '''
-    # skin = 'teclado1'
-
     def __init__(self, **kwargs):
-        super(Teclado, self).__init__(**kwargs)
-        self.crear_teclas()
+        super(Keyboard, self).__init__(**kwargs)
+        self.create_keys()
+        app = MDApp.get_running_app()
+        skin = app.config.get('Ahorcado', 'keyboard')
+        self.change_keyboard(skin)
 
-    def crear_teclas(self):
+
+    def create_keys(self):
         '''
         Create all keys for the keyboard
         '''
-        for letra in 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ':
-            name = letra if letra != 'Ñ' else 'N2'
-            self.add_widget(Tecla(letra=letra, filename=name))
+        for letter in AHORCADO.VALID_CHARACTERS:
+            name = letter if letter != 'Ñ' else 'N2'
+            self.add_widget(Key(letter=letter, filename=name))
 
-    def cambiar_teclado(self, teclado):
+
+    def change_keyboard(self, keyboard_skin):
         '''
         Change the skin of the keyboard. Skins are a string formed by word
         teclado plus a number, from 1 to 6.
         '''
 
-        self.skin = teclado
+        # self.skin = keyboard_skin
+        path_skin = os.path.join(os.path.dirname(__file__), 'images', keyboard_skin)
 
-        for tecla in self.children:
-            tecla.skin = self.skin
+        for key in self.children:
+            key.skin = os.path.join(path_skin, key.filename+'.png')
 
-    def reset_teclado(self):
+
+    def reset_keyboard(self):
         '''
         Reset all keys, putting their disabled attribute to False.
         '''
-        for tecla in self.children:
-            tecla.disabled = False
+        for key in self.children:
+            key.disabled = False
 
-    def pulsar_tecla(self, letra):
+
+    def push_key(self, letter):
         '''
         Triggers a pulsation of a key (used for the hint)
 
         Parameters
         ----------
-        letra : string (char)
+        letter : string (char)
             Key to be pulsed
         '''
-        for tecla in self.children:
-            if tecla.letra == letra:
-                tecla.play()
-                tecla.pulsar()
+        for key in self.children:
+            if key.letter == letter:
+                key.play()
+                key.push()
 
 
-class Tecla(Button):
+class Key(Button):
     '''
     Logic for each of the keys of the keyboard.
 
     Attributes
     ----------
-    letra : string (char)
+    letter : string (char)
         This is the letter that corresponds to the key
     skin : string
         skin to be used
     filename : string
-        filename of the key to be loaded. It's the same as letra, except for
+        filename of the key to be loaded. It's the same as letter, except for
         letter ñ, that uses the filename n2 to avoid issues with os.
     disabled : boolean
         Defines whether the key is disabled or not. Used to dim the image of
         the key.
 
     '''
-    letra = StringProperty()
+    letter = StringProperty()
     skin = StringProperty()
     filename = StringProperty()
     disabled = BooleanProperty(False)
 
-    def pulsar(self):
+    def push(self):
         '''
-        Trigger the evaluar_letra method, and disable the letter, so it shows
+        Trigger the check_letter method, and disable the letter, so it shows
         dimmer on the screen.
 
         '''
         app = MDApp.get_running_app()
-        app.root.ids.ahorcado.evaluar_letra(self.letra)
+        app.root.ids.ahorcado.check_letter(self.letter)
         self.disabled = True
+
 
     def play(self):
         app = MDApp.get_running_app()
-        if app.root.ids.ahorcado.mute:
-            return
-
-        app.play('tecla')
+        if not app.root.ids.ahorcado.mute:
+            app.play('key')

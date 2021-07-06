@@ -20,7 +20,7 @@ from kivy.clock import Clock
 from kivy.app import App
 
 # my app imports
-import buscaminas.constants as MINAS
+import buscaminas.constants as MINES
 from buscaminas.area import Area
 
 
@@ -37,7 +37,7 @@ Builder.load_string(
             pos: self.pos
     size_hint: None, None
     size: self.parent.width, self.parent.width
-    cols: self.columnas
+    cols: self.cols
 
 """)
 
@@ -49,9 +49,9 @@ class Field(GridLayout):
     
     Attributes
     ----------
-    columnas : NumericProperty
+    cols : NumericProperty
         Number of columns of the field
-    filas : NumericProperty
+    rows : NumericProperty
         Number of rows of the field
     mines : NumericProperty
         Number of mines
@@ -64,8 +64,8 @@ class Field(GridLayout):
     sounds : dictionary
         Dictionary with all the sounds of the game.
     '''
-    columnas = NumericProperty(9)
-    filas = NumericProperty(9)
+    cols = NumericProperty(9)
+    rows = NumericProperty(9)
     mines = NumericProperty(0)
     time = NumericProperty(0)
     game_active = False
@@ -107,15 +107,15 @@ class Field(GridLayout):
         Start a new game: reset score and timer, rebuild the field.
         '''
         self.parent.parent.ids.start_button.change_face('standard')
-        ventana_width = self.parent.width
-        ventana_height = (self.parent.height - 
+        window_width = self.parent.width
+        window_height = (self.parent.height - 
                           self.parent.parent.ids.toolbar.height -
                           self.parent.parent.ids.menu.height) / 2
-        self.mines = MINAS.LEVELS[self.level]['mines']
-        self.columnas = MINAS.LEVELS[self.level]['columnas']
-        self.filas = MINAS.LEVELS[self.level]['filas']
-        self.size = (ventana_width * MINAS.LEVELS[self.level]['window'][0], 
-                     ventana_height * MINAS.LEVELS[self.level]['window'][1])
+        self.mines = MINES.LEVELS[self.level]['mines']
+        self.cols = MINES.LEVELS[self.level]['cols']
+        self.rows = MINES.LEVELS[self.level]['rows']
+        self.size = (window_width * MINES.LEVELS[self.level]['window'][0], 
+                     window_height * MINES.LEVELS[self.level]['window'][1])
             
         self.clear_widgets()
         self.distribute_mines()
@@ -137,13 +137,13 @@ class Field(GridLayout):
         Create a field with mines distributed randomly. The number of mines 
         is defined by mines attribute.
         '''
-        areas = [9]*self.mines + [0]*(self.columnas*self.filas - self.mines)
+        areas = [9]*self.mines + [0]*(self.cols*self.rows - self.mines)
         shuffle(areas)
         
         n=0
-        for i in range(self.filas):
-            for j in range(self.columnas):
-                self.add_widget(Area(posicion=[j, i], value=areas[n]))
+        for i in range(self.rows):
+            for j in range(self.cols):
+                self.add_widget(Area(location=[j, i], value=areas[n]))
                 n += 1
 
     
@@ -154,7 +154,7 @@ class Field(GridLayout):
         '''
         for area in self.children:
             if area.value != 9:  # skip if area is a bomb
-                neighbours = self.find_neighbours(area.posicion)
+                neighbours = self.find_neighbours(area.location)
                 for n in neighbours:
                     if n.value == 9:
                         area.value += 1
@@ -177,8 +177,8 @@ class Field(GridLayout):
         '''
         ret = list()
         for child in self.children:
-            if child.posicion != list(p):
-                i, j = child.posicion
+            if child.location != list(p):
+                i, j = child.location
                 if (p[0]-1 <= i <= p[0]+1) and (p[1]-1 <= j <= p[1]+1):
                     ret.append(child)
         
@@ -264,7 +264,7 @@ class Field(GridLayout):
         area : Area
             Area which has a value of 0
         '''
-        neighbours = self.find_neighbours(area.posicion)
+        neighbours = self.find_neighbours(area.location)
         for neighbour in neighbours:
             neighbour.uncover()
     
@@ -282,32 +282,62 @@ class Field(GridLayout):
 
         '''
         if 0 < area.value < 9:
-            neighbours = self.find_neighbours(area.posicion)
+            neighbours = self.find_neighbours(area.location)
             flagged = [n for n in neighbours if n.flag]
             if len(flagged) == area.value:
                 not_flagged = [n for n in neighbours if not n.flag]
                 for tile in not_flagged:
                     tile.uncover()
 
+
     def entry_mode(self, button):
-        if self.mode == 'bandera':
+        '''
+        Switch entry mode, between flag or covered. This defines what happens
+        when cliked: either puts a flag, or uncovers the area. This method
+        is triggered when clicking the button on the toolbar.
+
+        Parameters
+        ----------
+        button : MDButton
+            Button that has been clicked. Used to change the icon on it.
+
+        '''
+        if self.mode == 'flag':
             self.mode = 'covered'
             button.icon = 'bomb'
         else:
-            self.mode = 'bandera'
+            self.mode = 'flag'
             button.icon  = 'flag'
 
         
     def set_level(self, button):
+        '''
+        Switch level (1, 2 or 3). This method is triggered when clicking the 
+        button on the toolbar.
+
+        Parameters
+        ----------
+        button : MDButton
+            Button that has been clicked. Used to change the icon on it.
+
+        '''
         self.level = self.level % 3 + 1
         button.icon = f'numeric-{self.level}-box'
 
         
     def mute_button(self, button):
-        '''Toogle mute flag'''
+        '''
+        Switch mute flag. This method is triggered when clicking the 
+        button on the toolbar.
+
+        Parameters
+        ----------
+        button : MDButton
+            Button that has been clicked. Used to change the icon on it.
+
+        '''
         self.mute = not self.mute
         if self.mute:
             button.icon = 'volume-off'
         else:
             button.icon = 'volume-high'
-        # self.parent.parent.ids.toolbar.icon_mute = 'volume-on'

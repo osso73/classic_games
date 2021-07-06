@@ -20,10 +20,10 @@ from kivy.app import App
 from kivymd.uix.screen import MDScreen
 
 # my app imports
-from ahorcado.dibujo import Dibujo
-from ahorcado.letras import LetrasFalladas
-from ahorcado.palabra import PalabraLetras
-from ahorcado.teclado import Teclado
+from ahorcado.drawing import Drawing
+from ahorcado.letters import FailedLetters
+from ahorcado.word import Word
+from ahorcado.keyboard import Keyboard
 from popup import PopupButton
 import ahorcado.constants as AHORCADO
 
@@ -34,10 +34,10 @@ Builder.load_string(
 <ScreenAhorcado>:
     name: 'ahorcado'
 
-    obj_dibujo: pantalla_dibujo
-    obj_letras_falladas: pantalla_letras_falladas
-    obj_palabra: pantalla_palabra
-    obj_teclado: pantalla_teclado
+    drawing: drawing_area
+    errors: failed_letters_area
+    target_word: word_area
+    keyboard: keyboard_area
 
 
     id: main
@@ -48,24 +48,24 @@ Builder.load_string(
             title: 'Ahorcado'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", root.iniciar_juego], ["help", root.dar_pista], ["volume-high", root.mute_button], ["help-circle-outline", root.help_button]]
+            right_action_items: [["play-circle-outline", root.start_game], ["help", root.give_hint], ["volume-high", root.mute_button], ["help-circle-outline", root.help_button]]
 
         BoxLayout:
             orientation: 'horizontal'
-            Dibujo:
-                id: pantalla_dibujo
+            Drawing:
+                id: drawing_area
 
-            LetrasFalladas:
-                id: pantalla_letras_falladas
+            FailedLetters:
+                id: failed_letters_area
                 width: root.width * 1 / 6
 
 
-        PalabraLetras:
-            id: pantalla_palabra
+        Word:
+            id: word_area
             height: root.height / 10
 
-        Teclado:
-            id: pantalla_teclado
+        Keyboard:
+            id: keyboard_area
             height: root.height / 10 * 2
 
 """)
@@ -80,60 +80,60 @@ class ScreenAhorcado(MDScreen):
 
     Attributes
     ----------
-    fallos : int
+    num_errors : int
         Number of failed tries
-    obj_dibujo : ObjectProperty
+    drawing : ObjectProperty
         Object with the drawing
-    obj_letras_falladas : ObjectProperty
+    errors : ObjectProperty
         Object of the failed letters
-    obj_palabra : ObjectProperty
+    target_word : ObjectProperty
         Object of the word to find
-    obj_teclado : ObjectProperty
+    keyboard : ObjectProperty
         Object of the keyboard
-    teclado : string
+    keyboard_skin : string
         Name of the skin to be used for keyboard
     active : boolean
         Defines whether the game is active or not
-    pista : boolean
+    allow_hint : boolean
         Variable to track if a hint is available or not. Only one hint
         per game is allowed.
 
     '''
-    fallos = NumericProperty(0)
-    obj_dibujo = ObjectProperty(None)
-    obj_letras_falladas = ObjectProperty(None)
-    obj_palabra = ObjectProperty(None)
-    obj_teclado = ObjectProperty(None)
-    teclado = StringProperty('teclado1')
+    num_errors = NumericProperty(0)
+    drawing = ObjectProperty(None)
+    errors = ObjectProperty(None)
+    target_word = ObjectProperty(None)
+    keyboard = ObjectProperty(None)
+    keyboard_skin = StringProperty('teclado1')
     active = False
-    pista = BooleanProperty(True)
+    allow_hint = BooleanProperty(True)
     mute = BooleanProperty(False)
 
 
-    def iniciar_juego(self, *args):
+    def start_game(self, *args):
         '''
         Start the game: find a new word, and reset all variables.
         '''
-        self.obj_palabra.buscar_palabra()
-        self.reset_juego()
+        self.target_word.find_word()
+        self.reset_game()
 
 
-    def reset_juego(self):
+    def reset_game(self):
         '''
         Reset all the variables to start the game.
         '''
-        self.fallos = 0
-        self.letras_acertadas = ''
-        self.letras_falladas = ''
+        self.num_errors = 0
+        self.good_letters = ''
+        self.failed_letters = ''
         self.active = True
-        self.pista = True
-        self.obj_letras_falladas.reset_letras()
-        self.obj_dibujo.reset_dibujo()
-        self.obj_palabra.reset_palabra()
-        self.obj_teclado.reset_teclado()
+        self.allow_hint = True
+        self.errors.reset_letters()
+        self.drawing.reset_drawing()
+        self.target_word.reset_word()
+        self.keyboard.reset_keyboard()
 
 
-    def final(self, win):
+    def end_game(self, win):
         '''
         Launch a popup a the end of the game.
 
@@ -144,55 +144,55 @@ class ScreenAhorcado(MDScreen):
             adjusted depending on this.
         '''
         if win:
-            msg = '¡¡Has ganado!!\n¡¡ENHORABUENA!!'
+            msg = 'You in!!\nCONGRATULATIONS!!'
             self.play('win')
         else:
-            msg = 'Lo siento,\nte han colgado...'
+            msg = "I'm sorry,'\nyou've been HANGED..."
             self.play('lose')
 
-        PopupButton(title='Final', msg=msg)
-        self.obj_palabra.actual = self.obj_palabra.palabra
+        PopupButton(title='End', msg=msg)
+        self.target_word.current = self.target_word.word
         self.active =  False
 
 
-    def evaluar_letra(self, letra):
+    def check_letter(self, letter):
         '''
         Check if the letter is in the word or not. If it is, show
-        the letter in its place, and add to the self.letras_acertadas;
-        if it is not, increase the self.fallos and add the letter
-        to the self.letras_falladas.
+        the letter in its place, and add to the self.good_letters;
+        if it is not, increase the self.num_errors and add the letter
+        to the self.failed_letters.
 
         Parameters
         ----------
-        letra : string (1-char)
+        letter : string (1-char)
             Letter to be evaluated.
 
         '''
         if not self.active:
             return
 
-        # si no es un carácter válido, o ya ha salido, no hace nada
-        if letra not in AHORCADO.CARACTERES_VALIDOS or \
-            letra in self.letras_falladas + self.letras_acertadas:
+        # if the character is not valid, or was previously selected, do nothing
+        if letter not in AHORCADO.VALID_CHARACTERS or \
+            letter in self.failed_letters + self.good_letters:
             return
 
-        # si letra es correcta, se muestra
-        if letra in self.obj_palabra.palabra:
-            self.obj_palabra.anadir_letra(letra)
-            self.letras_acertadas += letra
-            if self.obj_palabra.actual == self.obj_palabra.palabra:
-                self.final(win=True)
+        # if the letter is correct, it will be shown
+        if letter in self.target_word.word:
+            self.target_word.add_letter(letter)
+            self.good_letters += letter
+            if self.target_word.current == self.target_word.word:
+                self.end_game(win=True)
 
-        # si la letra no es correcta, se añade a la lista de fallos
+        # if not correct, it is added to the list of errors
         else:
-            self.fallos += 1
-            self.letras_falladas += letra
-            self.obj_letras_falladas.anadir_letra(
-                letra, self.fallos)
-            self.obj_dibujo.anadir_dibujo(self.fallos)
+            self.num_errors += 1
+            self.failed_letters += letter
+            self.errors.add_letter(
+                letter, self.num_errors)
+            self.drawing.add_piece(self.num_errors)
 
-            if self.fallos >= 10:
-                self.final(win=False)
+            if self.num_errors >= 10:
+                self.end_game(win=False)
 
 
     def mute_button(self, button):
@@ -201,22 +201,22 @@ class ScreenAhorcado(MDScreen):
         button.icon = 'volume-off' if self.mute else 'volume-high'
 
 
-    def dar_pista(self, *args):
+    def give_hint(self, *args):
         '''
         Give a hint: show one of the letters. Only if this is
         the first time hint is requested.
         '''
         if self.active:
-            if self.pista:
-                letra = choice(self.obj_palabra.palabra)
-                while letra in self.obj_palabra.actual:
-                    letra = choice(self.obj_palabra.palabra)
+            if self.allow_hint:
+                letter = choice(self.target_word.word)
+                while letter in self.target_word.current:
+                    letter = choice(self.target_word.word)
 
-                self.obj_teclado.pulsar_tecla(letra)
-                self.pista = False
+                self.keyboard.push_key(letter)
+                self.allow_hint = False
             else:
                 PopupButton(title='Aviso',
-                                    msg='¡No puedes pedir más pistas!')
+                                    msg='You cannot get more hints!')
 
 
     def play(self, sound):
@@ -241,15 +241,32 @@ class ScreenAhorcado(MDScreen):
 
 
     def config_change(self, config, section, key, value):
+        '''
+        When configuration changes (e.g. skin of the keyboard, or the hanged
+        man), trigger the change on the objects.
+
+        Parameters
+        ----------
+        config : ConfigParser
+            Configuration object. To write the configuration.
+        section : string
+            Section of the configuration. Should always be 'ahorcado'.
+        key : string
+            Key that has changed.
+        value : string
+            New value of the key, after the change.
+
+        '''
         if key == 'keyboard':
-            self.obj_teclado.cambiar_teclado(value)
+            self.keyboard.change_keyboard(value)
 
         elif key == 'man':
-            self.obj_dibujo.cambiar_hombre(value[-1])
+            self.drawing.change_man(value[-1])
 
 
         config.write()
 
     
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-ahorcado-hanged')
+        '''Open web-browser with the help page for the game'''
+        webbrowser.open(AHORCADO.URL_HELP)
