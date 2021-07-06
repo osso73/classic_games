@@ -18,6 +18,7 @@ from kivymd.uix.screen import MDScreen
 
 # my app imports
 from game_2048.board import Board
+import game_2048.constants as G2048
 
 
 Builder.load_string(
@@ -106,25 +107,15 @@ Builder.load_string(
             pos: self.pos
             size: self.size
             source: self.icon
-
-<NewButton>
-    font_size: 120
-    size: self.texture_size
-    texture_size: self.size
-    padding: 20, 20
     
 """)
 
 
 class Screen2048(MDScreen):
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-2048')
-
+        webbrowser.open(G2048.URL_HELP)
 
 
 class ButtonJoystick(Button):
     icon = StringProperty()
 
-
-class NewButton(Button):
-    pass

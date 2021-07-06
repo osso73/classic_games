@@ -29,7 +29,7 @@ Builder.load_string(
 <Tile>:
     pos: self.calc_position()
     size_hint: None, None
-    size: self.tamano - SPACING, self.tamano - SPACING
+    size: self.size_pizels - SPACING, self.size_pizels - SPACING
     canvas.before:
         Color:
             rgba: 1,1,1,1
@@ -51,7 +51,7 @@ class Tile(Label):
         shown, showing the value and a colour.
     position: list (i, j)
         Position of the tile in the grid. i, j can have values from 0 to 3
-    tamano: int
+    size_pizels: int
         Size of the tile, in pixels. Needed to calculate position of tile in 
         screen
     merged: boolean
@@ -62,7 +62,7 @@ class Tile(Label):
     '''
     value = NumericProperty(0)
     position = ListProperty()
-    tamano = NumericProperty()
+    size_pizels = NumericProperty()
     merged = False
     _previous = 0
     
@@ -75,8 +75,8 @@ class Tile(Label):
         (x, y) : tuple
             Coordinates in screen
         '''
-        return (self.position[0]*(self.tamano) + G2048.SPACING, 
-                (self.position[1])*(self.tamano) + G2048.SPACING)
+        return (self.position[0]*(self.size_pizels) + G2048.SPACING, 
+                (self.position[1])*(self.size_pizels) + G2048.SPACING)
     
     def on_position(self, *args):
         '''
@@ -106,7 +106,7 @@ class Tile(Label):
         else:
             m,n = self.pos
             self.size = [0, 0]
-            self.pos = [m+self.tamano/2, n+self.tamano/2]
+            self.pos = [m+self.size_pizels/2, n+self.size_pizels/2]
             anim = Animation(size=(x, y), pos=(m, n), duration=0.1)
         anim.start(self)
         self._previous = self.value

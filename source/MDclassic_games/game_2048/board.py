@@ -31,7 +31,7 @@ Builder.load_string(
     r"""
 
 <Board>:
-    size: self.ventana, self.ventana
+    size: self.num_pixels, self.num_pixels
     size_hint: None, None
     canvas:
         Color:
@@ -50,7 +50,7 @@ class Board(RelativeLayout):
 
     Attributes
     ----------
-    ventana : int
+    num_pixels : int
         Size of the board, in pixels.
     win_score : int
         Value of the tile that is required to win (2048 by default)
@@ -69,7 +69,7 @@ class Board(RelativeLayout):
         Controls if sounds should play or not. If True, sounds don't play.
     
     '''
-    ventana = NumericProperty()
+    num_pixels = NumericProperty()
     win_score = NumericProperty(2048)
     score = NumericProperty(0)
     swipe_x = swipe_y = 0
@@ -97,7 +97,8 @@ class Board(RelativeLayout):
         '''
         initialisation is triggered after the parent window has been set up
         '''
-        self.ventana = min(self.parent.height, self.parent.width)
+        self.num_pixels = min(self.parent.height, self.parent.width)
+
         
     def on_touch_down(self, touch):
         '''
@@ -112,6 +113,7 @@ class Board(RelativeLayout):
         if self.collide_point(touch.x, touch.y):
             self.swipe_x = touch.x
             self.swipe_y = touch.y
+
     
     def on_touch_up(self, touch):
         '''
@@ -146,6 +148,7 @@ class Board(RelativeLayout):
                 self.move(direction)
                 return direction
 
+
     def change_win_score(self):
         '''
         Change the winning score, cycling through values stored in SCORES
@@ -155,6 +158,7 @@ class Board(RelativeLayout):
         ind = scores.index(self.win_score)
         new_ind = (ind + 1) % len(scores)
         self.win_score = scores[new_ind]
+
         
     def start_game(self, *args):
         '''
@@ -164,10 +168,10 @@ class Board(RelativeLayout):
         self.clear_widgets()
         self.active_game = True
         self.score = 0
-        tamano = (self.ventana - G2048.SPACING) / 4
+        num_pixels = (self.num_pixels - G2048.SPACING) / 4
         for i in range(4):
             for j in range(4):
-                self.add_widget(Tile(position=(i, j), tamano=tamano))        
+                self.add_widget(Tile(position=(i, j), size_pizels=num_pixels))        
         self.add_tile()
         self.add_tile()
         
@@ -179,6 +183,7 @@ class Board(RelativeLayout):
         '''
         new_tile = choice(self.get_empty_tiles())
         new_tile.value = choice(G2048.NEW_TILE_SEQUENCE)
+
         
     def get_empty_tiles(self):
         '''
@@ -209,6 +214,7 @@ class Board(RelativeLayout):
             full_tiles = [t for t in full_tiles if t.position[1] == col]
         
         return full_tiles
+
     
     def move(self, direction, *args):
         '''
@@ -258,6 +264,7 @@ class Board(RelativeLayout):
                                                 self.get_full_tiles(col=col)),
                                         G2048.MOVE_DURATION*n)
             Clock.schedule_once(self.end_of_move, G2048.MOVE_DURATION*3)
+
     
     def end_of_move(self, *args):
         '''
@@ -275,6 +282,7 @@ class Board(RelativeLayout):
                 child.merged = False
             self.end_of_game()
         self._moving = False
+
     
     def end_of_game(self):
         '''
@@ -292,20 +300,21 @@ class Board(RelativeLayout):
         '''
         if [child for child in self.children if child.value >= self.win_score]:
             # win game
-            msg = 'Has ganado!'
+            msg = 'You win!'
             self.play('win')
         
         elif not self.available_moves():
             # no empty tiles --> lose game
-            msg = 'Has perdido\nYa no puedes mover!'
+            msg = 'You lost\nYou cannot move!'
             self.play('game_over')
         
         else:
             return False
         
-        PopupButton(title='Final', msg=msg)
+        PopupButton(title='End', msg=msg)
         self.active_game = False
         return True
+
     
     def available_moves(self):
         '''
@@ -341,6 +350,7 @@ class Board(RelativeLayout):
         '''
         for tile in row_line:
             self.move_tile(direction, tile)
+
     
     def move_tile(self, direction, tile):
         '''
@@ -358,16 +368,17 @@ class Board(RelativeLayout):
         tile : Tile
             Tiles to be moved.
         '''
-        old_position = tile.position
-        final_position = self.check_final(direction, old_position, tile.value)
-        if final_position != old_position:
-            self.add_widget(Tile(position=old_position, tamano=tile.tamano))        
+        initial_position = tile.position
+        final_position = self.check_final(direction, initial_position, tile.value)
+        if final_position != initial_position:
+            self.add_widget(Tile(position=initial_position, size_pizels=tile.size_pizels))        
             self.remove_widget(tile)
             self.add_widget(tile)  # to ensure it in on top
             tile_to_remove = self.get_tile(final_position)
             tile.position = final_position
             Clock.schedule_once(partial(self.end_of_move_tile, tile_to_remove, tile), 
                                 G2048.MOVE_TILE)
+
     
     def end_of_move_tile(self, tile_to_remove, tile, *args):
         '''
@@ -385,6 +396,7 @@ class Board(RelativeLayout):
         tile.value += tile_to_remove.value
         self.remove_widget(tile_to_remove)
         self._moved_tile = True
+
         
     def check_final(self, direction, position, value):
         '''
@@ -428,6 +440,7 @@ class Board(RelativeLayout):
             else:
                 return position
         return self.check_final(direction, new_position, value)
+
         
     def get_tile(self, position):
         '''
@@ -458,7 +471,7 @@ class Board(RelativeLayout):
             tile = dict()
             tile['value'] = child.value
             tile['position'] = child.position
-            tile['tamano'] = child.tamano
+            tile['num_pixels'] = child.size_pizels
             tile['score'] = self.score
             self.last_move.append(tile)            
             
@@ -471,7 +484,7 @@ class Board(RelativeLayout):
         if self.active_game:
             self.clear_widgets()
             for tile in self.last_move:
-                obj = Tile(position=tile['position'], tamano=tile['tamano'])
+                obj = Tile(position=tile['position'], size_pizels=tile['num_pixels'])
                 self.add_widget(obj)
                 obj.value = tile['value']
                 self.score -= tile['value']
