@@ -23,7 +23,7 @@ from kivy.clock import Clock
 Builder.load_string(
     r"""
 
-<Carta>:
+<CardMemory>:
     on_release: self.click()
     canvas:
         Color:
@@ -36,7 +36,7 @@ Builder.load_string(
 """)
 
 
-class Carta(Button):
+class CardMemory(Button):
     '''
     This class defines the behaviour of each card: the image that is in the 
     front and the back, and its status (shown or not shown). The card is 
@@ -61,9 +61,11 @@ class Carta(Button):
     show = StringProperty()
     shown = BooleanProperty(False)
     
+    
     def __init__(self, **kwargs):
-        super(Carta, self).__init__(**kwargs)
+        super(CardMemory, self).__init__(**kwargs)
         self.show = self.back
+
 
     def click(self):
         '''
@@ -74,12 +76,14 @@ class Carta(Button):
             self.parent.play('move')
             Clock.schedule_once(self.add_card_to_current)
             
+
     def add_card_to_current(self, *args):
         '''
         Add card to Tapete.current_cards list.
         '''
         self.parent.current_cards.append(self)
         
+
     def turn(self):
         '''
         Turn the card. If the card is shown, turns it back; if not, 

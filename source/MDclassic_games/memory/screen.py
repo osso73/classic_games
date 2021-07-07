@@ -17,8 +17,10 @@ from kivymd.uix.screen import MDScreen
 
 
 # my app imports
-from memory.tapete import Tapete
+from memory.mat import Mat
 
+
+URL_HELP = 'https://osso73.github.io/classic_games/games/classic_games/#game-of-memory'
 
 
 Builder.load_string(
@@ -34,7 +36,7 @@ Builder.load_string(
             title: 'Memory'
             elevation: 10
             left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", obj_tapete.start_game], ["volume-high", obj_tapete.mute_button], ["help-circle-outline", root.help_button]]
+            right_action_items: [["play-circle-outline", mat_area.start_game], ["volume-high", mat_area.mute_button], ["help-circle-outline", root.help_button]]
             
         MDBoxLayout:
             orientation: 'horizontal'
@@ -48,30 +50,31 @@ Builder.load_string(
                 spacing: '10dp'
 
                 MDChip:
-                    text: obj_tapete.tema_actual
+                    text: mat_area.current_theme
                     valign: 'center'
                     icon: ''
-                    on_release: obj_tapete.cambiar_tema()
+                    on_release: mat_area.change_theme()
                 MDChip:
-                    text: str(obj_tapete.tamano)
+                    text: str(mat_area.num_pairs)
                     icon: ''
-                    on_release: obj_tapete.change_level()
+                    on_release: mat_area.change_level()
 
             MDLabel:
                 id: score
-                text: 'Moves: ' + str(obj_tapete.movimientos)
+                text: 'Moves: ' + str(mat_area.moves)
                 halign: "center"
                 font_style: 'H4'
         
-        Tapete:
-            id: obj_tapete
+        Mat:
+            id: mat_area
 
 """)
+
 
 class ScreenMemory(MDScreen):
     def config_change(self, config, section, key, value):
         if key == 'theme':
-            self.ids.obj_tapete.tema_actual = value
+            self.ids.mat_area.tema_actual = value
 
         elif key == 'level':
             num = int(value)
@@ -80,10 +83,10 @@ class ScreenMemory(MDScreen):
             elif num > 20:
                 num = 20
             config.set('Memory', 'level', num)
-            self.ids.obj_tapete.tamano = num
+            self.ids.mat_area.num_pairs = num
 
         config.write()
 
 
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-memory')
+        webbrowser.open(URL_HELP)

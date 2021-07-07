@@ -8,7 +8,7 @@ Created on Wed May 26 18:43:35 2021
 
 
 # std libraries
-
+import os
 
 # non-std libraries
 from kivy.properties import StringProperty, NumericProperty, ListProperty
@@ -26,7 +26,7 @@ import game_15puzzle.constants as FIFTEEN
 Builder.load_string(
     r"""
 
-<Ficha>:
+<Card>:
     canvas.before:
         Color:
             rgba: [1,1,1,1] if self.name else [0,0,0,0] 
@@ -37,7 +37,7 @@ Builder.load_string(
 
 """)
 
-class Ficha(Label):
+class Card(Label):
     '''
     Contains the properties and logic of the tiles and their movement.
     
@@ -46,11 +46,11 @@ class Ficha(Label):
     name : StringProperty
         Name of the tile, a number between 1 and the size of board -1. It can
         be '' as well, for the empty tile.
-    tamano : NumericProperty
+    board_size : NumericProperty
         Size of the board: 3 for 3x3, 4 for 4x4, 5 for 5x5.
-    lado : NumericProperty
+    card_size : NumericProperty
         Length of the side, in pixels. Tiles are square.
-    posicion : ListProperty
+    position : ListProperty
         Position in the board, starting from (0,0) at top-left, to (n,n) 
         bottom-right, n being the size of the board.
     filename : StringProperty
@@ -58,26 +58,32 @@ class Ficha(Label):
     '''
     
     name = StringProperty()
-    tamano = NumericProperty()
-    lado = NumericProperty()
-    posicion = ListProperty()
+    board_size = NumericProperty()
+    card_size = NumericProperty()
+    position = ListProperty()
     filename = StringProperty()
     
     def __init__(self, **kwargs):
-        super(Ficha, self).__init__(**kwargs)
-        self.pos = self.calcular_posicion()
+        super(Card, self).__init__(**kwargs)
+        self.pos = self.calculate_position()
         app = MDApp.get_running_app()
         tema = app.root.ids.fifteen.ids.muestra.tema
-        tamano = app.root.ids.fifteen.ids.muestra.tamano
-        if self.name:
-            self.filename = f'game_15puzzle/images/temas/{tema}/{tamano}/{self.name}.jpg'
-        else:
-            self.filename = f'game_15puzzle/images/temas/{tema}/{tamano}/{tamano**2}.jpg'
+        board_size = app.root.ids.fifteen.ids.muestra.board_size
+        # if self.name:
+        #     self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{self.name}.jpg'
+        # else:
+        #     self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{board_size**2}.jpg'
+        
+        image = self.name if self.name else str(board_size**2)        
+        # self.filename = os.path.join(FIFTEEN.THEMES, tema, board_size, imag+'.jpg')
+        self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{image}.jpg'
+
+
 
     
-    def calcular_posicion(self):
+    def calculate_position(self):
         '''
-        Calculate the position on the canvas, in pixels, based on the posicion 
+        Calculate the position on the canvas, in pixels, based on the position 
         attribute of the tile
 
         Returns
@@ -85,8 +91,8 @@ class Ficha(Label):
         tuple
             Coordinates (x, y ) of the position on the canvas.
         '''
-        return (self.posicion[0]*self.lado + FIFTEEN.SPACING/2, 
-                (self.tamano-1-self.posicion[1])*self.lado + FIFTEEN.SPACING/2)
+        return (self.position[0]*self.card_size + FIFTEEN.SPACING/2, 
+                (self.board_size-1-self.position[1])*self.card_size + FIFTEEN.SPACING/2)
 
     
     def on_touch_down(self, touch):
@@ -108,20 +114,20 @@ class Ficha(Label):
         '''
         empty = self.parent.find_empty()
         if empty:
-            ex, ey = empty.posicion
-            px, py = self.posicion
+            ex, ey = empty.position
+            px, py = self.position
             if (ex==px and ey==py+1) or (ex==px and ey==py-1) or\
                 (ey==py and ex==px+1) or (ey==py and ex==px-1):
-                    empty.posicion, self.posicion = self.posicion, empty.posicion
+                    empty.position, self.position = self.position, empty.position
                     self.parent.parent.parent.play('move2')
                     self.parent.movimientos += 1
             self.parent.end_of_game()
     
 
-    def on_posicion(self, *args):
+    def on_position(self, *args):
         '''
-        When posicion changes, initiate the Animation of the move to the new
+        When position changes, initiate the Animation of the move to the new
         position.
         '''
-        anim = Animation(pos=self.calcular_posicion(), duration=FIFTEEN.MOVE_DURATION)
+        anim = Animation(pos=self.calculate_position(), duration=FIFTEEN.MOVE_DURATION)
         anim.start(self)

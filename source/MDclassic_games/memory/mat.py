@@ -15,26 +15,25 @@ from time import sleep
 
 # non-std libraries
 from kivy.lang import Builder
-from kivy.core.audio import SoundLoader
 from kivy.properties import NumericProperty, ListProperty, StringProperty, BooleanProperty
 
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.app import MDApp
 
 # my app imports
-from memory.carta import Carta
+from memory.card import CardMemory
 from popup import PopupButton
 
 
 
-TEMAS = os.path.join(os.path.dirname(__file__), 'images', 'temas')
+THEMES = os.path.join(os.path.dirname(__file__), 'images', 'themes')
 
 
 Builder.load_string(
     r"""
 
-<Tapete>:
-    cols: self.columnas
+<Mat>:
+    cols: self.columns
     md_bg_color: app.theme_cls.primary_light
     padding: '5dp'
     spacing: '5dp'
@@ -42,7 +41,7 @@ Builder.load_string(
 """)
 
 
-class Tapete(MDGridLayout):
+class Mat(MDGridLayout):
     '''
     Main area of the game, where the tiles are distributed. This class has 
     the logic to turn tiles, shuffle, etc. The tiles are distributed in a 
@@ -50,29 +49,29 @@ class Tapete(MDGridLayout):
     
     Attributes
     ----------
-    columnas : NumericProperty
+    columns : NumericProperty
         Number of columns of the GridLayout. 
     current_cards : ListProperty
         Cards that are turned up, but not yet matched. This list can have 0, 1
         or 2 cards max.
-    movimientos : NumericProperty
+    moves : NumericProperty
         Count the number of moves that have been made. It is the score.
-    imagenes : list
+    images : list
         List of filenames of the images.
-    tema_actual : StringProperty
+    current_theme : StringProperty
         Current theme to be used.
-    tamano : NumericProperty
+    num_pairs : NumericProperty
         Number of pairs to be discovered.
     mute : boolean
         If True, the sounds will not play; otherwise, they will play. Set
         to False by default. This is triggered by button in toolbar.
         
     '''
-    columnas = NumericProperty(2)
+    columns = NumericProperty(2)
     current_cards = ListProperty()
-    movimientos = NumericProperty(0)
-    tema_actual = StringProperty()
-    tamano = NumericProperty()
+    moves = NumericProperty(0)
+    current_theme = StringProperty()
+    num_pairs = NumericProperty()
     mute = BooleanProperty(False)
     
 
@@ -81,56 +80,48 @@ class Tapete(MDGridLayout):
         Create the list of themes based on the folders available, load the
         sounds to memory so they can be played without delay.
         '''
-        super(Tapete, self).__init__(**kwargs)
-        self.lista_temas = os.listdir(TEMAS)
-        self.cambiar_tema()
+        super(Mat, self).__init__(**kwargs)
+        self.theme_list = os.listdir(THEMES)
+        self.change_theme()
         
         app = MDApp.get_running_app()
-        self.tema_actual = app.config.get('Memory', 'theme')
-        self.tamano = int(app.config.get('Memory', 'level'))
+        self.current_theme = app.config.get('Memory', 'theme')
+        self.num_pairs = int(app.config.get('Memory', 'level'))
 
         
-    def cambiar_tema(self):
+    def change_theme(self):
         '''
-        Switch to the following theme of the lista_temas.
+        Switch to the following theme of the theme_list.
         '''
-        if not self.tema_actual:
-            self.tema_actual = self.lista_temas[0]
+        if not self.current_theme:
+            self.current_theme = self.theme_list[0]
         else:
-            ind = self.lista_temas.index(self.tema_actual)
-            new_ind = ind+1 if ind<len(self.lista_temas)-1 else 0
-            self.tema_actual = self.lista_temas[new_ind]
+            ind = self.theme_list.index(self.current_theme)
+            new_ind = ind+1 if ind<len(self.theme_list)-1 else 0
+            self.current_theme = self.theme_list[new_ind]
     
     
     def change_level(self):
         '''
         Switch to the following size. Available sizes range from 2 to 20.
         '''
-        self.tamano = self.tamano + 1 if self.tamano < 20 else 2
+        self.num_pairs = self.num_pairs + 1 if self.num_pairs < 20 else 2
 
     
 
     def play(self, sound):
         '''
-        Play a sound from the dictionary of sounds.
+        Trigger play method from the main app, if not muted.
 
         Parameters
         ----------
         sound : string
             Key of the dictionary corresponding to the sound to be played.
 
-        Raises
-        ------
-        Exception
-            If string passed is not in the dictionary.
         '''
-        if self.mute:
-            return
-
-        app = MDApp.get_running_app()
-        app.play(sound)
-
-
+        if not self.mute:
+            app = MDApp.get_running_app()
+            app.play(sound)
 
 
     def load_images(self):
@@ -151,7 +142,7 @@ class Tapete(MDGridLayout):
             Filename of the image shown in the back of the cards.
 
         '''
-        p = os.path.join(TEMAS, self.tema_actual) 
+        p = os.path.join(THEMES, self.current_theme) 
         ims = os.listdir(p)
         ims = [os.path.join(p,im) for im in ims if im.startswith('image')]
         back = os.path.join(p,'back.jpg')
@@ -166,16 +157,16 @@ class Tapete(MDGridLayout):
         self.clear_widgets()
         
         self.play('start')
-        self.imagenes, back = self.load_images()
-        self.movimientos = 0
+        self.images, back = self.load_images()
+        self.moves = 0
         
         # take only a number of images of the total, duplicate and shuffle
-        imagenes = sample(self.imagenes, self.tamano)
-        imagenes = sample(imagenes*2, self.tamano*2)
+        images = sample(self.images, self.num_pairs)
+        images = sample(images*2, self.num_pairs*2)
         
-        self.set_columns(self.tamano)     
-        for im in imagenes:
-            self.add_widget(Carta(image=im, back=back))
+        self.set_columns(self.num_pairs)     
+        for im in images:
+            self.add_widget(CardMemory(image=im, back=back))
     
     
     def set_columns(self, num):
@@ -190,13 +181,13 @@ class Tapete(MDGridLayout):
             Total number of pairs of images to be distributed.
         '''
         if num < 5:
-            self.columnas = 2
+            self.columns = 2
         elif num < 10:
-            self.columnas = 3
+            self.columns = 3
         elif num < 16:
-            self.columnas = 4
+            self.columns = 4
         else:
-            self.columnas = 5
+            self.columns = 5
         
         
     def on_current_cards(self, *args, **kwargs):
@@ -206,7 +197,7 @@ class Tapete(MDGridLayout):
         are left with the image; if no match, turn the cards down again.
         '''
         if len(self.current_cards) == 2:
-            self.movimientos += 1
+            self.moves += 1
             if self.current_cards[0].image != self.current_cards[1].image:
                 sleep(2)  # wait 2 seconds before turning back cards
                 self.current_cards.pop().turn()
@@ -227,8 +218,7 @@ class Tapete(MDGridLayout):
                 return
         
         self.play('win-short')
-        PopupButton(title='Final', 
-                          msg='!Muy bien!\nHas encontrado todas las parejas')
+        PopupButton(title='End', msg='Well done!\nYou found all pairs')
 
 
     def mute_button(self, button):

@@ -17,7 +17,8 @@ from kivymd.app import MDApp
 
 # my app imports
 from game_15puzzle.puzzle import Puzzle
-from game_15puzzle.muestra import Muestra
+from game_15puzzle.sample import Sample
+import game_15puzzle.constants as FIFTEEN
 
 
 Builder.load_string(
@@ -40,7 +41,7 @@ Builder.load_string(
             
         MDLabel:
             id: score
-            text: 'Moves: ' + str(puzzle.movimientos)
+            text: 'Moves: ' + str(puzzle.moves)
             font_style: 'H5'
             halign: 'center'
             size_hint_y: None
@@ -52,23 +53,23 @@ Builder.load_string(
         
         BoxLayout:
             orientation: 'horizontal'
-            on_size: muestra.initialize_grid()
+            on_size: sample.initialize_grid()
         
             FloatLayout:
                 MDChip:
                     text: 'Theme'
                     pos_hint: {'center_x': 0.5, 'center_y': 0.66}
-                    on_release: muestra.cambiar_tema()
+                    on_release: sample.change_theme()
                     icon: ''
 
                 MDChip:
-                    text: 'Level: ' + str(muestra.tamano - 2)
+                    text: 'Level: ' + str(sample.board_size - 2)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.33}
-                    on_release: muestra.cambiar_tamano()
+                    on_release: sample.change_size()
                     icon: ''
                     
-            Muestra:
-                id: muestra
+            Sample:
+                id: sample
 
 """)
 
@@ -109,13 +110,13 @@ class Screen15Puzzle(MDScreen):
         if key == 'level':
             # change level
             level = int(value)
-            self.ids.muestra.cambiar_tamano(level)
+            self.ids.sample.change_size(level)
 
         elif key == 'theme':
-            self.ids.muestra.cambiar_tema(value)
+            self.ids.sample.change_theme(value)
 
         config.write()
 
 
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-15-puzzle')
+        webbrowser.open(FIFTEEN.URL_HELP)

@@ -22,7 +22,7 @@ from kivymd.app import MDApp
 
 # my app imports
 import game_15puzzle.constants as FIFTEEN
-from game_15puzzle.ficha import Ficha
+from game_15puzzle.card import Card
 
 
 
@@ -31,7 +31,7 @@ Builder.load_string(
 
 <Puzzle>:
     size_hint: None, None
-    size: self.ventana, self.ventana
+    size: self.window_size, self.window_size
 
 """)
 
@@ -43,17 +43,17 @@ class Puzzle(RelativeLayout):
     
     Attributes
     ----------
-    ventana : NumericProperty
+    window_size : NumericProperty
         Width and height of the widget. Determined from parent's size.        
-    movimientos : NumericProperty
+    moves : NumericProperty
         Count the number of moves made (for the score).
-    tamano : NumericProperty
+    board_size : NumericProperty
         Size of the board: 3 for 3x3, 4 for 4x4, 5 for 5x5
         
     '''
-    ventana = NumericProperty(100)
-    movimientos = NumericProperty(0)
-    tamano = NumericProperty()
+    window_size = NumericProperty(100)
+    moves = NumericProperty(0)
+    board_size = NumericProperty()
     
     def __init__(self, **kwargs):
         super(Puzzle, self).__init__(**kwargs)
@@ -66,7 +66,7 @@ class Puzzle(RelativeLayout):
         '''
         Establish the width and height of the widget, based on parent's size
         '''
-        self.ventana = min(self.parent.height, self.parent.width)
+        self.window_size = min(self.parent.height, self.parent.width)
 
     
     def start_game(self, *args):
@@ -76,13 +76,13 @@ class Puzzle(RelativeLayout):
         self.parent.parent.play('start')
         self.clear_widgets()
         app = MDApp.get_running_app()
-        self.tamano = app.root.ids.fifteen.ids.muestra.tamano
-        self.movimientos = 0
+        self.board_size = app.root.ids.fifteen.ids.sample.board_size
+        self.moves = 0
         
         # create list of tiles. Each tile has a number, so its order can be
         # checked. A blank tile is added at the end
-        lado = int(self.ventana / self.tamano)
-        title = list(range(1, self.tamano**2)) + ['']
+        card_size = int(self.window_size / self.board_size)
+        title = list(range(1, self.board_size**2)) + ['']
         shuffle(title)
         
         # ensure that the puzzle is solvable; if not shuffle again
@@ -91,17 +91,17 @@ class Puzzle(RelativeLayout):
         
         # create tiles as widgets added to the Puzzle
         n = 0
-        for i in range(self.tamano):
-            for j in range(self.tamano):
-                self.add_widget(Ficha(name=str(title[n]), lado=lado, 
-                                      tamano=self.tamano,
-                                      size=(lado-FIFTEEN.SPACING, 
-                                            lado-FIFTEEN.SPACING),
+        for i in range(self.board_size):
+            for j in range(self.board_size):
+                self.add_widget(Card(name=str(title[n]), lado=card_size, 
+                                      board_size=self.board_size,
+                                      size=(card_size-FIFTEEN.SPACING, 
+                                            card_size-FIFTEEN.SPACING),
                                       size_hint=(None, None), 
-                                      posicion=(j, i)))
+                                      position=(j, i)))
                 n += 1
         # load theme
-        self.parent.parent.ids.muestra.load_tema()
+        self.parent.parent.ids.muestra.load_theme()
 
 
     def find_empty(self):
@@ -133,8 +133,8 @@ class Puzzle(RelativeLayout):
         for child in self.children:
             if not child.name:
                 continue
-            if int(child.name) != (child.posicion[0] + 
-                                   child.posicion[1] * self.tamano + 1):
+            if int(child.name) != (child.position[0] + 
+                                   child.position[1] * self.board_size + 1):
                 return False        
         return True
     
@@ -146,14 +146,14 @@ class Puzzle(RelativeLayout):
         '''
         if self.check_win():
             self.parent.parent.play('win-short')
-            lado = int(self.ventana / self.tamano)
+            num_pixels = int(self.window_size / self.board_size)
             for child in self.children:
                 if not child.name:
-                    child.name=str(self.tamano**2)
+                    child.name=str(self.board_size**2)
                     child.size=(0,0)
                 
                 # animation is applied to all tiles
-                anim = Animation(size=(lado, lado), duration=0.5)
+                anim = Animation(size=(num_pixels, num_pixels), duration=0.5)
                 anim.start(child)
                 
 
@@ -184,14 +184,14 @@ class Puzzle(RelativeLayout):
             True if the game is solvable; False if not.
 
         '''
-        lado = math.sqrt(len(game))
-        if int(lado) != lado:
+        board_size = math.sqrt(len(game))
+        if int(board_size) != board_size:
             raise Exception('Game sequence not an exact square.')
         
         if '' not in game:
             raise ValueError("Blank tile missing. Expected ''")
         
-        lado = int(lado)
+        board_size = int(board_size)
         seq = [int(n) for n in game if n]
         inversions = 0
         for n in seq:
@@ -199,14 +199,14 @@ class Puzzle(RelativeLayout):
                 if seq.index(n) < seq.index(m) and n > m:
                     inversions += 1
         
-        if lado % 2:
+        if board_size % 2:
             if inversions % 2:
                 return False
             else:
                 return True
         else:
             blank = game.index('')
-            row_blank = lado - blank // lado
+            row_blank = board_size - blank // board_size
             if row_blank % 2:
                 if not inversions % 2:
                     return True
