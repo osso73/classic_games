@@ -7,13 +7,11 @@ Created on Wed May 19 20:21:28 2021
 
 
 # std libraries
-import os
 import webbrowser
 
 
 # non-std libraries
 from kivy.lang import Builder
-from kivy.properties import StringProperty
 
 from kivymd.uix.screen import MDScreen
 
@@ -21,6 +19,9 @@ from kivymd.uix.screen import MDScreen
 # my app imports
 from pong.pongboard import PongBoard
 
+
+
+URL_HELP = 'https://osso73.github.io/classic_games/games/classic_games/#game-of-pong'
 
 
 Builder.load_string(
@@ -43,6 +44,7 @@ Builder.load_string(
         
 
 """)
+
 
 class ScreenPong(MDScreen):
     '''
@@ -73,4 +75,4 @@ class ScreenPong(MDScreen):
 
 
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-pong')
+        webbrowser.open(URL_HELP)

@@ -183,7 +183,7 @@ class PongBoard(Widget):
         self.active = False
         num = 1 if self.player1.score >= 5 else 2
         
-        PopupButton(title='Final', msg=f'El jugador {num} gana!!')
+        PopupButton(title='End', msg=f'Player {num} wins!!')
 
 
     def pause_button(self, button):

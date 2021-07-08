@@ -17,7 +17,7 @@
       "type": "options",
       "title": "Skin",
       "desc": "Skin to be used for the ball and paddles.",
-      "options": ["original", "futbol", "basket", "jupiter", "billar", "tenis"],
+      "options": ["original", "football", "basketball", "jupiter", "pool", "tennis"],
       "section": "Pong",
       "key": "skin"
     }

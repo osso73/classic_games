@@ -11,7 +11,7 @@ import os
 import random
 
 # non-std libraries
-from kivy.properties import NumericProperty, ListProperty, StringProperty, BooleanProperty
+from kivy.properties import NumericProperty, ListProperty, StringProperty, BooleanProperty, DictProperty
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivy.lang import Builder
@@ -30,45 +30,25 @@ Builder.load_string(
     size_pixels: app.root.ids.snake.ids.game.size_pixels
     grid: app.root.ids.snake.ids.game.size_grid
     size: self.size_pixels, self.size_pixels
-
-
-<SnakePart>:
-    canvas.before:
-        Color:
-            rgba: COLOUR_IMAGE if self.image else COLOUR_SNAKE
-        Rectangle:
-            source: self.image
-            pos: self.pos
-            size: self.size
-
-<SnakeHead>:
     colour: COLOUR_IMAGE
     canvas.before:
+        PushMatrix
+        Rotate:
+            angle: self.rotation[self.direction]
+            origin: self.center
         Color:
-            rgba: self.colour
+            rgba: self.colour if self.image else COLOUR_SNAKE
         Rectangle:
             source: self.image
             pos: self.pos
             size: self.size
-
-<Food>:
-    canvas.before:
-        Color:
-            rgba: COLOUR_IMAGE
-        Rectangle:
-            source: self.image
-            pos: self.pos
-            size: self.size
+    canvas.after:
+        PopMatrix
 
 
 <Wall>:
-    canvas.before:
-        Color:
-            rgba: COLOUR_IMAGE
-        Rectangle:
-            source: 'snake/images/wall.jpg'
-            pos: self.pos
-            size: self.size
+    image: 'snake/images/wall.jpg'
+
 
 """)
 
@@ -76,50 +56,105 @@ Builder.load_string(
 
 
 class GridElement(Widget):
+    '''
+    This class defines the mechanisms to translate the position of an element
+    in the grid to the position on the screen in pixels. All elements (head,
+    body parts, food) inherit from this class.
+    
+    Attributes
+    ----------
+    active : boolean
+        If True, the update function will move the snake; if False, it will
+        do nothing. This is set to False when the game finishes, and set
+        to active when a new game starts.
+    n, m : NumericProperty
+        Coordinates in the grid.
+    pos_nm : ListProperty
+        The two coordinates n and m in a list of 2.
+    grid: ListProperty
+        Size of the grid. Inherits from parent.
+    image : StringProperty
+        name of the image to be shown. It can be the tail, or none.
+    direction : StringProperty
+        Direction of the tail. Can be one of ['LEFT', 'RIGHT', 'UP', 'DOWN'].
+    rotation : DictProperty
+        Contains the angle of rotation of tail image for each direction.
+    colour: ListProperty
+        Colour (in rgba) of the element. Used when crashing to change colours
+        of the head.
+
+    '''
     n = NumericProperty()
     m = NumericProperty()
     pos_nm = ListProperty()
     grid = ListProperty()
-
-    def __init__(self, *args, **kwargs):
-        super(GridElement, self).__init__(*args, **kwargs)
+    image = StringProperty('')
+    direction = StringProperty('RIGHT')
+    rotation = DictProperty({'RIGHT': 0, 'UP': 90, 'LEFT': 180, 'DOWN': 270})
+    colour = ListProperty()
 
 
     def set_position(self):
+        '''Set the position on the screen, based on n,m coordinates'''
         self.x = self.parent.x + self.n * self.width
         self.y = self.parent.y + self.m * self.height
 
+
     def on_n(self, *args):
+        '''When n changes, update pos_nm'''
         self.n = int(self.n)
         self.pos_nm = [self.n, self.m]
 
+
     def on_m(self, *args):
+        '''When m changes, update pos_nm'''
         self.m = int(self.m)
         self.pos_nm = [self.n, self.m]
 
+
     def on_pos_nm(self, *args):
+        '''
+        When pos_nm changes, trigger set_position (e.g. update position 
+        on screen
+        
+        '''
         self.n, self.m = self.pos_nm
         self.set_position()
 
 
-
-
 class Food(GridElement):
-    image = StringProperty()
+    '''
+    This class to define the food, and its behaviour. It inherits from the
+    GridElement, so it can be positioned on the grid by giving grid coordinates
+    
+    Attributes:
+    -----------
+    images : list
+        Contains all the different images available on the image folder.
+    current : dict
+        Dictionary of the parameters of the current food. These are: 
+            speed: what increase of speed when eaten
+            score: how many points it adds when eaten
+            length: what length is added to the snake when eaten
+    speed_counter: int
+        Counter of the number of moves used with high speed. Used to limit the
+        amount of time the snake goes to a higher speed.
+        
+    '''
 
     def __init__(self, *args, **kwargs):
         super(Food, self).__init__(*args, **kwargs)
         self.images = os.listdir(os.path.join(SNAKE.IMAGES, 'food'))
-        self.food_parameters = {
-            'fruit': {'speed': 1, 'score': 3, 'length': 1},
-            'junk':  {'speed': SNAKE.FOOD_SPEED, 'score': 1, 'length': 2},
-            'sweet': {'speed': 1, 'score': 1, 'length': 3},
-            }
-        self.current = self.food_parameters['fruit']
+        self.current = SNAKE.FOOD_PARAMETERS['fruit']
         self.speed_counter = 0
 
 
     def spawn(self, snake):
+        '''
+        Generate a new random food on a random position on the grid 
+        (except on a wall or on the snake)
+        
+        '''
         p = self._get_pos()
         positions = [ part.pos_nm for part in snake ]
         while p in positions:
@@ -128,100 +163,112 @@ class Food(GridElement):
         self.pos_nm = p
         self.image = os.path.join(SNAKE.IMAGES, 'food', random.choice(self.images))
 
+
     def _get_pos(self):
+        '''Return a random position within the grid'''
+        
         return [random.choice(range(self.grid[0]+1)),
                 random.choice(range(self.grid[1]+1))]
 
+
     def on_image(self, *args):
+        '''When image changes, update the food parameters.'''
+        
         name = os.path.basename(self.image)
         food_type = name.split('-')[0]
-        self.current = self.food_parameters[food_type]
+        self.current = SNAKE.FOOD_PARAMETERS[food_type]
 
 
 class Wall(GridElement):
+    '''Defines the wall element, used to load the image. No actions.'''
     pass
 
 
 class SnakePart(GridElement):
-    image = StringProperty('')
+    '''
+    Defines the snake part, i.e. any part except the head (separate class).
+    Each snake part can be defined as tail, in which case will show the tail
+    image, or normal, which shows no image, just the green colour.
+    
+    Attributes:
+    -----------
+    is_tail : BooleanProperty
+        True if the part is the tail. False otherwise.
+        
+    '''
     is_tail = BooleanProperty()
-    direction = StringProperty('RIGHT')
-
-    def __init__(self, *args, **kwargs):
-        super(SnakePart, self).__init__(*args, **kwargs)
-        self.tail_image = dict()
-        self.tail_image['LEFT'] = os.path.join(SNAKE.IMAGES, 'snake', 'tail_left.png')
-        self.tail_image['RIGHT'] = os.path.join(SNAKE.IMAGES, 'snake', 'tail_right.png')
-        self.tail_image['UP'] = os.path.join(SNAKE.IMAGES, 'snake', 'tail_up.png')
-        self.tail_image['DOWN'] = os.path.join(SNAKE.IMAGES, 'snake', 'tail_down.png')
 
 
     def on_is_tail(self, *args):
+        '''When is_tail changes its state, change the image accordingly'''
+        
         if self.is_tail:
-            self.image = self.tail_image[self.direction]
+            self.image = os.path.join(SNAKE.IMAGES, 'snake', 'tail.png')
         else:
             self.image = ''
-
-    def on_direction(self, *args):
-        if self.is_tail:
-            self.image = self.tail_image[self.direction]
-        else:
-            self.image = ''
-
+        
 
 
 class SnakeHead(GridElement):
-    image = StringProperty()
-    direction = StringProperty()
+    '''
+    Defines the head of the snake, with methods to open/close mouth, and
+    change direction..
+    
+    Attributes:
+    -----------
+    list_colours : list
+        List of colours to be shown when crashing. It iterates through this
+        list.
+    mouth_open : BooleanProperty
+        True if the mouth should be open; False otherwise. Mouth is open if
+        close to the food.
+    crashed : BooleanProperty
+        True when the snake has collisioned; False otherwise. When True, it 
+        triggers the changes in colour.
+        
+    '''
     mouth_open = BooleanProperty(False)
     crashed = BooleanProperty(False)
-    colour = ListProperty()
 
 
     def __init__(self, *args, **kwargs):
         super(SnakeHead, self).__init__(*args, **kwargs)
         self.original_size = self.size
-        self.head_images = dict()
-        self.head_images['LEFT'] = dict()
-        self.head_images['LEFT'][True] = os.path.join(SNAKE.IMAGES, 'snake', 'open_left.png')
-        self.head_images['LEFT'][False] = os.path.join(SNAKE.IMAGES, 'snake', 'head_left.png')
-
-        self.head_images['RIGHT'] = dict()
-        self.head_images['RIGHT'][True] = os.path.join(SNAKE.IMAGES, 'snake', 'open_right.png')
-        self.head_images['RIGHT'][False] = os.path.join(SNAKE.IMAGES, 'snake', 'head_right.png')
-
-        self.head_images['UP'] = dict()
-        self.head_images['UP'][True] = os.path.join(SNAKE.IMAGES, 'snake', 'open_up.png')
-        self.head_images['UP'][False] = os.path.join(SNAKE.IMAGES, 'snake', 'head_up.png')
-
-        self.head_images['DOWN'] = dict()
-        self.head_images['DOWN'][True] = os.path.join(SNAKE.IMAGES, 'snake', 'open_down.png')
-        self.head_images['DOWN'][False] = os.path.join(SNAKE.IMAGES, 'snake', 'head_down.png')
+        self.image = os.path.join(SNAKE.IMAGES, 'snake', 'head.png')
         self.list_colours = [[1, 0, 0, 1], [0, 1, 0, 1], [0, 0, 1, 1],
                              [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1],
                              [1, 1, 1, 1]]
 
 
-    def on_direction(self, *args):
-        self.change_image()
-
     def on_mouth_open(self, *args):
-        self.change_image()
+        '''When mouth_opn changes its state, change the image of the head'''
+
+        name = 'open' if self.mouth_open else 'head'
+        self.image = os.path.join(SNAKE.IMAGES, 'snake', name+'.png')
+
 
     def open_mouth(self, food):
+        '''
+        Check if mouth should be open or not, by measuring distance to the 
+        food, and set the variable mouth_open
+        
+        '''        
         radius = self.width
         if abs(food.x - self.x) <= radius and abs(food.y - self.y) <= radius:
             self.mouth_open = True
         else:
             self.mouth_open = False
 
-    def change_image(self):
-        self.image = self.head_images[self.direction][self.mouth_open]
 
     def on_crashed(self, *args):
+        '''When crashed is True, trigger the sequence of changing colours'''
+        
         self.event = Clock.schedule_interval(self.change_colour, 0.2)
 
+
     def change_colour(self, *args):
+        '''Change colour of the snake. It goes through the list_colours'''
+
         idx = self.list_colours.index(self.colour)
         idx = (idx +1) % len(self.list_colours)
         self.colour = self.list_colours[idx]

@@ -127,7 +127,6 @@ class GameBoard(Widget):
         self.speed = SNAKE.SPEED/self.speed_factor
 
 
-
     def on_speed(self, *args):
         # first time event does not need to be cancelled
         if hasattr(self, 'event'):
@@ -153,10 +152,6 @@ class GameBoard(Widget):
         Define the size of the GameBoard widget. Based on the size of the
         grid, self.size_snake, it calculates the number of pixels of each
         square of the grid, and stores it in self.size_pixels.
-
-        Returns
-        -------
-        None.
 
         '''
         factor = 0.95
@@ -206,7 +201,7 @@ class GameBoard(Widget):
 
     def new_level(self):
         '''
-        Start a new game. Reset the values (score, move, etc.), remove the
+        Start a new level. Reset the values (score, move, etc.), remove the
         previous snake and food, and recreate a new snake and food. Finally
         set the game to active, which will start moving the snake.
 
@@ -235,6 +230,12 @@ class GameBoard(Widget):
 
 
     def build_wall(self):
+        '''
+        Build a wall based on the positions defined as walls for the current
+        level. For each position, create a brick, give it the right position,
+        and add it to the wall list, so it can be tested for collisions.
+
+        '''
         positions = self.level.get_walls()
 
         for p in positions:
@@ -245,11 +246,18 @@ class GameBoard(Widget):
 
 
     def create_snake(self):
+        '''
+        Create the snake at the beginning of the level. It creates a snake with
+        a head, and a number of body parts defined by INITIAL_SNAKE_LENGTH.
+        All parts are added at the same position; when the snake starts moving
+        the parts will be fall in its correct position.
+        
+        '''
         head = SnakeHead()
         self.add_widget(head)
         head.pos_nm = self.level.get_start_position()
         self.snake_parts.append(head)
-        for _ in range(2):
+        for _ in range(SNAKE.INITIAL_SNAKE_LENGTH-1):
             new_part = SnakePart()
             self.add_widget(new_part)
             new_part.pos_nm = head.pos_nm
@@ -257,6 +265,10 @@ class GameBoard(Widget):
 
 
     def clear_screen(self):
+        '''
+        Remove all elements of the grid and screen, initialise all variables
+
+        '''
         if len(self.snake_parts) > 0 and hasattr(self.snake_parts[0], 'event'):
             self.snake_parts[0].event.cancel()
         self.snake_parts = []
@@ -371,10 +383,6 @@ class GameBoard(Widget):
         *args : ?
             Arguments passed by the event. Not used.
 
-        Returns
-        -------
-        None.
-
         '''
         # if only head, return
         if len(self.snake_parts) < 2:
@@ -402,10 +410,6 @@ class GameBoard(Widget):
             Argument passed by the event. The value that has changed, i.e.
             the new score.
 
-        Returns
-        -------
-        None.
-
         '''
         if self.score == 0:
             return
@@ -422,6 +426,11 @@ class GameBoard(Widget):
 
 
     def change_level(self):
+        '''
+        Actions at the end of the level: play sound, and show a pop-up.
+        Then trigger the method start_next_level.
+
+        '''
         self.play('next_level')
         self.active = False
         msg = 'Reached end of level\nMoving to next level.'
@@ -430,6 +439,16 @@ class GameBoard(Widget):
 
 
     def start_next_level(self, *args):
+        '''
+        Actions to start a new level: increase level count and reset progress
+        bar. Then trigger the new_level method.
+
+        Parameters
+        ----------
+        *args : ?
+            Arguments from popup call. Not used
+
+        '''
         self.level.set_level(self.level.num_level+1)
         self.num_level = self.level.num_level
         app = App.get_running_app()
@@ -439,6 +458,16 @@ class GameBoard(Widget):
 
 
     def collision(self):
+        '''
+        Check if the head of the snake has hit a wall or the body of the 
+        snake. This is checked at every move of the snake.
+
+        Returns
+        -------
+        bool
+            True if there is a collision; False otherwise.
+
+        '''
         # collision with body
         head = self.snake_parts[0]
         for element in self.snake_parts[1:]:
@@ -456,19 +485,39 @@ class GameBoard(Widget):
 
 
     def game_over(self, win=False):
+        '''
+        Finish the game by playing a sound and showing a popup. 
+
+        Parameters
+        ----------
+        win : bool, optional
+            To define if the end of the game is for a win or a lose. Based on
+            that the different sound and popup are shown. The default is False.
+
+        '''
         self.active = False
         if win:
             self.play('win')
             msg = 'Congratulations!\nYOU WIN!!!'
             PopupButton(title='End', msg=msg)
-
-
         else:
             self.snake_parts[0].crashed = True
             self.play('game_over')
 
 
-    def change_direction(self, direct, *args):
+    def change_direction(self, direct):
+        '''
+        Change the direction of the snake, based on the argument direct. This
+        method includes the logic to decide if it has to change direction
+        or not, and setting the variables corresponding to new direction.
+
+        Parameters
+        ----------
+        direct : string
+            Can be one of ['UP', 'DOWN', 'LEFT', 'RIGHT']. This is the new
+            direction.
+
+        '''
         if not self.active:
             return
         head = self.snake_parts[0]
@@ -489,6 +538,7 @@ class GameBoard(Widget):
             self.move_y = -1
             head.direction = direct
 
+
     def on_touch_down(self, touch):
         '''
         When touch down, store the value of (x, y) in attributes swipe_x
@@ -501,6 +551,7 @@ class GameBoard(Widget):
         '''
         self.swipe_x = touch.x
         self.swipe_y = touch.y
+
 
     def on_touch_up(self, touch):
         '''
@@ -538,20 +589,14 @@ class GameBoard(Widget):
 
     def play(self, sound):
         '''
-        Play a sound from the dictionary of sounds.
+        Trigger play method from the main app, if not muted.
 
         Parameters
         ----------
         sound : string
             Key of the dictionary corresponding to the sound to be played.
 
-        Raises
-        ------
-        Exception
-            If string passed is not in the dictionary.
         '''
-        if self.mute:
-            return
-
-        app = App.get_running_app()
-        app.play(sound)
+        if not self.mute:
+            app = App.get_running_app()
+            app.play(sound)

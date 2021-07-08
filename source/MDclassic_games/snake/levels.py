@@ -6,6 +6,16 @@ Created on Sat Apr  3 12:22:14 2021
 @author: osso73
 """
 
+# std libraries
+
+
+# non-std libraries
+
+
+# my app imports
+import snake.constants as SNAKE
+
+
 
 class Level():
     '''
@@ -22,8 +32,6 @@ class Level():
     grid : list (n, m)
         Size of the grid used (in squares, not in pixels). Used to calculate
         positions of the walls and snake.
-    level_parameters : dict
-        Contains all the values of initial position, direction for each level.
     level_max_score : int
         Maximum score for the current level, based on the size of the grid.
     level_curr_score : int
@@ -41,20 +49,6 @@ class Level():
         self.level_curr_score = 0
         self.level_pct = 0
         self.level_max_score = self.get_max_score()
-        self.level_parameters = {  # parameters for vertical layout
-            1: {'pos_ini': (0.5, 0.5), 'dir': 'DOWN'},
-            2: {'pos_ini': (0.5, 0.75), 'dir': 'RIGHT'},
-            3: {'pos_ini': (0.25, 0.5), 'dir': 'DOWN'},
-            4: {'pos_ini': (0.5, 0.5), 'dir': 'RIGHT'},
-            5: {'pos_ini': (0.5, 0.5), 'dir': 'DOWN'},
-            6: {'pos_ini': (0.15, 0.5), 'dir': 'DOWN'},
-            7: {'pos_ini': (0.15, 0.5), 'dir': 'DOWN'},
-            8: {'pos_ini': (0.5, 0.5), 'dir': 'DOWN'},
-            9: {'pos_ini': (0.25, 0.5), 'dir': 'DOWN'},
-            10: {'pos_ini': (0.5, 0.5), 'dir': 'RIGHT'},
-            11: {'pos_ini': (0.2, 0.5), 'dir': 'DOWN'},
-            12: {'pos_ini': (0.2, 0.5), 'dir': 'DOWN'},
-            }
 
     
     def get_max_score(self):
@@ -74,6 +68,16 @@ class Level():
 
     
     def get_walls(self):
+        '''
+        Select the build function corresponding to the current level, and 
+        return the result.
+
+        Returns
+        -------
+        list
+            List of positions whew there is a wall.
+
+        '''
         build_func = [self.build_walls01, self.build_walls02, 
                       self.build_walls03, self.build_walls04,
                       self.build_walls05, self.build_walls06,
@@ -84,15 +88,33 @@ class Level():
 
 
     def get_start_position(self):
+        '''
+        Return the start position of the snake, based on the current level.
+
+        Returns
+        -------
+        tupple
+            Tupple of ints, corresponding to the grid position of start.
+
+        '''
         n, m = self.grid
-        n_factor, m_factor = self.level_parameters[self.num_level]['pos_ini']
+        n_factor, m_factor = SNAKE.LEVEL_PARAMETERS[self.num_level]['pos_ini']
         if n > m:  # swap factors in case of landscape layout
             n_factor, m_factor = 1-m_factor, 1-n_factor
         return int(n * n_factor), int(m * m_factor)
         
             
     def get_start_direction(self):
-        d = self.level_parameters[self.num_level]['dir']
+        '''
+        Return the start direction of the snake, based on the current level.
+
+        Returns
+        -------
+        d : string
+            Direction. Can be one of ['UP', 'DOWN', 'LEFT', 'RIGHT'].
+
+        '''
+        d = SNAKE.LEVEL_PARAMETERS[self.num_level]['dir']
         n, m = self.grid
         if n > m:  # swap direction in case of landscape layout
             d = 'RIGHT' if d == 'DOWN' else 'DOWN'
@@ -100,6 +122,16 @@ class Level():
 
     
     def set_level(self, num):
+        '''
+        Set the level in self.num_level, and load the variable max_score, and
+        reset the current score.        
+
+        Parameters
+        ----------
+        num : int
+            Level number.
+
+        '''
         self.num_level = num
         self.level_max_score = self.get_max_score()
         self.level_curr_score = 0
@@ -107,35 +139,49 @@ class Level():
 
         
     def inc_score(self, num):
+        '''Increase the score by num, and recalculate percentage'''
+        
         self.level_curr_score += num
         self.level_pct = self.level_curr_score / self.level_max_score
 
             
     def build_walls01(self):
+        '''Build function for level 1. Return list of positions of wall.'''
+        
         return []
 
 
     def build_walls02(self):
+        '''Build function for level 2. Return list of positions of wall.'''
+
         return self.build_one_short_line(0.5)
 
 
     def build_walls03(self):
+        '''Build function for level 3. Return list of positions of wall.'''
+
         return self.build_one_long_line(0.5)
 
 
     def build_walls04(self):
+        '''Build function for level 4. Return list of positions of wall.'''
+
         positions = self.build_one_short_line(1/3)
         positions += self.build_one_short_line(-1/3)
         return positions
 
 
     def build_walls05(self):
+        '''Build function for level 5. Return list of positions of wall.'''
+
         positions = self.build_one_long_line(1/3)
         positions += self.build_one_long_line(-1/3)
         return positions
 
 
     def build_walls06(self):
+        '''Build function for level 6. Return list of positions of wall.'''
+
         positions = self.build_one_long_line(0.5)
         positions += self.build_one_short_line(1/3)
         positions += self.build_one_short_line(-1/3)
@@ -143,6 +189,8 @@ class Level():
 
 
     def build_walls07(self):
+        '''Build function for level 7. Return list of positions of wall.'''
+
         positions = self.build_one_long_line(1/3)
         positions += self.build_one_long_line(-1/3)
         positions += self.build_one_short_line(0.5)
@@ -150,16 +198,22 @@ class Level():
 
 
     def build_walls08(self):
+        '''Build function for level 8. Return list of positions of wall.'''
+
         return self.build_around()
 
 
     def build_walls09(self):
+        '''Build function for level 9. Return list of positions of wall.'''
+
         positions = self.build_around()
         positions += self.build_one_long_line(0.5)
         return positions
 
 
     def build_walls10(self):
+        '''Build function for level 10. Return list of positions of wall.'''
+
         positions = self.build_around()
         positions += self.build_one_short_line(1/3)
         positions += self.build_one_short_line(-1/3)
@@ -167,6 +221,8 @@ class Level():
 
 
     def build_walls11(self):
+        '''Build function for level 11. Return list of positions of wall.'''
+
         positions = self.build_around()
         positions += self.build_one_short_line(1/3)
         positions += self.build_one_short_line(-1/3)
@@ -175,6 +231,8 @@ class Level():
 
 
     def build_walls12(self):
+        '''Build function for level 12. Return list of positions of wall.'''
+
         positions = self.build_around()
         positions += self.build_one_short_line(1/4)
         positions += self.build_one_short_line(2/4)
@@ -183,6 +241,16 @@ class Level():
 
 
     def build_around(self):
+        '''
+        Build function to build walls around the screen, with holes. Used by
+        the functions to build the levels.
+        
+        Returns
+        -------
+        positions : list
+            List of grid coordinates where there is a wall.
+                
+        '''
         n_max, m_max = self.grid
         n_list = [n for n in range(n_max+1)]
         m_list = [m for m in range(m_max+1)]
@@ -211,6 +279,22 @@ class Level():
 
 
     def build_one_short_line(self, pct):
+        '''
+        Build function to build a short line of wall, located at pct of the 
+        screen. Used by the functions to build the levels.
+        
+        Parameters
+        ----------
+        pct : float
+            Percentage of the screen where the line is located. E.g. 0.5 means
+            the line is in the middle of the grid.
+        
+        Returns
+        -------
+        positions : list
+            List of grid coordinates where there is a wall.
+        
+        '''
         n_max, m_max = self.grid
         n_list = [n for n in range(n_max+1)]
         m_list = [m for m in range(m_max+1)]
@@ -239,6 +323,22 @@ class Level():
         
 
     def build_one_long_line(self, pct):
+        '''
+        Build function to build a long line of wall, located at pct of the 
+        screen. Used by the functions to build the levels.
+        
+        Parameters
+        ----------
+        pct : float
+            Percentage of the screen where the line is located. E.g. 0.5 means
+            the line is in the middle of the grid.
+        
+        Returns
+        -------
+        positions : list
+            List of grid coordinates where there is a wall.
+        
+        '''
         n_max, m_max = self.grid
         n_list = [n for n in range(n_max+1)]
         m_list = [m for m in range(m_max+1)]

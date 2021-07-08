@@ -93,6 +93,7 @@ class ScreenSnake(MDScreen):
     '''
     
     level_progress_bar = NumericProperty(0)
+
     
     def config_change(self, config, section, key, value):
         if key == 'speed':
@@ -117,4 +118,4 @@ class ScreenSnake(MDScreen):
 
 
     def help_button(self, button):
-        webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/#game-of-snake')
+        webbrowser.open(SNAKE.URL_HELPL)
