@@ -72,6 +72,12 @@ Builder.load_string(
 
 
 class ScreenMemory(MDScreen):
+    '''
+    This is the main screen, to organize the menu and the mat area. Almost
+    no logic here, as everything is happening on the Mat class. Only
+    handles the settings changes for memory.
+    
+    '''  
     def config_change(self, config, section, key, value):
         if key == 'theme':
             self.ids.mat_area.tema_actual = value

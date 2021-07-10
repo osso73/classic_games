@@ -68,9 +68,8 @@ class CardMemory(Button):
 
 
     def click(self):
-        '''
-        When button is clicked, trigger the function to turn the card.
-        '''
+        '''When button is clicked, trigger the function to turn the card.'''
+        
         if not self.shown:
             self.turn()
             self.parent.play('move')
@@ -78,9 +77,8 @@ class CardMemory(Button):
             
 
     def add_card_to_current(self, *args):
-        '''
-        Add card to Tapete.current_cards list.
-        '''
+        '''Add card to Tapete.current_cards list.'''
+        
         self.parent.current_cards.append(self)
         
 
@@ -88,6 +86,7 @@ class CardMemory(Button):
         '''
         Turn the card. If the card is shown, turns it back; if not, 
         turn it up.
+        
         '''
         if self.shown:
             self.show = self.back

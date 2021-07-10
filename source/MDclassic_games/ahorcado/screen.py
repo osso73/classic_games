@@ -111,17 +111,15 @@ class ScreenAhorcado(MDScreen):
 
 
     def start_game(self, *args):
-        '''
-        Start the game: find a new word, and reset all variables.
-        '''
+        '''Start the game: find a new word, and reset all variables.'''
+        
         self.target_word.find_word()
         self.reset_game()
 
 
     def reset_game(self):
-        '''
-        Reset all the variables to start the game.
-        '''
+        '''Reset all the variables to start the game.'''
+        
         self.num_errors = 0
         self.good_letters = ''
         self.failed_letters = ''
@@ -142,6 +140,7 @@ class ScreenAhorcado(MDScreen):
         win : boolean
             Indicates if the game is won or not. Popup text is
             adjusted depending on this.
+            
         '''
         if win:
             msg = 'You in!!\nCONGRATULATIONS!!'
@@ -197,6 +196,7 @@ class ScreenAhorcado(MDScreen):
 
     def mute_button(self, button):
         '''Toogle mute. Action triggered by toolbar button.'''
+        
         self.mute = not self.mute       
         button.icon = 'volume-off' if self.mute else 'volume-high'
 
@@ -205,6 +205,7 @@ class ScreenAhorcado(MDScreen):
         '''
         Give a hint: show one of the letters. Only if this is
         the first time hint is requested.
+        
         '''
         if self.active:
             if self.allow_hint:
@@ -232,6 +233,7 @@ class ScreenAhorcado(MDScreen):
         ------
         Exception
             If string passed is not in the dictionary.
+            
         '''
         if self.mute:
             return
@@ -269,4 +271,5 @@ class ScreenAhorcado(MDScreen):
     
     def help_button(self, button):
         '''Open web-browser with the help page for the game'''
+        
         webbrowser.open(AHORCADO.URL_HELP)

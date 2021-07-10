@@ -45,11 +45,6 @@ Builder.load_string(
     canvas.after:
         PopMatrix
 
-
-<Wall>:
-    image: 'snake/images/wall.jpg'
-
-
 """)
 
 
@@ -181,7 +176,10 @@ class Food(GridElement):
 
 class Wall(GridElement):
     '''Defines the wall element, used to load the image. No actions.'''
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super(Wall, self).__init__(*args, **kwargs)
+        self.image = os.path.join(SNAKE.IMAGES, 'wall.jpg')
 
 
 class SnakePart(GridElement):

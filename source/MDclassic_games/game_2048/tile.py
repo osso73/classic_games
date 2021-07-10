@@ -74,6 +74,7 @@ class Tile(Label):
         -------
         (x, y) : tuple
             Coordinates in screen
+            
         '''
         return (self.position[0]*(self.size_pizels) + G2048.SPACING, 
                 (self.position[1])*(self.size_pizels) + G2048.SPACING)
@@ -82,6 +83,7 @@ class Tile(Label):
         '''
         When position changes, trigger an animation to move to the new
         position on screen, and play sound of moving Tile.
+        
         '''
         if self.value:  # don't move empty tiles (e.g. self.value=0)
             anim = Animation(pos=self.calc_position(), duration=G2048.MOVE_TILE)
@@ -95,6 +97,7 @@ class Tile(Label):
         is 0, animation to spawn a new Tile; if not, animation of merge.
 
         Use self._previous to store the previous value.
+        
         '''
         x, y = self.size
         if self._previous != 0:

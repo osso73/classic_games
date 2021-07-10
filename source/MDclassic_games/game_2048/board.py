@@ -85,6 +85,7 @@ class Board(RelativeLayout):
         '''
         Function to play one of the sounds. It can be called from anywhere
         in the program.
+        
         '''
         if self.mute:
             return
@@ -95,7 +96,8 @@ class Board(RelativeLayout):
 
     def initialize_grid(self, *args):
         '''
-        initialisation is triggered after the parent window has been set up
+        Initialisation is triggered after the parent window has been set up
+        
         '''
         self.num_pixels = min(self.parent.height, self.parent.width)
 
@@ -109,6 +111,7 @@ class Board(RelativeLayout):
         ----------
         touch : touch event
             contains the coordinates of the touch.
+            
         '''
         if self.collide_point(touch.x, touch.y):
             self.swipe_x = touch.x
@@ -153,6 +156,7 @@ class Board(RelativeLayout):
         '''
         Change the winning score, cycling through values stored in SCORES
         global list. Store the new value in self.win_score.
+        
         '''
         scores = G2048.SCORES
         ind = scores.index(self.win_score)
@@ -164,6 +168,7 @@ class Board(RelativeLayout):
         '''
         Start the game: resets the scores, rebuild the board, and add
         two new tiles.
+        
         '''
         self.clear_widgets()
         self.active_game = True
@@ -180,6 +185,7 @@ class Board(RelativeLayout):
         '''
         Add a new tile on the board, i.e. change value attribute from 0 to a
         value. Value taken from a list of 2s and 4s.
+        
         '''
         new_tile = choice(self.get_empty_tiles())
         new_tile.value = choice(G2048.NEW_TILE_SEQUENCE)
@@ -193,6 +199,7 @@ class Board(RelativeLayout):
         -------
         list : list
             List of empty tiles.
+            
         '''
         return [child for child in self.children if not child.value]
 
@@ -206,6 +213,7 @@ class Board(RelativeLayout):
         -------
         full_tiles : list
             List of non-empty tiles.
+            
         '''
         full_tiles = [child for child in self.children if child.value]
         if row != -1:
@@ -275,6 +283,7 @@ class Board(RelativeLayout):
 
         This method is triggered after all the rows/tiles have moved, giving
         enough time for all the tiles to move before these actions take place.
+        
         '''
         if self._moved_tile:
             self.add_tile()
@@ -297,6 +306,7 @@ class Board(RelativeLayout):
         -------
         boolean
             True if the game has finished; False otherwise.
+            
         '''
         if [child for child in self.children if child.value >= self.win_score]:
             # win game
@@ -325,6 +335,7 @@ class Board(RelativeLayout):
         -------
         boolean
             True if there some moves are available, False otherwise
+            
         '''
         for tile in self.children:
             if not tile.value:
@@ -347,6 +358,7 @@ class Board(RelativeLayout):
             Direction of the move. Can be 'up', 'down', 'left' or 'right'.
         row_line : list
             List of tiles that need to be moved.
+            
         '''
         for tile in row_line:
             self.move_tile(direction, tile)
@@ -367,6 +379,7 @@ class Board(RelativeLayout):
             Direction of the move. Can be 'up', 'down', 'left' or 'right'.
         tile : Tile
             Tiles to be moved.
+            
         '''
         initial_position = tile.position
         final_position = self.check_final(direction, initial_position, tile.value)
@@ -392,6 +405,7 @@ class Board(RelativeLayout):
             Tile that has to be removed
         tile : Tile
             Tile that is moving
+            
         '''
         tile.value += tile_to_remove.value
         self.remove_widget(tile_to_remove)
@@ -455,6 +469,7 @@ class Board(RelativeLayout):
         -------
         tile : Tile
             Tile that corresponds to the given position
+            
         '''
         for child in self.children:
             if child.position == position:
@@ -465,6 +480,7 @@ class Board(RelativeLayout):
         Save the position of the board in a dictionary. This is called before 
         starting the move. The saved position can be used to go back to the 
         previous move.
+        
         '''
         self.last_move = []
         for child in self.children:
@@ -480,6 +496,7 @@ class Board(RelativeLayout):
         '''
         Move position of board to the position before the last move. Use the
         self.last_move
+        
         '''
         if self.active_game:
             self.clear_widgets()
@@ -492,9 +509,8 @@ class Board(RelativeLayout):
 
             
     def mute_button(self, button):
-        '''
-        Toogle the mute button on / off.
-        '''
+        '''Toogle the mute button on / off.'''
+        
         self.mute = not self.mute
         button.icon = 'volume-off' if self.mute else 'volume-high'
         

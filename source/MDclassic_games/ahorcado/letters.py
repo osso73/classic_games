@@ -67,6 +67,7 @@ class FailedLetters(MDBoxLayout):
     ----------
     error_string : string
         String showing the wrong letters.
+        
     '''
     error_string = StringProperty('_'*10)
     

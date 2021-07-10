@@ -1,3 +1,5 @@
+#:import Clock kivy.clock.Clock
+
 <MyDrawer>:
     screen: 'menu'
     enable_swiping: False
@@ -63,7 +65,9 @@
                 
             OneLineIconListItem:
                 text: 'Exit'
-                on_release: app.stop()
+                on_release: 
+                    app.play('bye')
+                    Clock.schedule_once(app.stop, 2)
                 IconLeftWidget:
                     icon: 'logout'
         

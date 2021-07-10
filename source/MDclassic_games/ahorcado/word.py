@@ -51,15 +51,15 @@ class Word(MDBoxLayout):
         this is the word showing the letters found and not found
     word : string
         this is the word that needs to be found
+        
     '''
     current = StringProperty(' ')
     word = ' '
     
     
     def reset_word(self):
-        '''
-        Reset self.current to all letters as '-'
-        '''
+        '''Reset self.current to all letters as "-"'''
+        
         self.current = '-'*len(self.word)
 
         
@@ -81,6 +81,7 @@ class Word(MDBoxLayout):
         -------
         string
             Word chosen
+            
         ''' 
         fullname = os.path.join(os.path.dirname(__file__), AHORCADO.WORDS_FILE)
         with open(fullname, 'rt') as f:
@@ -99,6 +100,7 @@ class Word(MDBoxLayout):
         ----------
         letter : string (char)
             Letter to be added
+            
         '''
         pos = 0
         pos = self.word.find(letter)

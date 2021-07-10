@@ -122,9 +122,8 @@ class PongBall(Widget):
 
     
     def __init__(self, *args, **kwargs):
-        '''
-        Trigger the clock event every 60th of sec.
-        '''
+        '''Trigger the clock event every 60th of sec.'''
+        
         super(PongBall, self).__init__(*args, **kwargs)
         app = App.get_running_app()
         self.max_vel = int(app.config.get('Pong', 'max-speed'))
@@ -134,14 +133,14 @@ class PongBall(Widget):
         '''
         Move the ball one step. This will be called in equal intervals to 
         animate the ball.
+        
         '''
         self.pos = Vector(*self.velocity) + self.pos
 
 
     def update_skin(self, skin_name):
-        '''
-        Change the skin used
-        '''
+        '''Change the skin used'''
+        
         self.source = os.path.join(os.path.dirname(__file__), 
                                    'images', skin_name, 'ball.gif')
 

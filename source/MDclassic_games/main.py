@@ -113,8 +113,8 @@ class MainApp(MDApp):
             })
 
         config.setdefaults('Ahorcado', {
-            'man': 'hombre1',
-            'keyboard': 'teclado2',
+            'man': 'man1',
+            'keyboard': 'keyboard2',
             })
 
         config.setdefaults('Memory', {
@@ -124,7 +124,7 @@ class MainApp(MDApp):
 
         config.setdefaults('fifteen', {
             'level': '1',
-            'theme': 'numeros',
+            'theme': 'numbers',
             })
 
         config.setdefaults('Snake', {

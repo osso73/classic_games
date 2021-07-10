@@ -11,9 +11,9 @@
       "type": "options",
       "title": "Theme",
       "desc": "Picture displayed.",
-      "options": ["arbol", "ardilla", "barco", "bombilla", "carnaval", "costa", 
-      "cyberpunk", "desayuno", "dibujo", "elefante", "eva", "luna", "mono",
-      "mortal_kombat", "moto", "muneca", "numeros", "paisaje", "pez", "via_lactea"],
+      "options": ["breakfast", "bulb", "ship", "eve", "squirrel", "shore", 
+          "tree", "milky_way", "bike", "carnival", "numbers", "landscape", 
+          "money", "blonde"],
       "section": "fifteen",
       "key": "theme"
     }

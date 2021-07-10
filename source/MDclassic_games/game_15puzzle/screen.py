@@ -102,11 +102,31 @@ class Screen15Puzzle(MDScreen):
 
     def mute_button(self, button):
         '''Toogle the mute on/off. Called from menu bar button.'''
+        
         self.mute = not self.mute
         button.icon = 'volume-off' if self.mute else 'volume-high'
         
         
     def config_change(self, config, section, key, value):
+        '''
+        
+
+        Parameters
+        ----------
+        config : TYPE
+            DESCRIPTION.
+        section : TYPE
+            DESCRIPTION.
+        key : TYPE
+            DESCRIPTION.
+        value : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
         if key == 'level':
             # change level
             level = int(value)

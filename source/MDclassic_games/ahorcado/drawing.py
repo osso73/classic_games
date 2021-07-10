@@ -24,6 +24,7 @@ Builder.load_string(
 #:set COLOUR_IMAGE [1,1,1,1]
 #:set COLOUR_ACTIVE [0,0,1,1]
 #:set COLOUR_DISABLED [0,0,1,0]
+#:set IMAGES 'ahorcado/images/'
 
 <Drawing>:
     skin: int(app.config.get('Ahorcado', 'man')[-1])
@@ -33,105 +34,105 @@ Builder.load_string(
         Rectangle:
             size: self.size
             pos: 0,0
-            source: 'ahorcado/images/desierto.jpg'
+            source: IMAGES + 'desert.jpg'
         Color:
             rgba: COLOUR_IMAGE if self.status[0]=='A' else COLOUR_DISABLED
         Rectangle:
             size: 8 * self.width/10, 0.35 * self.height/10
             pos: 1 * self.width/10, 1 * self.height/10
-            source: 'ahorcado/images/madera.jpg'
+            source: IMAGES + 'wood.jpg'
         Color:
             rgba: COLOUR_IMAGE if self.status[1]=='A' else COLOUR_DISABLED
         Rectangle:
             size: 0.5 * self.width/10, 8 * self.height/10
             pos: 2 * self.width/10, 1 * self.height/10
-            source: 'ahorcado/images/madera.jpg'
+            source: IMAGES + 'wood.jpg'
         Color:
             rgba: COLOUR_IMAGE if self.status[2]=='A' else COLOUR_DISABLED
         Rectangle:
             size: 5 * self.width/10, 0.35 * self.height/10
             pos: 1 * self.width/10, 9 * self.height/10
-            source: 'ahorcado/images/madera.jpg'
+            source: IMAGES + 'wood.jpg'
         Color:
             rgba: COLOUR_IMAGE if self.status[3]=='A' else COLOUR_DISABLED
         Rectangle:
             size: 0.5 * self.width/10, 1.35 * self.height/10
             pos: 6 * self.width/10, 8 * self.height/10
-            source: 'ahorcado/images/cuerda.jpg'
+            source: IMAGES + 'rope.jpg'
 
         Color:
             rgba: COLOUR_IMAGE if (self.status[4]=='A' and self.skin==1) else COLOUR_DISABLED
         Ellipse:
             size: 1.5 * self.width/10, 1.5 * self.height/10
             pos: 5.5 * self.width/10, 7 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-cara.png'
+            source: IMAGES + 'man/man1-face.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[5]=='A' and self.skin==1) else COLOUR_DISABLED
         Rectangle:
             size: 2 * self.width/10, 2.5 * self.height/10
             pos: 5.25 * self.width/10, 4.5 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-tronco.png'
+            source: IMAGES + 'man/man1-body.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[6]=='A' and self.skin==1) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.5 * self.height/10
             pos: 6.8 * self.width/10, 4.3 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-brazo-derecho.png'
+            source: IMAGES + 'man/man1-arm-right.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[7]=='A' and self.skin==1) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.5 * self.height/10
             pos: 4.6 * self.width/10, 4.3 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-brazo-izquierdo.png'
+            source: IMAGES + 'man/man1-arm-left.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[8]=='A' and self.skin==1) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.5 * self.height/10
             pos: 5.26 * self.width/10, 2.15 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-pierna-izquierda.png'
+            source: IMAGES + 'man/man1-leg-left.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[9]=='A' and self.skin==1) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.4 * self.height/10
             pos: 6.24 * self.width/10, 2.15 * self.height/10
-            source: 'ahorcado/images/hombre/hombre1-pierna-derecha.png'
+            source: IMAGES + 'man/man1-leg-right.png'
 
         Color:
             rgba: COLOUR_IMAGE if (self.status[4]=='A' and self.skin==2) else COLOUR_DISABLED
         Ellipse:
             size: 2 * self.width/10, 2 * self.height/10
             pos: 5.2 * self.width/10, 6.5 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-cara.png'
+            source: IMAGES + 'man/man2-face.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[5]=='A' and self.skin==2) else COLOUR_DISABLED
         Rectangle:
             size: 2 * self.width/10, 2.2 * self.height/10
             pos: 5.25 * self.width/10, 4.4 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-tronco.png'
+            source: IMAGES + 'man/man2-body.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[6]=='A' and self.skin==2) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.5 * self.height/10
             pos: 7.1 * self.width/10, 3.95 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-brazo-derecho.png'
+            source: IMAGES + 'man/man2-arm-right.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[7]=='A' and self.skin==2) else COLOUR_DISABLED
         Rectangle:
             size: 1 * self.width/10, 2.5 * self.height/10
             pos: 4.4 * self.width/10, 3.95 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-brazo-izquierdo.png'
+            source: IMAGES + 'man/man2-arm-left.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[8]=='A' and self.skin==2) else COLOUR_DISABLED
         Rectangle:
             size: 1.6 * self.width/10, 2.8 * self.height/10
             pos: 4.6 * self.width/10, 1.65 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-pierna-izquierda.png'
+            source: IMAGES + 'man/man2-leg-left.png'
         Color:
             rgba: COLOUR_IMAGE if (self.status[9]=='A' and self.skin==2) else COLOUR_DISABLED
         Rectangle:
             size: 1.6 * self.width/10, 2.8 * self.height/10
             pos: 6.2 * self.width/10, 1.65 * self.height/10
-            source: 'ahorcado/images/hombre/hombre2-pierna-derecha.png'
+            source: IMAGES + 'man/man2-leg-right.png'
 
 """)
 

@@ -101,6 +101,9 @@ class GameBoard(Widget):
         Define if the game mode is story (True) or single-level (False)
     wall : list
         Contains all the widgets that form the wall, of type Wall
+    level_progress_bar : NumericProperty
+        Used to show the progress inside one level. This is updated according
+        to the level.score.
     '''
 
     score = NumericProperty(0)
@@ -113,6 +116,7 @@ class GameBoard(Widget):
     mute = BooleanProperty(False)
     pause = BooleanProperty(False)
     num_level = NumericProperty(1)
+    level_progress_bar = NumericProperty(0)
 
 
     def __init__(self, *args, **kwargs):
@@ -192,8 +196,8 @@ class GameBoard(Widget):
         '''
         self.play('start-mario')
         self.score = 0
+        self.level_progress_bar = 0.0
         app = App.get_running_app()
-        app.root.ids.snake.level_progress_bar = 0.0
         self.num_level = int(app.config.get('Snake', 'level_start'))
         self.level = Level(self.size_grid, self.num_level)
         self.new_level()
@@ -416,8 +420,7 @@ class GameBoard(Widget):
 
         if self.story:
             self.level.inc_score(self.food.current['score'])
-            app = App.get_running_app()
-            app.root.ids.snake.level_progress_bar = self.level.level_pct
+            self.level_progress_bar = self.level.level_pct
             if self.level.level_pct >= 1:
                 if self.num_level == 12:
                     self.game_over(win=True)
@@ -451,8 +454,7 @@ class GameBoard(Widget):
         '''
         self.level.set_level(self.level.num_level+1)
         self.num_level = self.level.num_level
-        app = App.get_running_app()
-        app.root.ids.snake.level_progress_bar = self.level.level_pct
+        self.level_progress_bar = self.level.level_pct
         self.new_level()
 
 

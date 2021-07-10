@@ -26,7 +26,7 @@ import game_15puzzle.constants as FIFTEEN
 Builder.load_string(
     r"""
 
-<Card>:
+<Card15>:
     canvas.before:
         Color:
             rgba: [1,1,1,1] if self.name else [0,0,0,0] 
@@ -37,7 +37,8 @@ Builder.load_string(
 
 """)
 
-class Card(Label):
+
+class Card15(Label):
     '''
     Contains the properties and logic of the tiles and their movement.
     
@@ -64,21 +65,13 @@ class Card(Label):
     filename = StringProperty()
     
     def __init__(self, **kwargs):
-        super(Card, self).__init__(**kwargs)
+        super(Card15, self).__init__(**kwargs)
         self.pos = self.calculate_position()
         app = MDApp.get_running_app()
-        tema = app.root.ids.fifteen.ids.muestra.tema
-        board_size = app.root.ids.fifteen.ids.muestra.board_size
-        # if self.name:
-        #     self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{self.name}.jpg'
-        # else:
-        #     self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{board_size**2}.jpg'
-        
+        theme = app.root.ids.fifteen.ids.sample.theme
+        board_size = app.root.ids.fifteen.ids.sample.board_size
         image = self.name if self.name else str(board_size**2)        
-        # self.filename = os.path.join(FIFTEEN.THEMES, tema, board_size, imag+'.jpg')
-        self.filename = f'game_15puzzle/images/temas/{tema}/{board_size}/{image}.jpg'
-
-
+        self.filename = os.path.join(FIFTEEN.THEMES, theme, str(board_size), image+'.jpg')
 
     
     def calculate_position(self):
@@ -120,7 +113,7 @@ class Card(Label):
                 (ey==py and ex==px+1) or (ey==py and ex==px-1):
                     empty.position, self.position = self.position, empty.position
                     self.parent.parent.parent.play('move2')
-                    self.parent.movimientos += 1
+                    self.parent.moves += 1
             self.parent.end_of_game()
     
 

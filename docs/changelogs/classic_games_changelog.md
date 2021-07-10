@@ -14,11 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Help button for each of the games, pointing to the game instructions (iss. #78)
 - Limit the maximum speed of the ball in game pong (iss. #79)
+- Audio message when clicking on exit
 
 
 ### Changed
 - Icon and splash screen
 - Order of the games in the main menu, side menu and settings, to be aligned with the order they were created.
+- Level progress bar: changed to an MD widget, more aligned with theme.
 
 
 ### Removed

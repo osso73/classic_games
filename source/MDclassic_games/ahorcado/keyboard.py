@@ -75,7 +75,8 @@ class Keyboard(MDGridLayout):
     def change_keyboard(self, keyboard_skin):
         '''
         Change the skin of the keyboard. Skins are a string formed by word
-        teclado plus a number, from 1 to 6.
+        keyboard plus a number, from 1 to 6.
+        
         '''
 
         # self.skin = keyboard_skin
@@ -86,9 +87,8 @@ class Keyboard(MDGridLayout):
 
 
     def reset_keyboard(self):
-        '''
-        Reset all keys, putting their disabled attribute to False.
-        '''
+        '''Reset all keys, putting their disabled attribute to False.'''
+        
         for key in self.children:
             key.disabled = False
 
@@ -101,6 +101,7 @@ class Keyboard(MDGridLayout):
         ----------
         letter : string (char)
             Key to be pulsed
+            
         '''
         for key in self.children:
             if key.letter == letter:

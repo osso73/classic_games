@@ -104,9 +104,8 @@ class PongBoard(Widget):
 
     
     def __init__(self, *args, **kwargs):
-        '''
-        Trigger the clock event every 60th of sec.
-        '''
+        '''Trigger the clock event every 60th of sec.'''
+        
         super(PongBoard, self).__init__(*args, **kwargs)
         Clock.schedule_interval(self.update, 1.0/60.0)
         app = App.get_running_app()
@@ -118,6 +117,7 @@ class PongBoard(Widget):
     def serve_ball(self, vel=0):
         '''
         Start the point: start the ball from the center, and sets the velocity.
+        
         '''
         vel = (self.initial_vel, 0) if vel==0 else (vel, 0)
         self.ball.center = self.center
@@ -125,9 +125,8 @@ class PongBoard(Widget):
     
     
     def on_touch_move(self, touch):
-        '''
-        Move the player based on the touch on the screen.
-        '''
+        '''Move the player based on the touch on the screen.'''
+        
         if touch.y < self.top:
             if touch.x < self.width / 3:
                 self.player1.center_y = touch.y
@@ -136,9 +135,8 @@ class PongBoard(Widget):
 
     
     def start_game(self, *args):
-        '''
-        Start the game: reset scores, and serve the ball
-        '''
+        '''Start the game: reset scores, and serve the ball'''
+        
         self.active = True
         self.player1.score = 0
         self.player2.score = 0
@@ -150,6 +148,7 @@ class PongBoard(Widget):
         This is the function that runs 60 times per second. It moves the ball,
         checks the bouncing from walls or paddles and adjust velocity. Also
         checks the score and if it's end of game.
+        
         '''
         if not self.active:
             return
@@ -177,9 +176,8 @@ class PongBoard(Widget):
 
     
     def end_game(self):
-        '''
-        Show popup to indicate who wins, and reset active flag to False.
-        '''
+        '''Show popup to indicate who wins, and reset active flag to False.'''
+        
         self.active = False
         num = 1 if self.player1.score >= 5 else 2
         
@@ -187,6 +185,8 @@ class PongBoard(Widget):
 
 
     def pause_button(self, button):
+        '''When clicking pause button, toogle active attribute.'''
+        
         self.active = not self.active
         button.icon = 'pause' if self.active else 'play'
 
@@ -195,6 +195,7 @@ class PongBoard(Widget):
         '''
         Change the skin: it sets the skin provided to the ball, 
         and each player.
+        
         '''        
         self.ball.update_skin(skin)
         self.player1.update_skin(skin)

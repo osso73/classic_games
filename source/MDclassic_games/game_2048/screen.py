@@ -112,7 +112,15 @@ Builder.load_string(
 
 
 class Screen2048(MDScreen):
+    '''
+    This is the main screen, to organize the menu and the board area. Almost
+    no logic here, as everything is happening on the Board class. Only
+    handles the help button.
+    
+    '''  
     def help_button(self, button):
+        '''Open web-browser with the help page of the game'''
+        
         webbrowser.open(G2048.URL_HELP)
 
 

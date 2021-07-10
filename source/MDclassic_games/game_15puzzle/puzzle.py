@@ -22,7 +22,7 @@ from kivymd.app import MDApp
 
 # my app imports
 import game_15puzzle.constants as FIFTEEN
-from game_15puzzle.card import Card
+from game_15puzzle.card import Card15
 
 
 
@@ -93,7 +93,7 @@ class Puzzle(RelativeLayout):
         n = 0
         for i in range(self.board_size):
             for j in range(self.board_size):
-                self.add_widget(Card(name=str(title[n]), lado=card_size, 
+                self.add_widget(Card15(name=str(title[n]), card_size=card_size, 
                                       board_size=self.board_size,
                                       size=(card_size-FIFTEEN.SPACING, 
                                             card_size-FIFTEEN.SPACING),
@@ -101,7 +101,7 @@ class Puzzle(RelativeLayout):
                                       position=(j, i)))
                 n += 1
         # load theme
-        self.parent.parent.ids.muestra.load_theme()
+        self.parent.parent.ids.sample.load_theme()
 
 
     def find_empty(self):

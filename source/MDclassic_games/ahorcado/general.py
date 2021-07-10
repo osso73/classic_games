@@ -24,6 +24,7 @@ def replace_letter(string, pos, letter):
     -------
     string:
         the new string with the character replaced
+        
     '''
     if pos > len(string):
         raise IndexError(f"pos > len(string) --> {pos} > {len(string)}")

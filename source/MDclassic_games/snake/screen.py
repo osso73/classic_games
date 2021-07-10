@@ -53,12 +53,11 @@ Builder.load_string(
                 text: 'Level: ' + str(game.num_level)
                 font_style: 'H5'
                 halign: 'center'
-                canvas.before:
-                    Color:
-                        rgba: app.theme_cls.bg_normal
-                    Rectangle:
-                        size: self.width * root.level_progress_bar, self.height
-                        pos: self.pos
+
+        MDProgressBar:
+            value: 100 * game.level_progress_bar
+            size_hint_y: None
+            height: '1dp'
         
         GridLayout:
             cols: 3
@@ -85,16 +84,7 @@ class ScreenSnake(MDScreen):
     no logic here, as everything is happening on the GameBoard class. Only
     handles the settings changes for snake.
     
-    Attributes
-    ----------
-    level_progress_bar : NumericProperty
-        Used to show the progress inside one level. This is updated according
-        to the level.score.
-    '''
-    
-    level_progress_bar = NumericProperty(0)
-
-    
+    '''  
     def config_change(self, config, section, key, value):
         if key == 'speed':
             self.ids.game.speed_factor = float(value)
