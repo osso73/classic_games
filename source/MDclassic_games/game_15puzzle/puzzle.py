@@ -76,7 +76,7 @@ class Puzzle(RelativeLayout):
         self.parent.parent.play('start')
         self.clear_widgets()
         app = MDApp.get_running_app()
-        self.board_size = app.root.ids.fifteen.ids.sample.board_size
+        self.board_size = app.sm.get_screen('fifteen').ids.sample.board_size
         self.moves = 0
         
         # create list of tiles. Each tile has a number, so its order can be

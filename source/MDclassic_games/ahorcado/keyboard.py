@@ -36,7 +36,7 @@ Builder.load_string(
     md_bg_color: 0, 0, 0, 1
 
 <Key>:
-    on_press: if not self.disabled: self.play()
+    on_press: if not self.disabled: self.parent.parent.parent.play('key')
     on_release: self.push()
     canvas:
         Color:
@@ -139,11 +139,6 @@ class Key(Button):
 
         '''
         app = MDApp.get_running_app()
-        app.root.ids.ahorcado.check_letter(self.letter)
+        app.sm.get_screen('ahorcado').check_letter(self.letter)
         self.disabled = True
 
-
-    def play(self):
-        app = MDApp.get_running_app()
-        if not app.root.ids.ahorcado.mute:
-            app.play('key')

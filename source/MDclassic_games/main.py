@@ -18,6 +18,7 @@ from kivy.uix.settings import SettingsWithSpinner
 from kivy.utils import platform
 from kivy.lang import Builder
 
+from kivymd.uix.snackbar import Snackbar
 
 # my app imports
 from drawer import MyDrawer
@@ -38,7 +39,7 @@ __version__ = '1.1'
 KV = r"""
 
 Screen:
-
+    
     MDNavigationLayout:
 
         ScreenManager:
@@ -46,34 +47,17 @@ Screen:
             
             Menu:
                 id: menu
-
-            ScreenSnake:
-                id: snake
-
-            ScreenAhorcado:
-                id: ahorcado
-
-            ScreenBuscaminas:
-                id: buscaminas
-            
-            Screen15Puzzle:
-                id: fifteen
-
-            Screen2048:
-                id: 2048
-
-            ScreenMemory:
-                id: memory
-            
-            ScreenPong:
-                id: pong
-            
         
         MyDrawer:
             id: my_drawer
             
-            on_screen:
-                screen_manager.current = self.screen
+            on_screen: app.change_screen(self.screen)
+                    
+
+<TempMsg>:
+    size_hint_x: 0.5
+    pos_hint: {"center_x": .5, "bottom": 1}
+
 
 """
 
@@ -103,6 +87,7 @@ class MainApp(MDApp):
     
     def on_start(self):
         self.sounds = self.load_sounds()
+        self.sm = self.root.ids.screen_manager
         
 
     def build_config(self, config):
@@ -151,19 +136,19 @@ class MainApp(MDApp):
     def on_config_change(self, config, section, key, value):
 
         if section == 'Snake':
-            self.root.ids.snake.config_change(config, section, key, value)
+            self.sm.get_screen('snake').config_change(config, section, key, value)
         
         elif section == 'Ahorcado':
-            self.root.ids.ahorcado.config_change(config, section, key, value)
+            self.sm.get_screen('ahorcado').config_change(config, section, key, value)
         
         elif section == 'fifteen':
-            self.root.ids.fifteen.config_change(config, section, key, value)
+            self.sm.get_screen('fifteen').config_change(config, section, key, value)
         
         elif section == 'Memory':
-            self.root.ids.memory.config_change(config, section, key, value)
+            self.sm.get_screen('memory').config_change(config, section, key, value)
         
         elif section == 'Pong':
-            self.root.ids.pong.config_change(config, section, key, value)
+            self.sm.get_screen('pong').config_change(config, section, key, value)
         
 
     def load_sounds(self):
@@ -204,7 +189,38 @@ class MainApp(MDApp):
             self.sounds[sound_name].play()
         else:
             raise Exception("Bad sound")
+        
+    
+    def change_screen(self, new_screen):
+        
+        if not self.sm.has_screen(new_screen):
+            if new_screen == 'pong':
+                TempMsg(text='Loading pong...').open()
+                self.sm.switch_to(ScreenPong())
+            elif new_screen == 'ahorcado':
+                TempMsg(text='Loading ahorcado...').open()
+                self.sm.add_widget(ScreenAhorcado())
+            elif new_screen == 'memory':
+                TempMsg(text='Loading memory...').open()
+                self.sm.add_widget(ScreenMemory())
+            elif new_screen == 'fifteen':
+                TempMsg(text='Loading 15 puzzle...').open()
+                self.sm.add_widget(Screen15Puzzle())
+            elif new_screen == '2048':
+                TempMsg(text='Loading 2048...').open()
+                self.sm.add_widget(Screen2048())
+            elif new_screen == 'buscaminas':
+                TempMsg(text='Loading buscaminas...').open()
+                self.sm.add_widget(ScreenBuscaminas())
+            elif new_screen == 'snake':
+                TempMsg(text='Loading snake...').open()
+                self.sm.add_widget(ScreenSnake())
+        
+        self.sm.current = new_screen
 
+
+class TempMsg(Snackbar):
+    pass
 
 
 if __name__ == '__main__':

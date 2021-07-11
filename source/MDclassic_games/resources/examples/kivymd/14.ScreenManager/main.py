@@ -31,10 +31,10 @@ class DemoApp(MDApp):
         screen = Builder.load_string(screen_helper)
 
         # Create the screen manager
-        sm = ScreenManager()
-        sm.add_widget(MenuScreen(name='menu'))
-        sm.add_widget(ProfileScreen(name='profile'))
-        sm.add_widget(UploadScreen(name='upload'))
+        # sm = ScreenManager()
+        # sm.add_widget(MenuScreen(name='menu'))
+        # sm.add_widget(ProfileScreen(name='profile'))
+        # sm.add_widget(UploadScreen(name='upload'))
 
 
         return screen

@@ -68,8 +68,8 @@ class Card15(Label):
         super(Card15, self).__init__(**kwargs)
         self.pos = self.calculate_position()
         app = MDApp.get_running_app()
-        theme = app.root.ids.fifteen.ids.sample.theme
-        board_size = app.root.ids.fifteen.ids.sample.board_size
+        theme = app.sm.get_screen('fifteen').ids.sample.theme
+        board_size = app.sm.get_screen('fifteen').ids.sample.board_size
         image = self.name if self.name else str(board_size**2)        
         self.filename = os.path.join(FIFTEEN.THEMES, theme, str(board_size), image+'.jpg')
 

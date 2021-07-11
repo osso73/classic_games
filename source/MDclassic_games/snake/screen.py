@@ -56,7 +56,8 @@ Builder.load_string(
 
         MDProgressBar:
             value: 100 * game.level_progress_bar
-            size_hint_y: None
+            size_hint: 0.9, None
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
             height: '1dp'
         
         GridLayout:

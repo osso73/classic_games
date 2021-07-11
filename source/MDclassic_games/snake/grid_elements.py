@@ -27,8 +27,8 @@ Builder.load_string(
 #:set COLOUR_SNAKE [140/255, 198/255, 62/255, 1]
 
 <GridElement>:
-    size_pixels: app.root.ids.snake.ids.game.size_pixels
-    grid: app.root.ids.snake.ids.game.size_grid
+    size_pixels: app.sm.get_screen('snake').ids.game.size_pixels
+    grid: app.sm.get_screen('snake').ids.game.size_grid
     size: self.size_pixels, self.size_pixels
     colour: COLOUR_IMAGE
     canvas.before:

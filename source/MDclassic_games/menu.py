@@ -24,6 +24,7 @@ Builder.load_file('menu.kv')
 class Menu(MDScreen):
     pass
 
+
 class MyTile(SmartTileWithLabel):
     txt = StringProperty()
     screen = StringProperty()

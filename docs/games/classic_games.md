@@ -361,7 +361,7 @@ It is divided in three areas:
 
 - _top row_: it shows a toolbar with some buttons that will allow you different functions, described in section [Buttons in toolbar](#buttons-in-toolbar).
 
-- _results row_: display the score and the current level, with a progress bar on the level. When the progress bar reaches 100%, you move to the next level.
+- _results row_: display the score and the current level, and a progress bar below to show the progress of the current level. When the progress bar reaches 100%, you move to the next level.
 
 - _playing ground_: this is where the snake will run. Here you can see as well the current score of the game, which is the number of fruits you have eaten.
 
