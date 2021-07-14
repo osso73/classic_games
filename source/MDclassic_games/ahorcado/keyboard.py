@@ -105,7 +105,7 @@ class Keyboard(MDGridLayout):
         '''
         for key in self.children:
             if key.letter == letter:
-                key.play()
+                self.parent.parent.play('key')
                 key.push()
 
 
