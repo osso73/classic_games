@@ -15,6 +15,7 @@ A couple of bug fixes that were left.
 ### Fixed
 - Hint button in ahorcado didn't work, made the app crash. Now this is fixed (iss. #83)
 - Help button in Snake didn't work, made the app crash. Now this is fixed (iss. #84)
+- Change settings before loading the game makes the app crash (iss. #85)
 
 
 ## v1.1 - 2021-07-11

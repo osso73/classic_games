@@ -136,18 +136,28 @@ class MainApp(MDApp):
     def on_config_change(self, config, section, key, value):
 
         if section == 'Snake':
+            if not self.sm.has_screen('snake'):
+                self.sm.add_widget(ScreenSnake())
             self.sm.get_screen('snake').config_change(config, section, key, value)
         
         elif section == 'Ahorcado':
+            if not self.sm.has_screen('ahorcado'):
+                self.sm.add_widget(ScreenAhorcado())
             self.sm.get_screen('ahorcado').config_change(config, section, key, value)
         
         elif section == 'fifteen':
+            if not self.sm.has_screen('fifteen'):
+                self.sm.add_widget(Screen15Puzzle())
             self.sm.get_screen('fifteen').config_change(config, section, key, value)
         
         elif section == 'Memory':
+            if not self.sm.has_screen('memory'):
+                self.sm.add_widget(ScreenMemory())
             self.sm.get_screen('memory').config_change(config, section, key, value)
         
         elif section == 'Pong':
+            if not self.sm.has_screen('pong'):
+                self.sm.add_widget(ScreenPong())
             self.sm.get_screen('pong').config_change(config, section, key, value)
         
 
