@@ -1,0 +1,1 @@
+I've created changelogs for each of the games separately. All changlogs are kept under the folder [changelogs](https://github.com/osso73/classic_games/tree/main/docs/changelogs), as part of the documentation of the program.

@@ -109,4 +109,4 @@ class ScreenSnake(MDScreen):
 
 
     def help_button(self, button):
-        webbrowser.open(SNAKE.URL_HELPL)
+        webbrowser.open(SNAKE.URL_HELP)

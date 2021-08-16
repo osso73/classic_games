@@ -2,16 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. Each version has its corresponding apk under the folder `releases`.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. I add a letter in the case I create a new version fixing only bugs.
+
+Each version has its corresponding apk under the folder `releases`.
 
 
-## Unreleased
+## v1.2 -  2021-08-01
+
+A couple of bug fixes that were left.
+
 
 ### Fixed
 - Hint button in ahorcado didn't work, made the app crash. Now this is fixed (iss. #83)
+- Help button in Snake didn't work, made the app crash. Now this is fixed (iss. #84)
 
 
-## [v1.1] 2021-07-11
+## v1.1 - 2021-07-11
+
+Some bug fixes, and recoding of the games to a single app.
+
 
 ### Fixed
 - Sample picture for 15puzzle was too separated (iss. #70). Now fixed.
@@ -35,7 +44,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
-## [v1.0] 2021-06-13
+## v1.0 - 2021-06-13
+
+Initial versión of the game, with all the individual games integrated and basic navigation functionality.
+
 
 ### Added
 - Spash screen, as per iss. #71.
@@ -51,7 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Hint button in ahorcado, if clicked when game is not happening, it hanged the game. Now this is fixed, as per iss. #75.
 
 
-## [v0.7] 2021-06-12
+## v0.7 - 2021-06-12
 
 ### Added
 - Game of Buscaminas implemented.
@@ -60,14 +72,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
-## [v0.6] 2021-06-12
+## v0.6 - 2021-06-12
 
 ### Added
 - Game of Pong implemented. Still using some elements from kivy.
 - Added settings for Pong
 
 
-## [v0.5] 2021-06-06
+## v0.5 - 2021-06-06
 
 ### Added
 - Game of Memory implemented. Still using some elements from kivy.
@@ -75,14 +87,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added mute button for Memory
 
 
-## [v0.4] 2021-06-04
+## v0.4 - 2021-06-04
 
 ### Added
 - Game of 2048 implemented. Still using some elements from kivy.
 - Added mute button for 2048
 
 
-## [v0.3] 2021-05-29
+## v0.3 - 2021-05-29
 
 ### Added:
 - Game of 15 puzzle implemented. Still using many elements from kivy.
@@ -90,7 +102,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Settings for 15 puzzle.
 
 
-## [v0.2] 2021-05-26
+## v0.2 - 2021-05-26
 
 ### Changed
 - Appearance: order of the menu to show snake, ahorcado first, and settings panels.
@@ -101,7 +113,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Settings for ahorcado.
 
 
-## [v0.1] 2021-05-23
+## v0.1 - 2021-05-23
 
 Initial version of the app. It includes the main menu with the navigation and the snake game with the settings. All the other games are not yet implemented.
 

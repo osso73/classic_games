@@ -33,18 +33,24 @@ Builder.load_string(
     rows: 3
     padding: '5dp'
     spacing: '5dp'
-    md_bg_color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: 0, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
 
 <Key>:
     on_press: if not self.disabled: self.parent.parent.parent.play('key')
     on_release: self.push()
-    canvas:
+    canvas.after:
         Color:
             rgba: [1, 1, 1, 0.2] if self.disabled else COLOUR_IMAGE
         Rectangle:
             size: root.size
             pos: root.pos
-            # source: 'ahorcado/images/'+root.skin+'/' + root.filename + '.png'
             source: root.skin
 
 """)

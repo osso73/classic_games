@@ -2,7 +2,7 @@
 
 This is the game designed with [KivyMD](https://kivymd.readthedocs.io), consolidating all the other games in a single application, with a nice menu and navigation.
 
-These instructions are for version 0.1. You can find [here](../changelogs/classic_games_changelog.md) a changelog explaining the changes introduced in each version.
+These instructions are for version 1.2. You can find [here](../changelogs/classic_games_changelog.md) a changelog explaining the changes introduced in each version.
 
 ## Application navigation
 
