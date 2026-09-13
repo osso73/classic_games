@@ -79,6 +79,8 @@ Dependency policy: begin with `kivy==2.3.1` and `kivymd==1.2.0` as conservative 
 
 ## 5. Phase 2 — Desktop compatibility, then smoke validation
 
+Follow [the detailed Phase 2 runbook](mdclassic_games_phase2_desktop_plan.md). Complete its checkpoints in order: review and commit each checkpoint before starting the next; the test foundation precedes compatibility changes, and game fixes are handled one game at a time.
+
 Allowed edits: necessary runtime `.py`/`.kv` files inside the app, root test suite, pytest configuration, focused CI workflow, and validation notes. Change runtime dependencies only for a demonstrated incompatibility, updating the lock and version record together. Set up the test harness described in 2D before editing game rules; add regression tests alongside 2A/2B fixes, then complete 2D before this phase ends.
 
 ### 2A. Repair shell startup
