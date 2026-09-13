@@ -5,13 +5,16 @@ description = "Classic games built with Kivy/KivyMD"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "kivy==2.3.1",
-    "kivymd==1.2.0",
+    "kivymd==2.0.0",
     "materialyoucolor==3.0.4",
     "pillow==12.3.0",
 ]
 
 [tool.uv]
 package = false
+
+[tool.uv.sources]
+kivymd = { git = "https://github.com/kivymd/KivyMD.git", rev = "2d8a7b458897a01a400770e3bc10ebffd946b91d" }
 
 [dependency-groups]
 dev = [
