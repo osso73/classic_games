@@ -20,3 +20,10 @@ kivymd = { git = "https://github.com/kivymd/KivyMD.git", rev = "2d8a7b458897a01a
 dev = [
     "pytest==9.1.1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/mdclassic_games"]
+addopts = "--strict-markers"
+markers = [
+    "gui: requires a working Kivy display and OpenGL context",
+]
