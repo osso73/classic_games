@@ -32,7 +32,15 @@ Every checkpoint follows this sequence:
 5. Stop for user review. Summarize changed files, behavior, checks, and open decisions.
 6. Commit the fix, its tests, and its validation note together only after the user requests a commit.
 
-A passed checkpoint is not a passed Phase 2. Do not start a dependent checkpoint until its predecessor is reviewed and committed, except for the test foundation in checkpoint 2, which is a prerequisite for all later code changes.
+A passed checkpoint is not a passed Phase 2. Execute checkpoints in order and stop after each for review. The user may make the commit themselves; do not commit automatically. Confirm the reviewed changes are committed before proceeding. Checkpoint 2 establishes the test foundation before application compatibility changes in checkpoints 3-10.
+
+If manual testing requires the user's desktop, provide the exact launch directory, command, and exercise checklist, then record those checks as NOT RUN until the user supplies observations. Review approval or a commit alone is not evidence that a runtime check passed. A blocked checkpoint may have its diagnostic notes reviewed and committed, but remains blocked.
+
+For a new session, use this instruction (replace `N` with the checkpoint number):
+
+> Read the Phase 2 runbook, master plan, and validation record. Execute checkpoint N only. Preserve existing changes, run its checks, append the results and next exact action to the validation record, and stop for review. Do not commit or begin the next checkpoint.
+
+Keep the Phase 1 record intact. For each checkpoint record status, environment/version inventory, files changed, commands and working directories, automated counts, manual observations, first relevant failure/log location, and next exact action. Use PASS / FAIL / NOT RUN for individual checks. Review both tracked diffs and new files before handoff; keep logs and generated output outside tracked source.
 
 ## Checkpoint 1 - Repair the KivyMD resource installation
 
@@ -61,11 +69,15 @@ uv run --locked python -c "from importlib.metadata import distribution; d = dist
 Then:
 
 1. Inspect the exact KivyMD source archive and hash selected in `uv.lock`.
-2. Compare the archive resource inventory, package build configuration, and installed distribution manifest.
+2. Compare the archive resource inventory, package build configuration, and installed distribution manifest. Check Python source as well as resources against the intended release: a metadata version of `1.2.0` alone does not prove the installed source is consistent with that release. Do not migrate against a mixed or stale installation.
 3. Reproduce the locked installation in an isolated temporary environment.
 4. Identify whether the omission is local installation damage, a source-distribution packaging defect, or a build/install defect.
 5. Select the smallest reproducible remedy supported by evidence. Any dependency-source change must be immutable, declared in project metadata, locked, and recorded.
-6. Verify the remedy from a fresh environment. Do not accept manually copying files into `.venv`.
+6. Verify the remedy from a fresh environment, accounting for cached built wheels when diagnosing a build defect. Record the artifact hash, build inputs, and commands used; avoid deleting global caches as a generic remedy. Do not accept manually copying files into `.venv`.
+
+Record actual Python patch, uv, Kivy, KivyMD, Pillow, materialyoucolor, and pytest versions. After any dependency decision, regenerate the lock with uv, rerun locked sync and `uv pip check`, and update the inventory. Never edit `uv.lock` by hand. If no supported reproducible 1.2.0 remedy can be established, stop with the evidence and a proposed plan decision rather than silently changing the framework baseline.
+
+Attempt startup with working directory `source/MDclassic_games` using `uv run --locked python main.py`. Preserve `main.ini` before launch, record the first meaningful traceback and log location, and check for automatic config writes afterward.
 
 Classify results:
 
@@ -90,6 +102,7 @@ tests/mdclassic_games/
   conftest.py
   unit/
   integration/
+    conftest.py
 ```
 
 Add this root configuration to `pyproject.toml`:
@@ -107,13 +120,16 @@ Requirements:
 
 - Resolve the app directory relative to test files, never the invoking directory.
 - Ensure imports target only `source/MDclassic_games`, not standalone or vendored modules with overlapping names.
-- Keep root conftest and unit tests free of Kivy/application imports.
+- Keep shared conftest and unit tests free of Kivy and GUI-dependent application imports. Unit tests may import genuinely pure application helpers, such as `ahorcado.general`, after checking that their package initialization also has no GUI side effects.
 - Defer Kivy and application imports in GUI tests until a GUI fixture or test executes.
 - Isolate writable Kivy home/log/config state with `tmp_path` and environment variables set before importing Kivy.
 - Redirect the app's actual config file to temporary storage and assert that tracked `main.ini` is unchanged.
 - Use the app directory as the GUI-test working directory.
 - Clean scheduled Clock events, Window bindings, widgets, and app state between tests. Use finite-timeout subprocess isolation when in-process cleanup is not reliable.
 - Make random choices deterministic at their production lookup point; advance scheduled callbacks deliberately rather than sleeping.
+- Mark every display-dependent test `gui`. Do not set a default marker expression that excludes these tests from the full suite, or globally replace Kivy with dummy classes. Registering a marker does not itself apply it to tests.
+
+Use one behavior-test module per game, normally in `integration/` because current rules are widget-bound. Test real production methods and observable state. Small behavior-preserving pure-helper extractions are allowed only when needed, characterized before extraction, and used by production callers; do not build a parallel rules engine for tests.
 
 Start with meaningful display-independent tests, such as resource presence and Ahorcado's `replace_letter` helper. Do not make a placeholder or zero-test suite the gate.
 
@@ -125,11 +141,13 @@ uv run --locked --group dev pytest tests/mdclassic_games/unit
 
 ### Gate
 
-Nonzero unit tests collect and pass without a display, GUI imports are not initialized by unit collection, and tracked configuration remains untouched.
+Nonzero unit tests collect and pass without a display, GUI imports are not initialized by unit collection, and tracked configuration remains untouched. Establish the fixture structure here; actual app lifecycle/config-isolation checks become executable with the shell in checkpoint 3 and must pass there. Do not claim an unexercised fixture proves isolation.
 
 ## Checkpoint 3 - Repair shell startup
 
 Use the first startup traceback after checkpoint 1 and the verified installed KivyMD 1.2.0 source. Make one coherent fix at a time.
+
+`main.py` imports all game screen modules eagerly even though it constructs screens lazily. If a game-module import or KV registration blocks shell startup, a minimal import/API repair belongs here; record that cross-game change and defer gameplay verification to its game checkpoint. Do not disable game imports or substitute fake screens to obtain a passing shell.
 
 | Files | Work | Verify |
 | --- | --- | --- |
@@ -151,23 +169,25 @@ Add real-widget shell regression tests as the shell becomes available.
 
 ### Gate
 
-The menu renders with seven visible tiles; tile and drawer navigation, drawer open/close, About, and Help work. Record remaining lazy game-screen tracebacks for the appropriate game checkpoint.
+The real menu renders with seven visible tiles; drawer open/close, About, and Help work. Shell integration tests exercise available shell behavior and verify temporary config isolation. Verify tile/drawer route declarations and attempt their events, recording lazy game-construction failures for checkpoints 4-10. Successful entry into every game is required at those checkpoints and checkpoint 11, not at this shell gate. Capture observations of loading messages where entry can proceed; do not count a failed game entry as a successful navigation test.
 
 ## Checkpoints 4-10 - Repair one game at a time
 
 Complete each row independently: implement only its compatibility fix, add its deterministic tests, run its checks, perform its desktop manual exercise, update the validation record, stop for review, and commit before advancing.
 
-| Checkpoint | Game folder / screen ID | Required automated behavior | Required desktop exercise |
+| Checkpoint | Game / screen ID | Required automated behavior | Required desktop exercise |
 | --- | --- | --- | --- |
 | 4 | Pong / `pong` | Paddle/wall collisions, exit scoring, serve/reset, speed limits using explicit updates | Start/restart, pause/resume, paddle control, ball/score, skin and speed settings |
-| 5 | Ahorcado / `ahorcado` | Fixed-word correct/wrong/repeated input, win/loss, Spanish characters | New word, letters, keyboard/man settings, word/image display |
-| 6 | Memory / `memory` | Pairs, match stays revealed, mismatch hides after scheduled resolution, completion | Matching/nonmatching pair, restart, size/theme, cartoons ICO images |
+| 5 | Ahorcado / `ahorcado` | Fixed-word correct input reveals all occurrences; wrong/repeated input, win/loss, Spanish characters | New word, letters, keyboard/man settings, word/image display |
+| 6 | Memory / `memory` | Pairs, match stays revealed, mismatch hides after scheduled resolution, resolved cards do not count as new matches, completion | Matching/nonmatching pair, restart, size/theme, cartoons ICO images |
 | 7 | 15 puzzle / `fifteen` | Legal/illegal moves, solved state, shuffle preserves tiles and existing solvability | Move, shuffle/restart, size/theme, reference image |
 | 8 | 2048 / `2048` | Four directions, one merge per tile, score, no-op, undo; control spawning | Direction buttons, merge/score, undo, target-score control, restart |
 | 9 | Buscaminas / `buscaminas` | Fixed-layout counts including edges, flood reveal, flags, mine/cleared outcome | New board, reveal, flag control, outcome popup if reachable |
 | 10 | Snake / `snake` | Movement, eating/growth/score, food update, relevant collisions, restart | Start, turn, eat, collision/game-over, restart, speed/size/mode |
 
 For 2048, cover the pre-spawn case `[2, 2, 2, 2]` moving left becoming `[4, 4, 0, 0]`.
+
+Folder names are lowercase game names except 15 puzzle (`game_15puzzle`) and 2048 (`game_2048`). Their screen IDs are respectively `fifteen` and `2048`. In Buscaminas include corner counts and flag/reveal interaction; in 2048 verify undo restores both board and score.
 
 For Memory, 15 puzzle, and 2048, inspect actual `MDChip` properties/events before modifying their KV. Preserve displayed values, callbacks, and live bindings; do not substitute static labels for interactive controls.
 
@@ -177,10 +197,12 @@ For every game:
 2. Exercise the listed controls.
 3. Return through the drawer, then reopen through the drawer.
 4. Confirm an existing screen is reused and no duplicate update behavior appears.
-5. Exercise relevant settings before and after lazy screen creation.
+5. On a fresh launch, change a relevant setting before opening its game and verify the lazily created screen; repeat after opening the game. Preserve section names and defaults.
 6. Run affected unit or GUI tests.
 
-Do not silently change a pre-existing gameplay rule to satisfy a new test. Record the observed and intended behavior for review instead. Required scenarios cannot be satisfied by a skip or non-strict `xfail`.
+Do not silently change a pre-existing gameplay rule to satisfy a new test. Record the observed and intended behavior for review instead. Any temporary `xfail` must be strict, narrowly targeted, and linked to a documented issue. Required scenarios cannot be satisfied by skips or any `xfail`, including strict ones.
+
+Run affected tests after each fix. After a shared shell, fixture, or dependency change, also run the established suite for previously completed checkpoints. Later tests not yet written are not passing results. If a game needs no compatibility edit, its tests and recorded manual checks still form its checkpoint deliverable.
 
 ## Checkpoint 11 - Complete cross-app regressions and CI
 
@@ -194,6 +216,8 @@ Complete test coverage for:
 - Representative GIF and ICO decoding through the real runtime provider, including Memory cartoons.
 - Help URL and requested sound playback through stubs while retaining real provider/asset-loading checks where supported.
 
+Audit existing package extension/exclusion rules in resource tests, but defer the known ICO-inclusion assertion until Phase 3 changes `buildozer.spec`. Record this handoff explicitly; do not make Phase 2 tests require an out-of-scope Android spec edit.
+
 Add `.github/workflows/mdclassic-games-tests.yml`, triggered by push and pull request, with explicit Python 3.11 and recorded uv version. It needs:
 
 | Job | Command |
@@ -201,7 +225,7 @@ Add `.github/workflows/mdclassic-games-tests.yml`, triggered by push and pull re
 | Unit | `uv run --locked --group dev pytest tests/mdclassic_games/unit` |
 | GUI | `xvfb-run -a uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` |
 
-The GUI job must document the verified Linux SDL/OpenGL/software-rendering prerequisites, set a finite timeout, and preserve failure logs. Xvfb is a display server, not proof that required GL/audio providers work. Missing providers are failures/blockers, not passing skips.
+Both jobs must use an explicit runner image and run `uv sync --locked --group dev` before testing. The GUI job must document the verified Linux SDL/OpenGL/software-rendering prerequisites, set a finite timeout, and preserve failure logs. Xvfb is a display server, not proof that required GL/audio providers work. Missing required providers are failures/blockers, not passing skips. Automated interaction tests may stub audible playback as described above; CI does not verify audible output.
 
 Run from repository root:
 
@@ -213,11 +237,11 @@ uv run --locked --group dev pytest
 
 ### Gate
 
-Both test layers collect nonzero tests and pass. All game scenarios in checkpoints 4-10 are covered. Settings and state isolation work. CI is passing, or remote execution is explicitly recorded as pending rather than claimed as passing.
+Both test layers collect nonzero tests and pass. All game scenarios in checkpoints 4-10 are covered. Settings and state isolation work without execution-order dependence. If remote CI execution is unavailable, record local verification separately and leave remote acceptance pending. Checkpoint 12's manual checks may still proceed, but pending CI is not a completed Phase 2 gate.
 
 ## Checkpoint 12 - Desktop acceptance and Phase 2 handoff
 
-Run the complete suite from repository root with a real display, GL context, and audio output:
+Run the complete suite from repository root with the established display/GL test environment (the verified Xvfb setup is acceptable for automation):
 
 ```bash
 uv run --locked --group dev pytest
@@ -225,7 +249,9 @@ uv run --locked --group dev pytest
 
 Record collection and passed/failed/skipped/xfail counts.
 
-Then launch from `source/MDclassic_games`:
+Reuse checkpoint 11's full-suite result if code, dependencies, configuration, fixtures, and test environment are unchanged; cite that result explicitly. Rerun after a fix or changed input rather than repeating an identical suite merely for the checkpoint boundary.
+
+For manual acceptance use a real interactive display, GL context, and audible output. Launch from `source/MDclassic_games`:
 
 ```bash
 uv run --locked python main.py
@@ -256,7 +282,7 @@ git diff --stat
 - [ ] Shell, seven games, controls, settings, sounds, and resources pass desktop acceptance.
 - [ ] Unit and GUI suites collect meaningful tests and pass.
 - [ ] Tests preserve tracked configuration and isolate state.
-- [ ] Focused CI passes, or its remote status is honestly pending.
+- [ ] Focused CI passes. If remote execution is unavailable, record it as pending and keep Phase 2 acceptance partial.
 - [ ] Validation record contains commands, counts, observations, failures, decisions, and the next action.
 - [ ] Review and commit Phase 2 as the final checkpoint.
 
