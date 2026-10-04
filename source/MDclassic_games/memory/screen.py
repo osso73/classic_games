@@ -14,6 +14,13 @@ import webbrowser
 from kivy.lang import Builder
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 
 # my app imports
@@ -32,11 +39,25 @@ Builder.load_string(
     BoxLayout:
         orientation: 'vertical'
     
-        MDToolbar:
-            title: 'Memory'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", mat_area.start_game], ["volume-high", mat_area.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Memory'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: mat_area.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: mat_area.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         MDBoxLayout:
             orientation: 'horizontal'

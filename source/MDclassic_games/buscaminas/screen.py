@@ -13,6 +13,13 @@ import webbrowser
 from kivy.lang import Builder
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 # my app imports
 from buscaminas.indicator import Indicator
@@ -30,12 +37,32 @@ Builder.load_string(
     BoxLayout:
         orientation: 'vertical'
     
-        MDToolbar:
+        MDTopAppBar:
             id: toolbar
-            title: 'Buscaminas'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", field.start_game], ['bomb', field.entry_mode], ['numeric-1-box', field.set_level], ['volume-high', field.mute_button], ["help-circle-outline", root.help_button]]
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Buscaminas'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: field.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'bomb'
+                    on_release: field.entry_mode()
+                MDActionTopAppBarButton:
+                    icon: 'numeric-1-box'
+                    on_release: field.set_level()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: field.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
 
         MDBoxLayout:

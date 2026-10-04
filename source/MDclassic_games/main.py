@@ -8,7 +8,11 @@ This is a temporary script file.
 
 # std libraries
 import os
+import sys
 
+# Kivy's bundled SDL mixer deadlocks through this host's PulseAudio bridge.
+if sys.platform.startswith('linux'):
+    os.environ.setdefault('SDL_AUDIODRIVER', 'alsa')
 
 # non-std libraries
 from kivymd.app import MDApp
@@ -17,8 +21,9 @@ from kivy.core.audio import SoundLoader
 from kivy.uix.settings import SettingsWithSpinner
 from kivy.utils import platform
 from kivy.lang import Builder
+from kivy.clock import Clock
 
-from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 
 # my app imports
 from drawer import MyDrawer
@@ -77,17 +82,18 @@ class MainApp(MDApp):
     version = __version__
     
     def build(self):
+        self.sounds = {}
         screen = Builder.load_string(KV)
         self.icon = 'images/icon.png'
-        self.theme_cls.primary_palette = 'DeepPurple'
+        self.theme_cls.primary_palette = '#673AB7'
         self.settings_cls = SettingsWithSpinner
         self.use_kivy_settings = False
         return screen
     
     
     def on_start(self):
-        self.sounds = self.load_sounds()
         self.sm = self.root.ids.screen_manager
+        Clock.schedule_once(self.load_sounds)
         
 
     def build_config(self, config):
@@ -161,7 +167,7 @@ class MainApp(MDApp):
             self.sm.get_screen('pong').config_change(config, section, key, value)
         
 
-    def load_sounds(self):
+    def load_sounds(self, *args):
         '''
         Load all sounds of the game, and put them into the dictionary.
 
@@ -176,6 +182,7 @@ class MainApp(MDApp):
         for s in soundlist:
             sound[s] = SoundLoader.load(os.path.join(folder, s))
 
+        self.sounds = sound
         return sound
 
 
@@ -229,8 +236,15 @@ class MainApp(MDApp):
         self.sm.current = new_screen
 
 
-class TempMsg(Snackbar):
-    pass
+class TempMsg(MDSnackbar):
+    def init_fbos(self):
+        # Loading messages have no interactive ripple, avoiding KivyMD's invalid FBO.
+        pass
+
+    def __init__(self, text, **kwargs):
+        kwargs.setdefault('size_hint_y', None)
+        kwargs.setdefault('height', 48)
+        super().__init__(MDSnackbarText(text=text), **kwargs)
 
 
 if __name__ == '__main__':
@@ -238,4 +252,3 @@ if __name__ == '__main__':
         Window.size = (400, 750)
     
     MainApp().run()
-

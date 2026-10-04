@@ -14,6 +14,13 @@ import webbrowser
 from kivy.lang import Builder
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 
 # my app imports
@@ -33,11 +40,25 @@ Builder.load_string(
     BoxLayout:
         orientation: 'vertical'
     
-        MDToolbar:
-            title: 'Pong'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", pong.start_game], ["pause", pong.pause_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Pong'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: pong.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'pause'
+                    on_release: pong.pause_button()
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         PongBoard:
             id: pong

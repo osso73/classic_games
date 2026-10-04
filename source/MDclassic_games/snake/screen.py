@@ -15,6 +15,13 @@ from kivy.lang import Builder
 from kivy.properties import NumericProperty
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 # my app imports
 from snake.gameboard import GameBoard
@@ -32,11 +39,28 @@ Builder.load_string(
         spacing: '10dp'
         md_bg_color: app.theme_cls.primary_light
     
-        MDToolbar:
-            title: 'Snake'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", game.start_game], ["pause", game.pause_button], ["volume-high", game.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Snake'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: game.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'pause'
+                    on_release: game.pause_button()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: game.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         BoxLayout:
             orientation: 'horizontal'

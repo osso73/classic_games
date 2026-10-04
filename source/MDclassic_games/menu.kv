@@ -2,7 +2,19 @@
     size_hint_y: None
     height: self.width
     on_release: app.root.ids.my_drawer.screen = root.screen
-    text: '[size=18]' + self.txt
+
+    MDSmartTileImage:
+        source: root.source
+
+    MDSmartTileOverlayContainer:
+        adaptive_height: True
+        padding: '8dp'
+        md_bg_color: 0, 0, 0, .5
+
+        MDLabel:
+            text: root.txt
+            theme_text_color: 'Custom'
+            text_color: 1, 1, 1, 1
     
     
 <Menu>:
@@ -11,10 +23,14 @@
     BoxLayout:
         orientation: 'vertical'
     
-        MDToolbar:
-            title: 'Classic Games'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Classic Games'
             
         ScrollView:
         
@@ -58,4 +74,3 @@
                     txt: 'snake'
                     source: 'snake/images/icon.png'
                     screen: 'snake'
-    

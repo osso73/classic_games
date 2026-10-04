@@ -18,6 +18,13 @@ from kivy.properties import NumericProperty, ObjectProperty, StringProperty, Boo
 from kivy.app import App
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 # my app imports
 from ahorcado.drawing import Drawing
@@ -44,11 +51,28 @@ Builder.load_string(
     BoxLayout:
         orientation: 'vertical'
 
-        MDToolbar:
-            title: 'Ahorcado'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", root.start_game], ["help", root.give_hint], ["volume-high", root.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Ahorcado'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: root.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'help'
+                    on_release: root.give_hint()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: root.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
 
         BoxLayout:
             orientation: 'horizontal'

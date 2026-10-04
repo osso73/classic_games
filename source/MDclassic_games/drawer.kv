@@ -3,7 +3,7 @@
 <MyDrawer>:
     screen: 'menu'
     enable_swiping: False
-    
+
     BoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
@@ -17,12 +17,13 @@
         MDLabel:
             text: 'Classic games'
             halign: 'center'
-            font_style: 'H5'
+            font_style: 'Headline'
+            role: 'small'
             size_hint_y: None
             height: self.texture_size[1]
             font_name: 'fonts/magnetob'
             theme_text_color: 'Custom'
-            text_color: app.theme_cls.primary_color
+            text_color: app.theme_cls.primaryColor
         
         Image:
             source: 'images/icon.png'
@@ -31,103 +32,114 @@
             
 
         MDList:
-            OneLineIconListItem:
-                text: 'Main menu'
+            MDListItem:
                 on_release:
                     root.set_state("close")
                     root.screen = 'menu'
-                IconLeftWidget:
+                MDListItemLeadingIcon:
                     icon: 'menu'
-                
-            OneLineIconListItem:
-                text: 'Settings'
+                MDListItemHeadlineText:
+                    text: 'Main menu'
+
+            MDListItem:
                 on_release:
                     root.set_state("close")
                     app.open_settings()
-                IconLeftWidget:
+                MDListItemLeadingIcon:
                     icon: 'cog'
-                
-            OneLineIconListItem:
-                text: 'Help'
+                MDListItemHeadlineText:
+                    text: 'Settings'
+
+            MDListItem:
                 on_release:
                     root.set_state("close")
                     root.open_help()
-                IconLeftWidget:
+                MDListItemLeadingIcon:
                     icon: 'help-circle-outline'
-                
-            OneLineIconListItem:
-                text: 'About'
+                MDListItemHeadlineText:
+                    text: 'Help'
+
+            MDListItem:
                 on_release:
                     root.set_state("close")
                     root.about()
-                IconLeftWidget:
+                MDListItemLeadingIcon:
                     icon: 'information-outline'
-                
-            OneLineIconListItem:
-                text: 'Exit'
-                on_release: 
+                MDListItemHeadlineText:
+                    text: 'About'
+
+            MDListItem:
+                on_release:
                     app.play('bye')
                     Clock.schedule_once(app.stop, 2)
-                IconLeftWidget:
+                MDListItemLeadingIcon:
                     icon: 'logout'
-        
+                MDListItemHeadlineText:
+                    text: 'Exit'
+
 
         
         ScrollView:
             MDList:
-                OneLineAvatarListItem:
-                    text: 'pong'
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'pong'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'pong/images/icon.jpg'
-                                        
-                OneLineAvatarListItem:
-                    text: 'ahorcado'
+                    MDListItemHeadlineText:
+                        text: 'pong'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'ahorcado'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'ahorcado/images/icon.jpg'
-                    
-                OneLineAvatarListItem:
-                    text: 'memory'
+                    MDListItemHeadlineText:
+                        text: 'ahorcado'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'memory'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'memory/images/icon.png'
-                    
-                OneLineAvatarListItem:
-                    text: '15 puzzle'
+                    MDListItemHeadlineText:
+                        text: 'memory'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'fifteen'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'game_15puzzle/images/icon.png'
-                    
-                OneLineAvatarListItem:
-                    text: '2048'
+                    MDListItemHeadlineText:
+                        text: '15 puzzle'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = '2048'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'game_2048/images/icon.png'
-                    
-                OneLineAvatarListItem:
-                    text: 'buscaminas'
+                    MDListItemHeadlineText:
+                        text: '2048'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'buscaminas'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'buscaminas/images/icon.png'
-             
-                OneLineAvatarListItem:
-                    text: 'snake'
+                    MDListItemHeadlineText:
+                        text: 'buscaminas'
+
+                MDListItem:
                     on_release:
                         root.set_state("close")
                         root.screen = 'snake'
-                    ImageLeftWidget:
+                    MDListItemLeadingAvatar:
                         source: 'snake/images/icon.png'
-                    
+                    MDListItemHeadlineText:
+                        text: 'snake'

@@ -11,7 +11,7 @@ This is a temporary script file.
 # non-std libraries
 from kivy.lang import Builder
 from kivy.properties import StringProperty
-from kivymd.uix.imagelist import SmartTileWithLabel
+from kivymd.uix.imagelist import MDSmartTile
 
 from kivymd.uix.screen import MDScreen
 
@@ -25,6 +25,7 @@ class Menu(MDScreen):
     pass
 
 
-class MyTile(SmartTileWithLabel):
+class MyTile(MDSmartTile):
     txt = StringProperty()
     screen = StringProperty()
+    source = StringProperty()

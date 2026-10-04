@@ -14,10 +14,17 @@ import webbrowser
 # non-std libraries
 from kivy.lang import Builder
 from kivy.app import App
+from kivy.properties import StringProperty
+from kivy.uix.widget import Widget
 
 from kivymd.uix.navigationdrawer import MDNavigationDrawer
-from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import (
+    MDDialog,
+    MDDialogButtonContainer,
+    MDDialogHeadlineText,
+    MDDialogSupportingText,
+)
+from kivymd.uix.button import MDButton, MDButtonText
 
 # my app imports
 
@@ -27,6 +34,8 @@ Builder.load_file('drawer.kv')
 
 
 class MyDrawer(MDNavigationDrawer):
+    screen = StringProperty('menu')
+
     def open_help(self):
         webbrowser.open('https://osso73.github.io/classic_games/games/classic_games/')
     
@@ -45,14 +54,19 @@ You can find more information on github:
 https://github.com/osso73/classic_games
         """
         
-        about = MDDialog(title='About',
-                         type='simple',
-                         text=msg,
-                         buttons=[
-                             MDFlatButton(text='CLOSE',
-                                          on_release=close_msg)
-                             ]
-                         )
+        about = MDDialog(
+            MDDialogHeadlineText(text='About'),
+            MDDialogSupportingText(text=msg),
+            MDDialogButtonContainer(
+                Widget(),
+                MDButton(
+                    MDButtonText(text='CLOSE'),
+                    style='text',
+                    on_release=close_msg,
+                ),
+                spacing='8dp',
+            ),
+        )
         
         about.open()
  

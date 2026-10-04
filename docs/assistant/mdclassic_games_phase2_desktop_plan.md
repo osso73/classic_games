@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-04. Status: **in progress — checkpoints 1 and 2 complete and committed; checkpoint 3 next**.
+Progress updated: 2026-10-04. Status: **checkpoint 3 complete and awaiting review/commit; checkpoint 4 next after commit**.
 
 ## Progress tracker
 
-**Current position:** test foundation established; shell startup repair is next. **Desktop acceptance: pending.**
+**Current position:** shell compatibility migration and manual desktop shell review pass; review and commit are next. **Desktop acceptance: pending.**
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, KivyMD 2.0.0 from official commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. The user-approved checkpoint 1 decision supersedes the original KivyMD 1.2.0 baseline. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -12,7 +12,7 @@ Progress updated: 2026-10-04. Status: **in progress — checkpoints 1 and 2 comp
 | --- | --- | --- | --- |
 | 1 | Repair framework installation | Complete | Fresh resource installation verified; committed `f1d0148` |
 | 2 | Establish test foundation | Complete | 10 unit tests passed; committed `0f5642d`; GUI fixtures still need executable isolation checks |
-| 3 | Repair shell startup | **Next** | Resolve `Snackbar` import; migrate shell APIs; add GUI tests and manual shell checks |
+| 3 | Repair shell startup | **Complete, uncommitted** | GUI/unit/full suites pass; menu, drawer, Help, About/CLOSE, Pong/Ahorcado/Buscaminas loading snackbars, and audio manually verified |
 | 4 | Pong | Pending | Compatibility, behavior tests, manual exercise |
 | 5 | Ahorcado | Pending | Full game tests and manual exercise; current pure-helper tests are foundation coverage only |
 | 6 | Memory | Pending | Compatibility, behavior tests, manual exercise |
@@ -23,7 +23,7 @@ Progress updated: 2026-10-04. Status: **in progress — checkpoints 1 and 2 comp
 | 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** execute checkpoint 3 only, beginning with `ImportError: cannot import name 'Snackbar' from 'kivymd.uix.snackbar'` at `main.py:21`, then stop for review.
+**Next exact action:** review and commit checkpoint 3. After the reviewed changes are committed, execute checkpoint 4 (Pong) only. The remaining recorded lazy-screen failures belong to their respective game checkpoints.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
