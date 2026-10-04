@@ -1,6 +1,33 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Reviewed: 2026-09-13. Status: **not executed**.
+Progress updated: 2026-10-04. Status: **in progress — checkpoints 1 and 2 complete and committed; checkpoint 3 next**.
+
+## Progress tracker
+
+**Current position:** test foundation established; shell startup repair is next. **Desktop acceptance: pending.**
+
+**Active baseline:** Python 3.11, Kivy 2.3.1, KivyMD 2.0.0 from official commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. The user-approved checkpoint 1 decision supersedes the original KivyMD 1.2.0 baseline. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
+
+| Checkpoint | Task | Status | Evidence / remaining work |
+| --- | --- | --- | --- |
+| 1 | Repair framework installation | Complete | Fresh resource installation verified; committed `f1d0148` |
+| 2 | Establish test foundation | Complete | 10 unit tests passed; committed `0f5642d`; GUI fixtures still need executable isolation checks |
+| 3 | Repair shell startup | **Next** | Resolve `Snackbar` import; migrate shell APIs; add GUI tests and manual shell checks |
+| 4 | Pong | Pending | Compatibility, behavior tests, manual exercise |
+| 5 | Ahorcado | Pending | Full game tests and manual exercise; current pure-helper tests are foundation coverage only |
+| 6 | Memory | Pending | Compatibility, behavior tests, manual exercise |
+| 7 | 15 puzzle | Pending | Compatibility, behavior tests, manual exercise |
+| 8 | 2048 | Pending | Compatibility, behavior tests, manual exercise |
+| 9 | Buscaminas | Pending | Compatibility, behavior tests, manual exercise |
+| 10 | Snake | Pending | Compatibility, behavior tests, manual exercise |
+| 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
+| 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
+
+**Next exact action:** execute checkpoint 3 only, beginning with `ImportError: cannot import name 'Snackbar' from 'kivymd.uix.snackbar'` at `main.py:21`, then stop for review.
+
+**Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
+
+Update this tracker and the master plan's phase summary alongside the validation record at every checkpoint handoff. Keep detailed commands, observations, counts, and failures in the validation record. The entries above summarize recorded evidence; no runtime checks were rerun for this documentation update.
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 1 runbook](mdclassic_games_phase1_uv_plan.md), and [the validation record](mdclassic_games_validation.md) before editing. This runbook expands master-plan Phase 2 only. It is deliberately split into small checkpoints: complete one checkpoint, review it, commit it, and only then begin the next.
 
@@ -8,7 +35,7 @@ Phase 2 tests the combined application on **desktop**. Do not build or install A
 
 ## Objective and boundaries
 
-Restore desktop compatibility with the locked Python 3.11, Kivy 2.3.1, and KivyMD 1.2.0 baseline while preserving the seven games, rules, controls, navigation, settings, sounds, and assets. Build a maintained pytest suite for the combined app before beginning Android work.
+Restore desktop compatibility with the locked Python 3.11, Kivy 2.3.1, and KivyMD 2.0.0 baseline while preserving the seven games, rules, controls, navigation, settings, sounds, and assets. Build a maintained pytest suite for the combined app before beginning Android work.
 
 Allowed changes:
 
@@ -19,7 +46,7 @@ Allowed changes:
 - Validation records and this runbook under `docs/assistant/`.
 - Dependency metadata and generated `uv.lock` only for a demonstrated, documented incompatibility.
 
-Do not change standalone games, application version, Android packaging, `requirements.txt`, asset selection, configuration section/key names, or the app-directory launch contract. Do not use KivyMD master or 2.x to avoid adapting the pinned 1.2.0 API.
+Do not change standalone games, application version, Android packaging, `requirements.txt`, asset selection, configuration section/key names, or the app-directory launch contract. Adapt against the pinned official KivyMD 2.0.0 source; do not switch to floating master or assume current development examples match that commit.
 
 ## Checkpoint workflow
 
@@ -43,6 +70,8 @@ For a new session, use this instruction (replace `N` with the checkpoint number)
 Keep the Phase 1 record intact. For each checkpoint record status, environment/version inventory, files changed, commands and working directories, automated counts, manual observations, first relevant failure/log location, and next exact action. Use PASS / FAIL / NOT RUN for individual checks. Review both tracked diffs and new files before handoff; keep logs and generated output outside tracked source.
 
 ## Checkpoint 1 - Repair the KivyMD resource installation
+
+**Completed historical procedure:** the steps below describe the original 1.2.0 investigation. Its failed resource build led to the explicitly approved immutable 2.0.0 remedy recorded in the validation record. Do not repeat these steps as an instruction to revert the active baseline.
 
 ### Entry condition
 
@@ -145,7 +174,7 @@ Nonzero unit tests collect and pass without a display, GUI imports are not initi
 
 ## Checkpoint 3 - Repair shell startup
 
-Use the first startup traceback after checkpoint 1 and the verified installed KivyMD 1.2.0 source. Make one coherent fix at a time.
+Use the first startup traceback after checkpoint 1 and the verified installed KivyMD 2.0.0 source at the pinned commit. Make one coherent fix at a time. API names in the table are investigation starting points: verify supported widget composition, properties, and events against that source before implementing replacements.
 
 `main.py` imports all game screen modules eagerly even though it constructs screens lazily. If a game-module import or KV registration blocks shell startup, a minimal import/API repair belongs here; record that cross-game change and defer gameplay verification to its game checkpoint. Do not disable game imports or substitute fake screens to obtain a passing shell.
 
@@ -278,7 +307,7 @@ git diff --stat
 
 ### Phase 2 completion gate
 
-- [ ] Framework resources install reproducibly from declared locked inputs.
+- [x] Framework resources install reproducibly from declared locked inputs.
 - [ ] Shell, seven games, controls, settings, sounds, and resources pass desktop acceptance.
 - [ ] Unit and GUI suites collect meaningful tests and pass.
 - [ ] Tests preserve tracked configuration and isolate state.

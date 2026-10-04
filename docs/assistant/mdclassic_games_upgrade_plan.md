@@ -1,6 +1,20 @@
 # MDclassic_games modernization execution plan
 
-Reviewed: 2026-09-13. Status: **planning only; no implementation or runtime validation performed during this review**.
+Original review: 2026-09-13. Progress updated: 2026-10-04. Status: **Phase 1 complete; Phase 2 in progress**.
+
+## Progress summary
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1–2 complete and committed; checkpoint 3 (shell startup) next |
+| 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
+| 4 | Android device validation | Pending; requires built APK |
+| 5 | Final documentation and handoff | Pending |
+
+See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Desktop acceptance, GUI-suite acceptance, and CI acceptance remain pending.
+
+**Approved baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Python 3.11 and Kivy 2.3.1 remain the baseline. This recorded user decision supersedes the original 1.2.0-only migration restriction; Android compatibility is still unvalidated.
 
 This document owns scope, phase order, compatibility work, Android work, and final acceptance. [The Phase 1 runbook](mdclassic_games_phase1_uv_plan.md) expands only Phase 1. These phase numbers supersede the previous plan: desktop compatibility now precedes Android packaging.
 
@@ -43,7 +57,7 @@ These are static review findings, not claims that every suspected API issue was 
 
 1. Read this plan and the Phase 1 runbook before editing. Inspect `git status --short` and preserve pre-existing work. Do not create branches or commits unless requested.
 2. Execute phases in order. Within a phase, make one small, coherent change at a time, run its check, and read the first meaningful traceback before changing more files.
-3. Use documentation/source for the **pinned release**. Do not copy KivyMD 2.x/development examples into a 1.2.0 migration. Never solve a failure by silently switching to a floating Git URL, disabling a game, or suppressing exceptions.
+3. Use documentation/source for the **pinned release and commit**. The active migration targets the approved KivyMD 2.0.0 commit; current development examples may differ. Never solve a failure by silently switching to a floating Git URL, disabling a game, or suppressing exceptions.
 4. Keep environment failures, application failures, and Android recipe failures separate. Missing display/GL/audio, network access, SDK, or device is a recorded blocker, not a passing test.
 5. A phase gate must pass before dependent work starts. Phase 1 deliberately permits a documented application API failure; Phase 2 resolves it. Documentation may record partial progress while a later phase is blocked.
 6. After each phase update `docs/assistant/mdclassic_games_validation.md` (create during execution) with the template below. Report the next exact action so another model can resume. Do not mark modernization complete while required checks remain blocked or unrun.
@@ -73,7 +87,7 @@ Follow [the detailed runbook](mdclassic_games_phase1_uv_plan.md).
 
 Deliver: root non-packaged uv project, Python selector, generated lockfile, pinned pytest development dependency, root selector ignore exception, provisional MD-app setup instructions, and validation record. Test implementation and discovery configuration belong to Phase 2.
 
-Dependency policy: begin with `kivy==2.3.1` and `kivymd==1.2.0` as conservative candidate releases, not a claim that they are latest or already validated. Resolve and record supporting dependency pins using release metadata rather than copying unverified Pillow/materialyoucolor versions. KivyMD 2.x migration is not part of this baseline. Later Android evidence may require a documented supporting-dependency adjustment and revalidation.
+Original Phase 1 dependency policy began with `kivy==2.3.1` and `kivymd==1.2.0` as conservative candidate releases, not a claim that they were latest or already validated. Phase 2 checkpoint 1 explicitly superseded the KivyMD selection with the pinned official 2.0.0 commit above; its API migration is now in scope. Resolve and record supporting dependency pins using release metadata rather than copying unverified Pillow/materialyoucolor versions. Later Android evidence may require a documented supporting-dependency adjustment and revalidation.
 
 **Gate:** locked sync, Python 3.11, dependency consistency, and version inventory pass. Attempt desktop startup from the correct directory and record its outcome. An API failure is Phase 2 input; a missing graphical environment leaves GUI validation explicitly pending. A resolver/install failure blocks completion of Phase 1.
 
@@ -85,7 +99,7 @@ Allowed edits: necessary runtime `.py`/`.kv` files inside the app, root test sui
 
 ### 2A. Repair shell startup
 
-1. Use the Phase 1 startup traceback and installed KivyMD 1.2.0 source/docs to identify the first broken API.
+1. Use the post-remedy Phase 2 checkpoint 1 startup traceback and installed pinned KivyMD 2.0.0 source/docs to identify the first broken API. Widget names below are investigation starting points; verify composition, properties, and events against the pinned source.
 2. In `menu.py` / `menu.kv`, migrate `SmartTileWithLabel` to the supported image-list composition (inspect `MDSmartTile`). Preserve square two-column image tiles, visible labels, source images, and existing `screen` routing. Check whether release events belong on the tile or a child; one click must navigate once.
 3. Replace `MDToolbar` with the pinned release's top app bar API (inspect `MDTopAppBar`) in `menu.kv` and all seven game `screen.py` embedded KV strings. Preserve titles, action icon ordering, callbacks and their arguments. Check elevation/height visually rather than assuming old values have identical meaning.
 4. In `main.py`, adapt `TempMsg` to the actual snackbar API (inspect `MDSnackbar` and its text content). Preserve notification text and callers where practical; a class rename alone may not preserve `text=` construction.
@@ -99,7 +113,7 @@ Allowed edits: necessary runtime `.py`/`.kv` files inside the app, root test sui
 Work through `pong`, `ahorcado`, `memory`, `game_15puzzle`, `game_2048`, `buscaminas`, `snake` in that order. Folder names and screen IDs differ: 15 puzzle uses `fifteen`, and 2048 uses `2048`.
 
 1. Open each game using a tile, return to the menu through the drawer, then open it through the drawer. Exercise it before proceeding to the next game.
-2. Check `MDChip` in Memory, 15 puzzle, and 2048 against the installed release's `kivymd/uix/chip/` implementation. In particular, verify the old `text` and `icon` properties and `on_release` event; adapt only unsupported properties or composition. Preserve displayed values, click actions, and bindings. Do not substitute static labels for interactive chips or assume newer releases' child widgets exist in 1.2.0.
+2. Check `MDChip` in Memory, 15 puzzle, and 2048 against the installed release's `kivymd/uix/chip/` implementation. In particular, verify the old `text` and `icon` properties and `on_release` event; adapt only unsupported properties or composition. Preserve displayed values, click actions, and bindings. Do not substitute static labels for interactive chips or assume current development examples match the pinned 2.0.0 source.
 3. Inspect remaining KivyMD properties used in embedded KV: labels/font styles, palette colors, progress bars, grid/box layouts. Fix only observed unsupported APIs or visual regressions.
 4. Open all five settings panels: Pong, Ahorcado, Memory, 15 puzzle, Snake. On a fresh launch, change a setting **before opening its game**, then verify the lazily created screen; repeat after opening the game. Preserve config section/key names and defaults.
 5. Check images, fonts, word-list loading, and audio. Keep the documented app-directory launch contract; do not start a repository-wide path refactor to support arbitrary working directories.
@@ -266,7 +280,7 @@ uv run --locked --group android buildozer android logcat
 ## Reference starting points
 
 - uv projects and locking: <https://docs.astral.sh/uv/guides/projects/>
-- KivyMD **1.2.0** release: <https://pypi.org/project/kivymd/1.2.0/>. Use the installed release's source for API details when matching versioned documentation is unavailable; do not substitute development documentation.
+- Active KivyMD **2.0.0** source: <https://github.com/kivymd/KivyMD/tree/2d8a7b458897a01a400770e3bc10ebffd946b91d>. Use this pinned source for API details when matching versioned documentation is unavailable; do not substitute development documentation. Original 1.2.0 artifact investigation is retained in the validation record.
 - Kivy packaging: <https://kivy.org/doc/stable/guide/packaging-android.html>
 - Buildozer installation: <https://buildozer.readthedocs.io/en/latest/installation.html>
 - p4a releases and recipe sources: <https://github.com/kivy/python-for-android/releases>
