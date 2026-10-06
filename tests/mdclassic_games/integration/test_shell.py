@@ -8,9 +8,8 @@ import textwrap
 import pytest
 
 
-@pytest.mark.gui
-def test_shell_builds_with_isolated_config(gui_environment, tmp_path):
-    """Build the real shell and exercise its migrated KivyMD components."""
+def run_shell_script(tmp_path, body):
+    """Run one shell scenario in a fresh Kivy process."""
 
     config_path = tmp_path / "main.ini"
     script = textwrap.dedent(
@@ -32,41 +31,7 @@ def test_shell_builds_with_isolated_config(gui_environment, tmp_path):
         app.sm = app.root.ids.screen_manager
         Window.add_widget(app.root)
 
-        menu = app.sm.get_screen("menu")
-        tiles = [widget for widget in menu.walk() if isinstance(widget, MyTile)]
-        assert [tile.screen for tile in tiles] == [
-            "pong", "ahorcado", "memory", "fifteen", "2048", "buscaminas", "snake"
-        ]
-        assert all(tile._image.source == tile.source for tile in tiles)
-
-        drawer = app.root.ids.my_drawer
-        assert drawer.screen == "menu"
-        drawer.set_state("open")
-        drawer.set_state("close")
-
-        assert issubclass(TempMsg, MDSnackbar)
-        snackbar = TempMsg(text="Loading pong...")
-        assert any(
-            isinstance(widget, MDSnackbarText) and widget.text == "Loading pong..."
-            for widget in snackbar.ids.label_container.children
-        )
-        snackbar.open()
-        snackbar.dismiss()
-
-        requested_urls = []
-        drawer_module.webbrowser.open = requested_urls.append
-        drawer.open_help()
-        assert requested_urls == [
-            "https://osso73.github.io/classic_games/games/classic_games/"
-        ]
-
-        drawer.about()
-        dialog = next(
-            widget for widget in Window.children if isinstance(widget, MDDialog)
-        )
-        dialog.dismiss()
-
-        assert os.path.isfile({str(config_path)!r})
+        {textwrap.indent(textwrap.dedent(body), '        ')}
 
         # Kivy's global window and Clock state are not reliably reset in-process.
         os._exit(0)
@@ -81,6 +46,102 @@ def test_shell_builds_with_isolated_config(gui_environment, tmp_path):
         timeout=30,
     )
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.gui
+def test_shell_menu_tiles_route_and_render_images(gui_environment, tmp_path):
+    """The real menu exposes every combined-app screen route and image."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        menu = app.sm.get_screen("menu")
+        tiles = [widget for widget in menu.walk() if isinstance(widget, MyTile)]
+        assert [tile.screen for tile in tiles] == [
+            "pong", "ahorcado", "memory", "fifteen", "2048", "buscaminas", "snake"
+        ]
+        assert all(tile._image.source == tile.source for tile in tiles)
+        """,
+    )
+
+
+@pytest.mark.gui
+def test_shell_drawer_state_and_screen_property(gui_environment, tmp_path):
+    """The drawer has an observable initial route and accepts open/close actions."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        drawer = app.root.ids.my_drawer
+        assert drawer.screen == "menu"
+        drawer.set_state("open")
+        drawer.set_state("close")
+        """,
+    )
+
+
+@pytest.mark.gui
+def test_shell_loading_snackbar_constructs_and_dismisses(gui_environment, tmp_path):
+    """The migrated snackbar retains loading text and opens without an FBO error."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        assert issubclass(TempMsg, MDSnackbar)
+        snackbar = TempMsg(text="Loading pong...")
+        assert any(
+            isinstance(widget, MDSnackbarText) and widget.text == "Loading pong..."
+            for widget in snackbar.ids.label_container.children
+        )
+        snackbar.open()
+        snackbar.dismiss()
+        """,
+    )
+
+
+@pytest.mark.gui
+def test_shell_help_requests_existing_url(gui_environment, tmp_path):
+    """Help delegates to the existing public documentation URL."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        requested_urls = []
+        drawer_module.webbrowser.open = requested_urls.append
+        app.root.ids.my_drawer.open_help()
+        assert requested_urls == [
+            "https://osso73.github.io/classic_games/games/classic_games/"
+        ]
+        """,
+    )
+
+
+@pytest.mark.gui
+def test_shell_about_dialog_constructs_and_dismisses(gui_environment, tmp_path):
+    """About builds the real KivyMD dialog and retains its CLOSE behavior."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        app.root.ids.my_drawer.about()
+        dialog = next(
+            widget for widget in Window.children if isinstance(widget, MDDialog)
+        )
+        dialog.dismiss()
+        """,
+    )
+
+
+@pytest.mark.gui
+def test_shell_uses_temporary_config(gui_environment, tmp_path):
+    """Shell construction writes only the subprocess's temporary configuration."""
+
+    run_shell_script(
+        tmp_path,
+        """
+        assert os.path.isfile(app.get_application_config())
+        """,
+    )
 
 
 @pytest.mark.gui

@@ -132,6 +132,18 @@ Failure: No remaining checkpoint 4 failure.
 Decision: Keep the minimal callback repair and its real-control regression. Preserve the user-selected tracked `main.ini` values outside the checkpoint change.
 Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.
 
+Phase / task: Phase 2 - Test reporting refinement: shell regressions
+Status: passed
+Files changed: `tests/mdclassic_games/integration/test_shell.py`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding Phase 2 entries.
+Command and working directory: repository root.
+Expected / observed result: Split the broad shell-construction regression into six focused subprocess-isolated GUI tests for menu tile routes/images, drawer state, loading snackbar, Help URL, About dialog, and temporary config isolation. Retained the existing audio lifecycle test as one coherent startup/preload scenario. Unit tests were already independently parameterized or focused and required no split.
+Manual checks: NOT RUN - this test-only reporting refinement changes no runtime behavior.
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 6.02s. `uv run --locked --group dev pytest` PASS: collected 23, passed 23, failed 0, skipped 0, xfailed 0 in 6.02s. `git diff --check` PASS.
+Failure: No remaining failure. The focused shell test run passed: collected 7, passed 7, failed 0, skipped 0, xfailed 0 in 4.07s.
+Decision: Preserve real app/KV/widget coverage in each focused case, using subprocess isolation because Kivy global state cannot be reliably reset in-process.
+Next exact action: Review the test-reporting refinement. Checkpoint 5 (Ahorcado) remains the next game checkpoint after the review.
+
 Phase / task: Phase 2 - Checkpoint 4 test reporting refinement
 Status: passed
 Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_validation.md`
