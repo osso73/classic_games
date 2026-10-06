@@ -95,3 +95,51 @@ Automated checks: Reused unchanged continuation results: GUI 2 passed, unit 10 p
 Failure: No remaining checkpoint 3 failure.
 Decision: Preserve the recorded game-specific lazy-screen failures for checkpoints 6, 7, 8, and 10; do not include them in this shell checkpoint's pass claim.
 Next exact action: Review and commit all checkpoint 3 changes. After the reviewed changes are committed, execute checkpoint 4 (Pong) only.
+
+Phase / task: Phase 2 - Checkpoint 4: Pong compatibility and automated behavior checks
+Status: in progress
+Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root. Because commit `a1beac1` replaced the checkpoint-1 KivyMD Git source with the PyPI 2.0.0 artifact after checkpoint 3's recorded validation, ran `uv sync --locked --group dev` before revalidating the existing test layers.
+Expected / observed result: The existing Pong `MDTopAppBar` composition remains compatible with the current locked artifact, and Pong constructs from the real app shell. Added a subprocess-isolated real-widget regression that uses explicit board updates to cover start/reset, left/right scoring and serves, wall/paddle collisions, speed cap, pause/resume, and speed/max-speed/skin configuration changes. No production Pong change was required.
+Manual checks: NOT RUN - the required interactive desktop exercise remains: start/restart, pause/resume, paddle controls, ball movement and score change, plus skin and speed settings. Automated checks cannot establish visible layout, touch controls, or audible output.
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 3, passed 3, failed 0, skipped 0, xfailed 0 in 2.81s. `uv run --locked --group dev pytest` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 2.78s. Revalidation immediately after the PyPI source selection also passed: 10 unit, 2 GUI, and 12 full-suite tests. `uv lock --check`, `uv pip check`, and `git diff --check` PASS.
+Failure: No remaining automated failure. The initial test-only setup attempted to call nonexistent `PongBoard.do_layout()` and compared Kivy's list-valued velocity with tuples; corrected the new regression without production changes. Missing `xclip`/`xsel` remains a non-blocking Kivy clipboard diagnostic.
+Decision: Retain the current PyPI `kivymd==2.0.0` source selected in commit `a1beac1`; current checkpoint 3 and Pong automated results validate it. Preserve Pong behavior; do not rename its existing dynamic `max_vel` setting during this checkpoint.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Pong exercise, and record PASS/FAIL observations. If it passes, review the checkpoint 4 diff and request a commit before checkpoint 5; otherwise repair only the first Pong failure.
+
+Phase / task: Phase 2 - Checkpoint 4 continuation: Pong pause callback repair
+Status: in progress
+Files changed: `source/MDclassic_games/pong/screen.py`, `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 entry.
+Command and working directory: repository root for pytest. User reproduced the fault using the interactive app from `source/MDclassic_games`.
+Expected / observed result: FAIL before repair - clicking Pong's pause action crashed because the KV callback called `pong.pause_button()` even though the method requires the button to update its icon. The callback now passes itself as `pong.pause_button(self)`. The real pause action has a scoped KV id and the Pong GUI regression dispatches its actual `on_release` event, asserting active state and pause/play icon transitions in both directions.
+Manual checks: FAIL before repair - user reported that clicking pause crashed. Recheck required after repair: pause/resume and the remaining Pong checkpoint exercise. The tracked `main.ini` now has user-selected Pong speed `5` and skin `tennis`; preserve these manual-test settings and exclude them from the checkpoint change.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_pong.py` PASS: collected 1, passed 1, failed 0, skipped 0, xfailed 0 in 0.37s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 3, passed 3, failed 0, skipped 0, xfailed 0 in 2.87s. `uv run --locked --group dev pytest` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 2.83s. `git diff --check` PASS.
+Failure: Resolved `TypeError` from the missing `button` argument in `PongBoard.pause_button`. The first test implementation could not discover the app-bar control with `screen.walk()` before rendering; this was a test setup issue resolved by the KV id and did not affect the app.
+Decision: Preserve the existing pause logic and icon behavior. Pass the actual KivyMD control instead of making the production method accept a missing argument, so the action continues to switch its displayed icon.
+Next exact action: Manually relaunch from `source/MDclassic_games` with `uv run --locked python main.py`, confirm pause/resume no longer crashes, then complete and report the remaining Pong checkpoint exercise. Do not start checkpoint 5 until this manual gate passes.
+
+Phase / task: Phase 2 - Checkpoint 4 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 continuation.
+Command and working directory: user reran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed the repaired pause/resume action works. Together with the preceding report that all remaining Pong exercises passed, this completes start/restart, paddle control, ball movement/score changes, and skin/speed setting validation.
+Manual checks: PASS - the full Pong checkpoint exercise passes after the pause callback repair.
+Automated checks: Reused unchanged continuation results: 10 unit tests, 3 GUI tests, and 13 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 4 failure.
+Decision: Keep the minimal callback repair and its real-control regression. Preserve the user-selected tracked `main.ini` values outside the checkpoint change.
+Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.
+
+Phase / task: Phase 2 - Checkpoint 4 test reporting refinement
+Status: passed
+Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 entries.
+Command and working directory: repository root.
+Expected / observed result: Split the former single Pong GUI test into six independently reported subprocess-isolated real-widget tests: start/serve, scoring/reserves, wall/paddle collisions, speed limit, pause control, and settings application. Each scenario retains the real `MainApp`, KV, widgets, and temporary configuration setup.
+Manual checks: Reused preceding checkpoint 4 PASS. This test-only reporting change does not alter runtime behavior.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_pong.py` PASS: collected 6, passed 6, failed 0, skipped 0, xfailed 0 in 1.94s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 8, passed 8, failed 0, skipped 0, xfailed 0 in 4.58s. `uv run --locked --group dev pytest` PASS: collected 18, passed 18, failed 0, skipped 0, xfailed 0 in 4.54s. `git diff --check` PASS.
+Failure: The first split generated indented subprocess source and failed all six cases with `IndentationError`; normalizing each scenario with `textwrap.dedent` before embedding fixed the test-only issue. The settings scenario initially referred to a helper-local path; it now checks the app's temporary config path directly.
+Decision: Keep separate pytest items so a failure identifies its Pong behavior directly, while preserving subprocess isolation for Kivy global state.
+Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.

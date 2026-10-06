@@ -54,8 +54,9 @@ Builder.load_string(
                     icon: 'play-circle-outline'
                     on_release: pong.start_game()
                 MDActionTopAppBarButton:
+                    id: pause_control
                     icon: 'pause'
-                    on_release: pong.pause_button()
+                    on_release: pong.pause_button(self)
                 MDActionTopAppBarButton:
                     icon: 'help-circle-outline'
                     on_release: root.help_button(self)

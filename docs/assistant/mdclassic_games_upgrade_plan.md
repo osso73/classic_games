@@ -1,20 +1,20 @@
 # MDclassic_games modernization execution plan
 
-Original review: 2026-09-13. Progress updated: 2026-10-04. Status: **Phase 1 complete; Phase 2 in progress**.
+Original review: 2026-09-13. Progress updated: 2026-10-06. Status: **Phase 1 complete; Phase 2 in progress**.
 
 ## Progress summary
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; checkpoints 1–3 complete, with checkpoint 3 awaiting review/commit; checkpoint 4 (Pong) follows |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1–4 complete, with Pong awaiting review/commit; checkpoint 5 (Ahorcado) follows |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
 
 See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Desktop acceptance, GUI-suite acceptance, and CI acceptance remain pending.
 
-**Approved baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Python 3.11 and Kivy 2.3.1 remain the baseline. This recorded user decision supersedes the original 1.2.0-only migration restriction; Android compatibility is still unvalidated.
+**Baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Commit `a1beac1` subsequently selected the released PyPI `kivymd==2.0.0` artifact instead; checkpoint 3 and Pong automated checks were rerun successfully against that locked artifact. Python 3.11 and Kivy 2.3.1 remain the baseline. Android compatibility is still unvalidated.
 
 This document owns scope, phase order, compatibility work, Android work, and final acceptance. [The Phase 1 runbook](mdclassic_games_phase1_uv_plan.md) expands only Phase 1. These phase numbers supersede the previous plan: desktop compatibility now precedes Android packaging.
 

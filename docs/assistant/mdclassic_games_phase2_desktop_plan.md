@@ -1,19 +1,19 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-04. Status: **checkpoint 3 complete and awaiting review/commit; checkpoint 4 next after commit**.
+Progress updated: 2026-10-06. Status: **checkpoint 4 (Pong) complete and awaiting review/commit; checkpoint 5 follows**.
 
 ## Progress tracker
 
-**Current position:** shell compatibility migration and manual desktop shell review pass; review and commit are next. **Desktop acceptance: pending.**
+**Current position:** shell compatibility migration is complete and committed. Pong compatibility, automated behavior checks, and manual desktop exercise pass; review and commit are next. **Desktop acceptance: pending.**
 
-**Active baseline:** Python 3.11, Kivy 2.3.1, KivyMD 2.0.0 from official commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. The user-approved checkpoint 1 decision supersedes the original KivyMD 1.2.0 baseline. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
+**Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
 | Checkpoint | Task | Status | Evidence / remaining work |
 | --- | --- | --- | --- |
 | 1 | Repair framework installation | Complete | Fresh resource installation verified; committed `f1d0148` |
 | 2 | Establish test foundation | Complete | 10 unit tests passed; committed `0f5642d`; GUI fixtures still need executable isolation checks |
-| 3 | Repair shell startup | **Complete, uncommitted** | GUI/unit/full suites pass; menu, drawer, Help, About/CLOSE, Pong/Ahorcado/Buscaminas loading snackbars, and audio manually verified |
-| 4 | Pong | Pending | Compatibility, behavior tests, manual exercise |
+| 3 | Repair shell startup | Complete | Committed `b5e27b1`; revalidated against the current PyPI KivyMD lock with 10 unit, 3 GUI, and 13 full-suite tests passing |
+| 4 | Pong | **Complete, uncommitted** | Real-widget behavior regression and full manual exercise pass, including repaired pause/resume |
 | 5 | Ahorcado | Pending | Full game tests and manual exercise; current pure-helper tests are foundation coverage only |
 | 6 | Memory | Pending | Compatibility, behavior tests, manual exercise |
 | 7 | 15 puzzle | Pending | Compatibility, behavior tests, manual exercise |
@@ -23,7 +23,7 @@ Progress updated: 2026-10-04. Status: **checkpoint 3 complete and awaiting revie
 | 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** review and commit checkpoint 3. After the reviewed changes are committed, execute checkpoint 4 (Pong) only. The remaining recorded lazy-screen failures belong to their respective game checkpoints.
+**Next exact action:** review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only. The remaining recorded lazy-screen failures belong to their respective game checkpoints.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
