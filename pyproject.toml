@@ -13,9 +13,6 @@ dependencies = [
 [tool.uv]
 package = false
 
-[tool.uv.sources]
-kivymd = { git = "https://github.com/kivymd/KivyMD.git", rev = "2d8a7b458897a01a400770e3bc10ebffd946b91d" }
-
 [dependency-groups]
 dev = [
     "pytest==9.1.1",

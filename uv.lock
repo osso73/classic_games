@@ -92,7 +92,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "kivy", specifier = "==2.3.1" },
-    { name = "kivymd", git = "https://github.com/kivymd/KivyMD.git?rev=2d8a7b458897a01a400770e3bc10ebffd946b91d" },
+    { name = "kivymd", specifier = "==2.0.0" },
     { name = "materialyoucolor", specifier = "==3.0.4" },
     { name = "pillow", specifier = "==12.3.0" },
 ]
@@ -208,13 +208,17 @@ wheels = [
 [[package]]
 name = "kivymd"
 version = "2.0.0"
-source = { git = "https://github.com/kivymd/KivyMD.git?rev=2d8a7b458897a01a400770e3bc10ebffd946b91d#2d8a7b458897a01a400770e3bc10ebffd946b91d" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asynckivy" },
     { name = "kivy" },
     { name = "materialshapes" },
     { name = "materialyoucolor" },
     { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b6/74/9a4b44c1f0e1a7ec1becb4f5554dd1c2e683baae502895666ea9f2b52df5/kivymd-2.0.0.tar.gz", hash = "sha256:23c45c53c5cd0e6138277be8715851b3c19bc7556d8edc780c0e3f644cf38d13", size = 2169477, upload-time = "2026-08-06T05:44:49.82Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/59/337322d61404c74cafa8a4da71dfe01f84a5dffedda28ba5a4a306fc6430/kivymd-2.0.0-py3-none-any.whl", hash = "sha256:403be9715fba6258fb772206e6c9443dc71237881c56279e7b9a2f7bab99e11b", size = 2234352, upload-time = "2026-08-06T05:44:47.975Z" },
 ]
 
 [[package]]
