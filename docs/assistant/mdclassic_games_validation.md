@@ -144,6 +144,30 @@ Failure: No remaining failure. The focused shell test run passed: collected 7, p
 Decision: Preserve real app/KV/widget coverage in each focused case, using subprocess isolation because Kivy global state cannot be reliably reset in-process.
 Next exact action: Review the test-reporting refinement. Checkpoint 5 (Ahorcado) remains the next game checkpoint after the review.
 
+Phase / task: Phase 2 - Checkpoint 5: Ahorcado compatibility and automated behavior checks
+Status: in progress
+Files changed: `tests/mdclassic_games/integration/test_ahorcado.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The existing Ahorcado app-bar composition constructs under the current pinned KivyMD artifact; no runtime compatibility change was required. Added five real-screen regressions: Spanish correct-letter reveal and win, wrong/repeated/invalid input, ten-error loss, keyboard-key and deterministic one-hint interaction, and keyboard/man settings. Each uses the real combined `MainApp`, screen, widgets, and game methods while setting a fixed target word.
+Manual checks: NOT RUN - required interactive desktop exercise remains: start a new word; make correct and wrong keyboard selections; change keyboard/man settings; verify word and image display; and check representative sounds.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_ahorcado.py` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 1.95s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 18, passed 18, failed 0, skipped 0, xfailed 0 in 7.88s. `uv run --locked --group dev pytest` PASS: collected 28, passed 28, failed 0, skipped 0, xfailed 0 in 7.94s. `git diff --check` PASS.
+Failure: No remaining automated failure.
+Decision: Preserve existing Ahorcado behavior and settings. The tests mute end-game sound only to avoid actual playback while still exercising win/loss logic; audible output remains a manual check.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Ahorcado checkpoint exercise, and report PASS/FAIL observations. If it passes, review the checkpoint 5 diff and request a commit before checkpoint 6; otherwise repair only the first Ahorcado failure.
+
+Phase / task: Phase 2 - Checkpoint 5 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 5 entry.
+Command and working directory: user ran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed the full Ahorcado exercise succeeds: new word, correct/wrong keyboard selections, keyboard/man settings, word/image display, and representative audio.
+Manual checks: PASS - all required Ahorcado checkpoint exercises passed. The tracked `main.ini` has the user-selected Ahorcado keyboard `keyboard1`; preserve this manual-test setting and exclude it from the checkpoint change.
+Automated checks: Reused unchanged checkpoint 5 results: 10 unit tests, 18 GUI tests, and 28 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 5 failure.
+Decision: Preserve existing Ahorcado behavior; no production compatibility edit was required.
+Next exact action: Review and commit checkpoint 5. After the reviewed changes are committed, execute checkpoint 6 (Memory) only.
+
 Phase / task: Phase 2 - Checkpoint 4 test reporting refinement
 Status: passed
 Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_validation.md`

@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-06. Status: **checkpoint 4 (Pong) complete and awaiting review/commit; checkpoint 5 follows**.
+Progress updated: 2026-10-06. Status: **checkpoint 5 (Ahorcado) complete and awaiting review/commit; checkpoint 6 follows**.
 
 ## Progress tracker
 
-**Current position:** shell compatibility migration is complete and committed. Pong compatibility, automated behavior checks, and manual desktop exercise pass; review and commit are next. **Desktop acceptance: pending.**
+**Current position:** shell compatibility migration and Pong checkpoint are complete and committed. Ahorcado automated behavior checks and manual desktop exercise pass; review and commit are next. **Desktop acceptance: pending.**
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -13,8 +13,8 @@ Progress updated: 2026-10-06. Status: **checkpoint 4 (Pong) complete and awaitin
 | 1 | Repair framework installation | Complete | Fresh resource installation verified; committed `f1d0148` |
 | 2 | Establish test foundation | Complete | 10 unit tests passed; committed `0f5642d`; GUI fixtures still need executable isolation checks |
 | 3 | Repair shell startup | Complete | Committed `b5e27b1`; revalidated against the current PyPI KivyMD lock with 10 unit, 3 GUI, and 13 full-suite tests passing |
-| 4 | Pong | **Complete, uncommitted** | Real-widget behavior regression and full manual exercise pass, including repaired pause/resume |
-| 5 | Ahorcado | Pending | Full game tests and manual exercise; current pure-helper tests are foundation coverage only |
+| 4 | Pong | Complete | Real-widget behavior regression and full manual exercise pass, including repaired pause/resume; committed `b4406c4` |
+| 5 | Ahorcado | **Complete, uncommitted** | Five real-widget behavior regressions and full manual exercise pass |
 | 6 | Memory | Pending | Compatibility, behavior tests, manual exercise |
 | 7 | 15 puzzle | Pending | Compatibility, behavior tests, manual exercise |
 | 8 | 2048 | Pending | Compatibility, behavior tests, manual exercise |
@@ -23,7 +23,7 @@ Progress updated: 2026-10-06. Status: **checkpoint 4 (Pong) complete and awaitin
 | 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only. The remaining recorded lazy-screen failures belong to their respective game checkpoints.
+**Next exact action:** review and commit checkpoint 5. After the reviewed changes are committed, execute checkpoint 6 (Memory) only.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
