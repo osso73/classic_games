@@ -37,7 +37,7 @@ Builder.load_string(
     MDBoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
         on_size: puzzle.initialize_grid()
     
         MDTopAppBar:
@@ -63,7 +63,8 @@ Builder.load_string(
         MDLabel:
             id: score
             text: 'Moves: ' + str(puzzle.moves)
-            font_style: 'H5'
+            font_style: 'Headline'
+            role: 'small'
             halign: 'center'
             size_hint_y: None
             height: self.texture_size[1]
@@ -78,16 +79,16 @@ Builder.load_string(
         
             FloatLayout:
                 MDChip:
-                    text: 'Theme'
                     pos_hint: {'center_x': 0.5, 'center_y': 0.66}
                     on_release: sample.change_theme()
-                    icon: ''
+                    MDChipText:
+                        text: 'Theme'
 
                 MDChip:
-                    text: 'Level: ' + str(sample.board_size - 2)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.33}
                     on_release: sample.change_size()
-                    icon: ''
+                    MDChipText:
+                        text: 'Level: ' + str(sample.board_size - 2)
                     
             Sample:
                 id: sample

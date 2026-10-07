@@ -64,7 +64,14 @@ class Sample(MDGridLayout):
     def __init__(self, **kwargs):
         super(Sample, self).__init__(**kwargs)
         app = MDApp.get_running_app()
-        self.theme = app.config.get('fifteen', 'theme')        
+        themes = self.available_themes()
+        if not themes:
+            raise RuntimeError('No complete 15 puzzle themes are available.')
+        configured_theme = app.config.get('fifteen', 'theme')
+        self.theme = configured_theme if configured_theme in themes else themes[0]
+        if self.theme != configured_theme:
+            app.config.set('fifteen', 'theme', self.theme)
+            app.config.write()
         self.board_size = int(app.config.get('fifteen', 'level')) + 2
         Clock.schedule_once(self.load_theme)
     
@@ -83,8 +90,23 @@ class Sample(MDGridLayout):
         self.clear_widgets()
         self.cols = self.board_size
         for n in list(range(1, self.board_size**2 + 1)):
-            self.add_widget(CardSample(name=str(n), theme=self.theme, 
+            self.add_widget(CardSample(name=str(n), theme=self.theme,
                                          board_size=str(self.board_size)))
+
+
+    @staticmethod
+    def available_themes():
+        '''Return themes that contain every tile at every supported board size.'''
+        return sorted(
+            theme for theme in os.listdir(FIFTEEN.THEMES)
+            if all(
+                os.path.isfile(
+                    os.path.join(FIFTEEN.THEMES, theme, str(board_size), f'{tile}.jpg')
+                )
+                for board_size in range(3, 6)
+                for tile in range(1, board_size**2 + 1)
+            )
+        )
 
 
     def change_theme(self, new_theme=None):
@@ -94,8 +116,7 @@ class Sample(MDGridLayout):
         load_theme().
 
         '''
-        fullname = FIFTEEN.THEMES
-        themes = os.listdir(fullname)
+        themes = self.available_themes()
 
         if new_theme:
             if new_theme in themes:
@@ -104,6 +125,8 @@ class Sample(MDGridLayout):
                 raise ValueError(f"Theme {new_theme} does not exist")
         
         else:
+            if self.theme not in themes:
+                self.theme = themes[0]
             ind = themes.index(self.theme)
             new_ind = (ind + 1) % len(themes)
             app = MDApp.get_running_app()
