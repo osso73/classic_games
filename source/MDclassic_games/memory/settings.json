@@ -3,7 +3,7 @@
       "type": "options",
       "title": "Theme",
       "desc": "Theme for the .",
-      "options": ["food", "starwars", "misc", "tecnology", "cartoons", "animals"],
+      "options": ["food", "starwars", "misc", "technology", "cartoons", "animals"],
       "section": "Memory",
       "key": "theme"
     },

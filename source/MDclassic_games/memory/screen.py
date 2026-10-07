@@ -64,27 +64,27 @@ Builder.load_string(
             padding: '10dp'
             size_hint_y: None
             height: score.texture_size[1] + dp(10)*2
-            md_bg_color: app.theme_cls.primary_light
+            md_bg_color: app.theme_cls.primaryColor
             
             BoxLayout:
                 orientation: 'horizontal'
                 spacing: '10dp'
 
                 MDChip:
-                    text: mat_area.current_theme
-                    valign: 'center'
-                    icon: ''
                     on_release: mat_area.change_theme()
+                    MDChipText:
+                        text: mat_area.current_theme
                 MDChip:
-                    text: str(mat_area.num_pairs)
-                    icon: ''
                     on_release: mat_area.change_level()
+                    MDChipText:
+                        text: str(mat_area.num_pairs)
 
             MDLabel:
                 id: score
                 text: 'Moves: ' + str(mat_area.moves)
                 halign: "center"
-                font_style: 'H4'
+                font_style: 'Headline'
+                role: 'large'
         
         Mat:
             id: mat_area
@@ -101,7 +101,7 @@ class ScreenMemory(MDScreen):
     '''  
     def config_change(self, config, section, key, value):
         if key == 'theme':
-            self.ids.mat_area.tema_actual = value
+            self.ids.mat_area.current_theme = value
 
         elif key == 'level':
             num = int(value)

@@ -179,3 +179,39 @@ Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_gam
 Failure: The first split generated indented subprocess source and failed all six cases with `IndentationError`; normalizing each scenario with `textwrap.dedent` before embedding fixed the test-only issue. The settings scenario initially referred to a helper-local path; it now checks the app's temporary config path directly.
 Decision: Keep separate pytest items so a failure identifies its Pong behavior directly, while preserving subprocess isolation for Kivy global state.
 Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.
+
+Phase / task: Phase 2 - Checkpoint 6: Memory compatibility and automated behavior checks
+Status: in progress
+Files changed: `source/MDclassic_games/memory/screen.py`, `source/MDclassic_games/memory/mat.py`, `tests/mdclassic_games/integration/test_memory.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: Memory initially failed at `app.theme_cls.primary_light`, which KivyMD 2.0 removed. Its two legacy text/icon `MDChip` declarations would also be unsupported. Replaced the removed color API with `primaryColor`, migrated both controls to the `MDChipText` composition, and replaced the removed H4 typography with the equivalent Headline/large role. Fixed the existing Memory theme settings callback to update `current_theme` rather than an undeclared `tema_actual` attribute. The screen now constructs and starts a game under the locked artifact.
+Manual checks: NOT RUN - required interactive desktop exercise remains: reveal matching and nonmatching pairs, restart, size/theme controls, cartoons ICO images, and representative sounds.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_memory.py` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 1.65s before the completion scenario was added; the later integration run PASS: collected 24, passed 24, failed 0, skipped 0, xfailed 0 in 10.08s. The Memory regressions use real screens/widgets and cover pair creation, matching, mismatch resolution, resolved cards, completion, and settings persistence in temporary config. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest` PASS: collected 34, passed 34, failed 0, skipped 0, xfailed 0 in 10.08s. `git diff --check` PASS.
+Failure: Resolved KivyMD compatibility failures: `AttributeError: 'ThemeManager' object has no attribute 'primary_light'` from `memory/mat.py:37`, then `KeyError: 'H4'` from `memory/screen.py:86`. The initial pair-creation test used an invalid comparison of `dict_values` to a set; correcting that test-only assertion did not change production behavior.
+Decision: Preserve Memory game rules and its synchronous mismatch behavior. Use the KivyMD 2.0 documented interactive chip composition rather than static labels. Existing color/tile layout intent is preserved with the active primary color.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Memory checkpoint exercise, and report PASS/FAIL observations. If it passes, review checkpoint 6 before any commit or checkpoint 7 work; otherwise repair only the first Memory failure.
+
+Phase / task: Phase 2 - Checkpoint 6 continuation: Memory theme and level crash repair
+Status: in progress
+Files changed: `source/MDclassic_games/memory/mat.py`, `source/MDclassic_games/memory/settings.json`, `tests/mdclassic_games/integration/test_memory.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md` in addition to the checkpoint 6 files above
+Environment: Same as the preceding checkpoint 6 entry.
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The theme selector previously used every directory under `memory/images/themes`; empty legacy directories such as `varios`, `dibujos`, and `futbol` have no card images or `back.jpg`, so starting them failed. The settings typo `tecnology` also selected a nonexistent directory. Valid themes contain 22-30 images, while game levels permit 20 pairs; a theme with fewer images would make `random.sample` fail at higher levels. Memory now selects only sorted directories containing `back.jpg` and at least 20 card images, and it falls back to the first complete theme for stale configuration. The settings list now names `technology` correctly.
+Manual checks: FAIL before repair - user reported crashes for empty/nonexistent themes, sometimes dependent on pair count. Recheck required after repair: cycle every selectable theme, start a level-20 board for each, confirm removed legacy values no longer appear, and complete the remaining Memory exercise.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_memory.py` PASS: collected 8, passed 8, failed 0, skipped 0, xfailed 0 in 2.83s. `uv run --locked --group dev pytest` PASS: collected 36, passed 36, failed 0, skipped 0, xfailed 0 in 10.94s. The new cases exercise every selectable theme at 20 pairs plus stale-config fallback.
+Failure: Resolved asset-selection failures: an empty or nonexistent theme caused `os.listdir`/missing `back.jpg` failures; a nonempty theme with fewer images than the selected pair count would cause `ValueError` from `random.sample` in `Mat.start_game`.
+Decision: Do not invent missing theme assets or lower configured difficulty silently. Expose only themes that support the documented maximum level, while retaining a safe fallback for existing stale local configuration.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, cycle every selectable Memory theme and start a 20-pair game in each, then complete matching/nonmatching, restart, cartoon ICO, and sound checks. Report PASS/FAIL observations before review.
+
+Phase / task: Phase 2 - Checkpoint 6 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 6 entries.
+Command and working directory: user reran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed Memory now works after the theme/level repair.
+Manual checks: PASS - Memory checkpoint exercise, including the formerly crashing themes, now passes.
+Automated checks: Reused unchanged continuation results: 8 focused Memory GUI tests and 36 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 6 failure.
+Decision: Keep the complete-theme filter, stale-config fallback, and corrected settings option while preserving the existing game rules and assets.
+Next exact action: Commit checkpoint 6. After the reviewed changes are committed, execute checkpoint 7 (15 puzzle) only.

@@ -34,7 +34,7 @@ Builder.load_string(
 
 <Mat>:
     cols: self.columns
-    md_bg_color: app.theme_cls.primary_light
+    md_bg_color: app.theme_cls.primaryColor
     padding: '5dp'
     spacing: '5dp'
 
@@ -81,24 +81,41 @@ class Mat(MDGridLayout):
         sounds to memory so they can be played without delay.
         '''
         super(Mat, self).__init__(**kwargs)
-        self.theme_list = os.listdir(THEMES)
-        self.change_theme()
-        
+        self.theme_list = sorted(
+            theme for theme in os.listdir(THEMES)
+            if self._has_images(theme) and os.path.isfile(
+                os.path.join(THEMES, theme, 'back.jpg')
+            )
+        )
         app = MDApp.get_running_app()
         self.current_theme = app.config.get('Memory', 'theme')
         self.num_pairs = int(app.config.get('Memory', 'level'))
+        if self.current_theme not in self.theme_list:
+            self.current_theme = self.theme_list[0]
 
         
     def change_theme(self):
         '''
         Switch to the following theme of the theme_list.
         '''
-        if not self.current_theme:
+        if self.current_theme not in self.theme_list:
             self.current_theme = self.theme_list[0]
         else:
             ind = self.theme_list.index(self.current_theme)
             new_ind = ind+1 if ind<len(self.theme_list)-1 else 0
             self.current_theme = self.theme_list[new_ind]
+
+
+    @staticmethod
+    def _has_images(theme):
+        """Return whether a theme has enough images for every game level."""
+
+        theme_path = os.path.join(THEMES, theme)
+        if not os.path.isdir(theme_path):
+            return False
+        return sum(
+            image.startswith('image') for image in os.listdir(theme_path)
+        ) >= 20
     
     
     def change_level(self):

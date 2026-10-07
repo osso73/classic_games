@@ -7,7 +7,7 @@ Original review: 2026-09-13. Progress updated: 2026-10-06. Status: **Phase 1 com
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; checkpoints 1–4 complete, with Ahorcado awaiting review/commit; checkpoint 6 (Memory) follows |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1–6 complete; checkpoint 7 (15 puzzle) follows |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
