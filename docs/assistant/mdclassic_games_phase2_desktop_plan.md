@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-08. Status: **checkpoint 7 (15 puzzle) complete; checkpoint 8 follows**.
+Progress updated: 2026-10-08. Status: **checkpoint 8 (2048) complete; checkpoint 9 follows**.
 
 ## Progress tracker
 
-**Current position:** shell compatibility migration, Pong, Ahorcado, Memory, and 15 puzzle checkpoints are complete. **Desktop acceptance: pending.**
+**Current position:** shell compatibility migration, Pong, Ahorcado, Memory, 15 puzzle, and 2048 checkpoints are complete. **Desktop acceptance: pending.**
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -17,13 +17,13 @@ Progress updated: 2026-10-08. Status: **checkpoint 7 (15 puzzle) complete; check
 | 5 | Ahorcado | Complete | Five real-widget behavior regressions and full manual exercise pass; committed `e7662c9` |
 | 6 | Memory | Complete | KivyMD 2 compatibility repair, eight real-widget behavior regressions, and full manual exercise pass |
 | 7 | 15 puzzle | Complete | KivyMD 2 migration, complete-theme filtering, six behavior regressions, and manual exercise pass |
-| 8 | 2048 | Pending | Compatibility, behavior tests, manual exercise |
+| 8 | 2048 | Complete | KivyMD 2 migration, seven real-widget behavior regressions, and manual desktop exercise pass |
 | 9 | Buscaminas | Pending | Compatibility, behavior tests, manual exercise |
 | 10 | Snake | Pending | Compatibility, behavior tests, manual exercise |
 | 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** execute checkpoint 8 (2048) only: inspect and repair its KivyMD compatibility, add deterministic real-widget behavior regressions, run its checks, and complete its manual desktop exercise before review.
+**Next exact action:** execute checkpoint 9 (Buscaminas) only: inspect and repair its KivyMD compatibility, add deterministic real-widget behavior regressions, run its checks, and complete its manual desktop exercise before review.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 

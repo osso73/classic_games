@@ -1,4 +1,5 @@
 # classic_games
+
 A series of classic games in Kivy
 
 This is a little project to develop some simple games in kivy, so I get to know the language and build some apps for mobile. I started building each game separately using kivy only, and afterwards I've created a wrapper using [KivyMD](https://github.com/kivymd/KivyMD) library, and brought all games todgether, using the look and feel from KivyMD.
@@ -14,9 +15,9 @@ The list of games to be developed is inspired in project [GameStore](https://git
 - [x] snake
 
 Other potential games that may come later:
+
 - [ ] asteroids
 - [ ] pacman
-
 
 ## Usage
 
@@ -55,11 +56,9 @@ Alternatively, you can download the .apk image of the games and install it direc
 
 You can find information about how to play these games in this page: https://osso73.github.io/classic_games/.
 
-
 ## Contribution
 
 I started this project to practice with kivy, and also to build some games for my daughter. So I'm not expecting to have a collaboration on this project. Having said that, feel free to open issues to improve the games, or improve the code. If you would like to contribute, drop me a mail.
-
 
 ## License
 
@@ -71,4 +70,4 @@ I am using resources from the following sites:
 - [Free Sound](https://freesound.org/)
 - [GoodFon.com](https://www.goodfon.com/)
 
-More information about the assets used in each of the games can be found in the [documentation](https://osso73.github.io/classic_games/) page, under the _Credits_ section in each game.
+More information about the assets used in each of the games can be found in the [documentation](https://osso73.github.io/classic_games/) page, under the *Credits* section in each game.

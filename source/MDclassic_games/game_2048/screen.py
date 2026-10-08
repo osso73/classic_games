@@ -38,7 +38,7 @@ Builder.load_string(
     
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
         on_size: board.initialize_grid()
     
         MDTopAppBar:
@@ -70,14 +70,15 @@ Builder.load_string(
             spacing: 20
             size_hint_y: 0.5
             MDChip:
-                text: str(board.win_score)
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                icon: ''
                 on_release: board.change_win_score()
+                MDChipText:
+                    text: str(board.win_score)
             MDLabel:
                 text: 'Score: {:,}'.format(board.score)
                 halign: "center"
-                font_style: 'H4'
+                font_style: 'Headline'
+                role: 'small'
 
         Board:
             id: board
