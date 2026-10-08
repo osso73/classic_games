@@ -53,10 +53,10 @@ Builder.load_string(
                     on_release: field.start_game()
                 MDActionTopAppBarButton:
                     icon: 'bomb'
-                    on_release: field.entry_mode()
+                    on_release: field.entry_mode(self)
                 MDActionTopAppBarButton:
                     icon: 'numeric-1-box'
-                    on_release: field.set_level()
+                    on_release: field.set_level(self)
                 MDActionTopAppBarButton:
                     icon: 'volume-high'
                     on_release: field.mute_button(self)

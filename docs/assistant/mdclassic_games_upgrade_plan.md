@@ -1,13 +1,13 @@
 # MDclassic_games modernization execution plan
 
-Original review: 2026-09-13. Progress updated: 2026-10-07. Status: **Phase 1 complete; Phase 2 in progress**.
+Original review: 2026-09-13. Progress updated: 2026-10-08. Status: **Phase 1 complete; Phase 2 in progress**.
 
 ## Progress summary
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; checkpoints 1-8 complete; checkpoint 9 (Buscaminas) follows |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1-8 complete; checkpoint 9 (Buscaminas) automated checks and right-click recheck pass, and its remaining manual exercise is pending |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |

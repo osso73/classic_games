@@ -15,6 +15,12 @@ if sys.platform.startswith('linux'):
     os.environ.setdefault('SDL_AUDIODRIVER', 'alsa')
 
 # non-std libraries
+from kivy.config import Config
+
+# Reserve right-click for Buscaminas flags instead of Kivy's red multitouch markers.
+if sys.platform.startswith('linux'):
+    Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
