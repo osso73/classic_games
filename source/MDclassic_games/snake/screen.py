@@ -22,6 +22,7 @@ from kivymd.uix.appbar import (
     MDTopAppBarTitle,
     MDTopAppBarTrailingButtonContainer,
 )
+from kivymd.uix.progressindicator import MDLinearProgressIndicator
 
 # my app imports
 from snake.gameboard import GameBoard
@@ -37,7 +38,7 @@ Builder.load_string(
     MDBoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
     
         MDTopAppBar:
             MDTopAppBarLeadingButtonContainer:
@@ -54,7 +55,7 @@ Builder.load_string(
                     on_release: game.start_game()
                 MDActionTopAppBarButton:
                     icon: 'pause'
-                    on_release: game.pause_button()
+                    on_release: game.pause_button(self)
                 MDActionTopAppBarButton:
                     icon: 'volume-high'
                     on_release: game.mute_button(self)
@@ -70,15 +71,17 @@ Builder.load_string(
             MDLabel:
                 id: score
                 text: 'Score: ' + str(game.score)
-                font_style: 'H5'
+                font_style: 'Headline'
+                role: 'small'
                 halign: 'center'
 
             MDLabel:
                 text: 'Level: ' + str(game.num_level)
-                font_style: 'H5'
+                font_style: 'Headline'
+                role: 'small'
                 halign: 'center'
 
-        MDProgressBar:
+        MDLinearProgressIndicator:
             value: 100 * game.level_progress_bar
             size_hint: 0.9, None
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}

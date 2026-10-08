@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-08. Status: **checkpoint 9 (Buscaminas) automated checks complete; manual desktop exercise pending**.
+Progress updated: 2026-10-08. Status: **checkpoints 1-10 complete; checkpoint 11 (cross-app regressions and CI) is next**.
 
 ## Progress tracker
 
-**Current position:** shell compatibility migration, Pong, Ahorcado, Memory, 15 puzzle, and 2048 checkpoints are complete. Buscaminas automated checks are complete; its manual desktop exercise remains. **Desktop acceptance: pending.**
+**Current position:** shell compatibility migration and all seven game checkpoints are complete. Cross-app regressions and CI are next. **Desktop acceptance: pending.**
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -18,12 +18,12 @@ Progress updated: 2026-10-08. Status: **checkpoint 9 (Buscaminas) automated chec
 | 6 | Memory | Complete | KivyMD 2 compatibility repair, eight real-widget behavior regressions, and full manual exercise pass |
 | 7 | 15 puzzle | Complete | KivyMD 2 migration, complete-theme filtering, six behavior regressions, and manual exercise pass |
 | 8 | 2048 | Complete | KivyMD 2 migration, seven real-widget behavior regressions, and manual desktop exercise pass |
-| 9 | Buscaminas | In progress | Toolbar callback and desktop right-click multitouch repairs plus six behavior regressions passed; right-click manual recheck passed, remaining game exercise pending |
-| 10 | Snake | Pending | Compatibility, behavior tests, manual exercise |
+| 9 | Buscaminas | Complete | Toolbar callback and desktop right-click multitouch repairs, six behavior regressions, and the required desktop exercise passed; committed `511cd0a` |
+| 10 | Snake | Complete | KivyMD 2 screen repair, five behavior regressions, and the required desktop exercise passed |
 | 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** manually launch Buscaminas from `source/MDclassic_games` with `uv run --locked python main.py` and complete the remaining exercise: new board, safe reveal, mine/cleared outcomes if reachable, drawer return/re-entry, and representative sound. The desktop right-click recheck already passed. Record observations before review; do not begin checkpoint 10.
+**Next exact action:** execute checkpoint 11 only: complete cross-app settings, navigation, resource, audio/browser-stub, and runtime-provider regressions; add and verify the focused CI workflow; then record local and remote CI evidence. Do not begin checkpoint 12.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 

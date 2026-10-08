@@ -7,7 +7,7 @@ Original review: 2026-09-13. Progress updated: 2026-10-08. Status: **Phase 1 com
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; checkpoints 1-8 complete; checkpoint 9 (Buscaminas) automated checks and right-click recheck pass, and its remaining manual exercise is pending |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1-10 complete; checkpoint 11 (cross-app regressions and CI) is next |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
