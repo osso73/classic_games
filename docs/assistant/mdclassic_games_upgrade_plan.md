@@ -16,7 +16,17 @@ See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progre
 
 **Baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Commit `a1beac1` subsequently selected the released PyPI `kivymd==2.0.0` artifact instead; checkpoint 3 and Pong automated checks were rerun successfully against that locked artifact. Python 3.11 and Kivy 2.3.1 remain the baseline. Android compatibility is still unvalidated.
 
-This document owns scope, phase order, compatibility work, Android work, and final acceptance. [The Phase 1 runbook](mdclassic_games_phase1_uv_plan.md) expands only Phase 1. These phase numbers supersede the previous plan: desktop compatibility now precedes Android packaging.
+This document owns scope, phase order, compatibility work, Android work, and final acceptance. Each detailed runbook expands its own phase. These phase numbers supersede the previous plan: desktop compatibility now precedes Android packaging.
+
+Detailed runbooks:
+
+- [Phase 1 - Reproducible desktop environment](mdclassic_games_phase1_uv_plan.md)
+- [Phase 2 - Desktop compatibility](mdclassic_games_phase2_desktop_plan.md)
+- [Phase 3 - Android toolchain and debug APK](mdclassic_games_phase3_android_plan.md)
+- [Phase 4 - Android device validation](mdclassic_games_phase4_device_plan.md)
+- [Phase 5 - Final documentation and handoff](mdclassic_games_phase5_handoff_plan.md)
+
+The Phase 3-5 runbooks are planning documents, not evidence that those phases have executed. They follow Phase 2's one-checkpoint-at-a-time review workflow; commits require an explicit user request.
 
 ## 1. Objective and boundaries
 
@@ -57,7 +67,7 @@ These are static review findings, not claims that every suspected API issue was 
 
 1. Read this plan and the Phase 1 runbook before editing. Inspect `git status --short` and preserve pre-existing work. Do not create branches or commits unless requested.
 2. Execute phases in order. Within a phase, make one small, coherent change at a time, run its check, and read the first meaningful traceback before changing more files.
-3. Use documentation/source for the **pinned release and commit**. The active migration targets the approved KivyMD 2.0.0 commit; current development examples may differ. Never solve a failure by silently switching to a floating Git URL, disabling a game, or suppressing exceptions.
+3. Use documentation/source for the **pinned release and commit**. The active baseline is the locked PyPI KivyMD 2.0.0 artifact; the approved official commit is an API reference after verifying it matches the artifact's relevant source. Current development examples may differ. Never solve a failure by silently switching to a floating Git URL, disabling a game, or suppressing exceptions.
 4. Keep environment failures, application failures, and Android recipe failures separate. Missing display/GL/audio, network access, SDK, or device is a recorded blocker, not a passing test.
 5. A phase gate must pass before dependent work starts. Phase 1 deliberately permits a documented application API failure; Phase 2 resolves it. Documentation may record partial progress while a later phase is blocked.
 6. After each phase update `docs/assistant/mdclassic_games_validation.md` (create during execution) with the template below. Report the next exact action so another model can resume. Do not mark modernization complete while required checks remain blocked or unrun.
@@ -197,6 +207,8 @@ Add a small GitHub Actions workflow triggered by pushes and pull requests, using
 
 ## 6. Phase 3 — Reproducible Android toolchain and debug APK
 
+Follow [the detailed Phase 3 runbook](mdclassic_games_phase3_android_plan.md). Its checkpoints separate toolchain/native-dependency feasibility, host setup, spec/resource checks, build, nested APK inspection, and clean-app-build reproduction. No Android toolchain combination is claimed validated by this plan.
+
 ### 3A. Select the toolchain before editing the spec
 
 Allowed edits: root build dependency group/lock, app build spec, narrowly scoped generated-output ignores, build instructions, validation record. Application changes require a reproduced Android compatibility problem.
@@ -249,6 +261,8 @@ Before closing this phase, run the full Phase 2 pytest suite in the desktop test
 
 ## 7. Phase 4 — Android device validation
 
+Follow [the detailed Phase 4 runbook](mdclassic_games_phase4_device_plan.md). It provides exact-artifact/device selection, safe fresh-data testing, full logcat capture, one-game-at-a-time touch checks, lifecycle scenarios, and the fix/rebuild/retest loop.
+
 Use a physical arm64 device or compatible emulator for the built ABI. Record device model, Android API, ABI, installation result, artifact path, and logcat observations.
 
 With working directory `source/MDclassic_games`:
@@ -267,6 +281,8 @@ uv run --locked --group android buildozer android logcat
 **Gate:** installed app passes required checks on at least one recorded device/emulator, and the final code/dependency/spec state has a recorded full pytest pass. Without device access this phase remains blocked, and Android runtime support must not be advertised as validated.
 
 ## 8. Phase 5 — Final docs and handoff
+
+Follow [the detailed Phase 5 runbook](mdclassic_games_phase5_handoff_plan.md). Its checkpoints cover evidence reconciliation, a functional runtime requirements export, public setup/test/build instructions, fresh-environment verification, and final acceptance.
 
 1. Reconcile MD-app sections of `README.md` and `docs/getting-started.md`: uv installation link, Python baseline, locked sync, correct working directory, desktop command, host prerequisites, pinned Android group/build/deploy commands. Keep standalone instructions separate. Correct the relevant `game.spec` reference to `buildozer.spec`.
 2. Keep `pyproject.toml` / `uv.lock` authoritative. Replace root `requirements.txt` with a **functional generated export**, retaining its existing MD-app dependency purpose, and explain that it does not cover every standalone game. Generate from root with `uv export --locked --no-dev --format requirements-txt --output-file requirements.txt`; confirm the export excludes the Android group. Never replace requirements with a comment-only file that makes `pip install -r` silently install nothing. Regenerate after runtime dependency changes.
