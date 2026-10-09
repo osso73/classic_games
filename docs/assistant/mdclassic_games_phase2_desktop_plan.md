@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-10. Status: **checkpoints 1-11 complete; checkpoint 12 desktop acceptance approved; final changes reviewed for commit; remote CI acceptance pending**.
+Progress updated: 2026-10-10. Status: **desktop acceptance committed; user reports both CI jobs passed; Node.js 24 action cleanup awaits review/commit and remote recheck**.
 
 ## Progress tracker
 
-**Current position:** user confirmed both the full desktop checklist and the repaired purple styling/reference-image recheck pass, and requested a commit. The current full suite passes 80 tests. Desktop acceptance is approved; Phase 2 closure is waiting on remote CI results. User-selected `main.ini` changes are preserved outside the checkpoint deliverable.
+**Current position:** desktop acceptance is committed as `3efd3cf`; the current full suite passes 80 tests. User supplied a screenshot of both CI jobs passing with Node.js 20 deprecation annotations. The workflow actions are updated to upstream versions declaring Node.js 24. That workflow-only cleanup needs review/commit and a remote recheck; the run URL and tested commit still need recording before Phase 2 closure.
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -21,9 +21,9 @@ Progress updated: 2026-10-10. Status: **checkpoints 1-11 complete; checkpoint 12
 | 9 | Buscaminas | Complete | Toolbar callback and desktop right-click multitouch repairs, six behavior regressions, and the required desktop exercise passed; committed `511cd0a` |
 | 10 | Snake | Complete | KivyMD 2 screen repair, five behavior regressions, and the required desktop exercise passed |
 | 11 | Cross-app regressions and CI | Complete | User approved completion and commit; 17 unit, 60 GUI, and 77 full-suite tests pass locally; Pong menu-return defect repaired; workflow added; Ubuntu/Xvfb/remote CI acceptance remains pending |
-| 12 | Desktop acceptance and handoff | In progress | Desktop and visual recheck approved; 80 tests pass; changes reviewed for the requested commit; remote CI acceptance remains pending |
+| 12 | Desktop acceptance and handoff | In progress | Desktop/visual acceptance committed `3efd3cf`; 80 tests pass; both CI jobs passed per user screenshot; Node.js 24 workflow cleanup review/commit, remote recheck and run URL pending |
 
-**Next exact action:** publish the approved commits on branch `MDclassic_games` with `git push origin MDclassic_games`, then open the repository's Actions tab and select the latest **MDclassic games tests** run for that branch/commit. Both `unit` and `gui` must pass; record the run URL and results, or investigate the first failing job step and its logs/artifacts. No push was performed by the assistant. Reuse checkpoint 12's 80-test result while tested inputs and environment remain unchanged. Preserve local user settings outside the checkpoint commit. Once remote CI passes, close checkpoint 12 and Phase 2 and hand off to Phase 3 toolchain selection. Phase 3 must add the deferred ICO packaging assertion.
+**Next exact action:** review the Node.js 24 action updates and commit only when requested. After publication, confirm both `unit` and `gui` pass without the Node.js 20 annotations; supply the run URL and tested commit so the remote evidence can be recorded. The preceding user screenshot shows a passing original workflow, not execution of the updated action versions. Reuse checkpoint 12's local 80-test result because application/test/dependency inputs are unchanged. Once updated CI passes and its evidence is recorded, close checkpoint 12 and Phase 2 and hand off to Phase 3 toolchain selection. Phase 3 must add the deferred ICO packaging assertion.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Checkpoint 11 permits a user-approved handoff with unavailable remote CI explicitly pending; this does not complete the Phase 2 CI gate. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
