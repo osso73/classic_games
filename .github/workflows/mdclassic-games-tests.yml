@@ -1,0 +1,69 @@
+name: MDclassic games tests
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.10'
+      - name: Install Cairo build prerequisites
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
+      - run: uv sync --locked --group dev
+      - name: Run display-independent tests
+        env:
+          DISPLAY: ''
+          WAYLAND_DISPLAY: ''
+        run: uv run --locked --group dev pytest tests/mdclassic_games/unit --junitxml=unit-results.xml
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: unit-failure-logs
+          path: unit-results.xml
+
+  gui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      KIVY_WINDOW: sdl2
+      KIVY_GL_BACKEND: sdl2
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      # Decode real OGGs without requiring an audible CI output device.
+      SDL_AUDIODRIVER: dummy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.10'
+      - name: Install display, software OpenGL, SDL audio and Cairo prerequisites
+        # Kivy's Linux wheel bundles SDL2; Mesa supplies software GL, Xvfb the display.
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          xvfb xauth libgl1 libgl1-mesa-dri libegl1 libasound2t64
+          libcairo2-dev pkg-config xclip
+      - run: uv sync --locked --group dev
+      - name: Run real-widget integration tests
+        shell: bash
+        run: |
+          set -o pipefail
+          xvfb-run -a uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration --junitxml=gui-results.xml 2>&1 | tee gui-tests.log
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: gui-failure-logs
+          path: |
+            gui-tests.log
+            gui-results.xml

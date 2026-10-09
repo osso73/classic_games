@@ -127,7 +127,15 @@ def test_shell_about_dialog_constructs_and_dismisses(gui_environment, tmp_path):
         dialog = next(
             widget for widget in Window.children if isinstance(widget, MDDialog)
         )
-        dialog.dismiss()
+        from kivymd.uix.button import MDButton, MDButtonText
+        texts = [getattr(widget, "text", "") for widget in dialog.walk()]
+        assert any(str(app.version) in text for text in texts)
+        close = next(widget for widget in dialog.walk()
+                     if isinstance(widget, MDButton)
+                     and any(isinstance(child, MDButtonText) and child.text == "CLOSE"
+                             for child in widget.walk()))
+        close.dispatch("on_release")
+        assert not dialog._is_open
         """,
     )
 
@@ -157,14 +165,25 @@ def test_shell_startup_preloads_audio(gui_environment, tmp_path):
 
         app = MainApp()
         app.get_application_config = lambda: {str(config_path)!r}
-        Clock.schedule_once(lambda dt: app.change_screen("pong"), 0.5)
-        Clock.schedule_once(lambda dt: app.play("bye"), 1)
-        Clock.schedule_once(app.stop, 2)
+        requested = []
+        def verify_startup(dt):
+            assert len(app.sounds) == 15
+            assert all(sound is not None for sound in app.sounds.values())
+            app.sounds["bye.ogg"].play = lambda: requested.append("bye")
+            app.play("bye")
+            app.change_screen("pong")
+            app.stop()
+        original_start = app.on_start
+        def start():
+            original_start()
+            Clock.schedule_once(verify_startup)
+        app.on_start = start
         app.run()
 
         assert "bye.ogg" in app.sounds
         assert len(app.sounds) == 15
         assert app.sm.has_screen("pong")
+        assert requested == ["bye"]
         """
     )
     result = subprocess.run(

@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-08. Status: **checkpoints 1-10 complete; checkpoint 11 (cross-app regressions and CI) is next**.
+Progress updated: 2026-10-09. Status: **checkpoints 1-11 complete; checkpoint 12 (desktop acceptance and handoff) is next; remote CI acceptance pending**.
 
 ## Progress tracker
 
-**Current position:** shell compatibility migration and all seven game checkpoints are complete. Cross-app regressions and CI are next. **Desktop acceptance: pending.**
+**Current position:** checkpoint 11's cross-app regressions, Pong menu-return repair, and CI workflow are complete and user-approved. Local unit, GUI, and full-suite checks pass. Remote CI remains pending under the checkpoint 11 gate's permitted handoff. **Desktop acceptance: pending; checkpoint 12 is next.**
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -20,12 +20,12 @@ Progress updated: 2026-10-08. Status: **checkpoints 1-10 complete; checkpoint 11
 | 8 | 2048 | Complete | KivyMD 2 migration, seven real-widget behavior regressions, and manual desktop exercise pass |
 | 9 | Buscaminas | Complete | Toolbar callback and desktop right-click multitouch repairs, six behavior regressions, and the required desktop exercise passed; committed `511cd0a` |
 | 10 | Snake | Complete | KivyMD 2 screen repair, five behavior regressions, and the required desktop exercise passed |
-| 11 | Cross-app regressions and CI | Pending | Settings, navigation, resources, full suite, CI workflow and passing jobs |
+| 11 | Cross-app regressions and CI | Complete | User approved completion and commit; 17 unit, 60 GUI, and 77 full-suite tests pass locally; Pong menu-return defect repaired; workflow added; Ubuntu/Xvfb/remote CI acceptance remains pending |
 | 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
 
-**Next exact action:** execute checkpoint 11 only: complete cross-app settings, navigation, resource, audio/browser-stub, and runtime-provider regressions; add and verify the focused CI workflow; then record local and remote CI evidence. Do not begin checkpoint 12.
+**Next exact action:** execute checkpoint 12 only: perform the desktop acceptance checklist, including Pong menu return/re-entry, audio, layout, and settings persistence. Reuse checkpoint 11's recorded 77-test full-suite pass if tested inputs and environment remain unchanged. When published, verify both jobs in `.github/workflows/mdclassic-games-tests.yml` and record their run URL/results; Ubuntu/Xvfb prerequisites remain unverified on that runner. Phase 2 acceptance still requires actual remote CI evidence. Phase 3 must add the deferred ICO packaging assertion.
 
-**Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
+**Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Checkpoint 11 permits a user-approved handoff with unavailable remote CI explicitly pending; this does not complete the Phase 2 CI gate. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
 Update this tracker and the master plan's phase summary alongside the validation record at every checkpoint handoff. Keep detailed commands, observations, counts, and failures in the validation record. The entries above summarize recorded evidence; no runtime checks were rerun for this documentation update.
 
@@ -255,6 +255,8 @@ Add `.github/workflows/mdclassic-games-tests.yml`, triggered by push and pull re
 | GUI | `xvfb-run -a uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` |
 
 Both jobs must use an explicit runner image and run `uv sync --locked --group dev` before testing. The GUI job must document the verified Linux SDL/OpenGL/software-rendering prerequisites, set a finite timeout, and preserve failure logs. Xvfb is a display server, not proof that required GL/audio providers work. Missing required providers are failures/blockers, not passing skips. Automated interaction tests may stub audible playback as described above; CI does not verify audible output.
+
+Checkpoint 11 implementation uses `ubuntu-24.04`, Python 3.11, and uv 0.12.10. Cairo development headers and pkg-config support the locked pycairo dependency. The GUI job installs Xvfb/xauth, Mesa GL/EGL and software-rendering drivers, ALSA's library, and xclip; Kivy's Linux wheel supplies SDL2. It selects `KIVY_WINDOW=sdl2`, `KIVY_GL_BACKEND=sdl2`, `LIBGL_ALWAYS_SOFTWARE=1`, and `SDL_AUDIODRIVER=dummy`. Local tests verified that provider combination on the existing desktop display, including real decoding of all 15 OGGs; the dummy output is not audible acceptance. Xvfb is unavailable on the current host, so the Ubuntu package list and Xvfb command require the first remote job result before being considered verified. Failed jobs upload JUnit reports and the GUI console log, including subprocess traceback output.
 
 Run from repository root:
 

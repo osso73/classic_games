@@ -219,7 +219,7 @@ class MainApp(MDApp):
         if not self.sm.has_screen(new_screen):
             if new_screen == 'pong':
                 TempMsg(text='Loading pong...').open()
-                self.sm.switch_to(ScreenPong())
+                self.sm.add_widget(ScreenPong())
             elif new_screen == 'ahorcado':
                 TempMsg(text='Loading ahorcado...').open()
                 self.sm.add_widget(ScreenAhorcado())
