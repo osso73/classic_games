@@ -1,10 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-09. Status: **checkpoints 1-11 complete; checkpoint 12 (desktop acceptance and handoff) is next; remote CI acceptance pending**.
+Progress updated: 2026-10-10. Status: **checkpoints 1-11 complete; checkpoint 12 desktop acceptance approved; final changes reviewed for commit; remote CI acceptance pending**.
 
 ## Progress tracker
 
-**Current position:** checkpoint 11's cross-app regressions, Pong menu-return repair, and CI workflow are complete and user-approved. Local unit, GUI, and full-suite checks pass. Remote CI remains pending under the checkpoint 11 gate's permitted handoff. **Desktop acceptance: pending; checkpoint 12 is next.**
+**Current position:** user confirmed both the full desktop checklist and the repaired purple styling/reference-image recheck pass, and requested a commit. The current full suite passes 80 tests. Desktop acceptance is approved; Phase 2 closure is waiting on remote CI results. User-selected `main.ini` changes are preserved outside the checkpoint deliverable.
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
@@ -21,9 +21,9 @@ Progress updated: 2026-10-09. Status: **checkpoints 1-11 complete; checkpoint 12
 | 9 | Buscaminas | Complete | Toolbar callback and desktop right-click multitouch repairs, six behavior regressions, and the required desktop exercise passed; committed `511cd0a` |
 | 10 | Snake | Complete | KivyMD 2 screen repair, five behavior regressions, and the required desktop exercise passed |
 | 11 | Cross-app regressions and CI | Complete | User approved completion and commit; 17 unit, 60 GUI, and 77 full-suite tests pass locally; Pong menu-return defect repaired; workflow added; Ubuntu/Xvfb/remote CI acceptance remains pending |
-| 12 | Desktop acceptance and handoff | Pending | Interactive gameplay, audio, layout, persistence, final review and commit |
+| 12 | Desktop acceptance and handoff | In progress | Desktop and visual recheck approved; 80 tests pass; changes reviewed for the requested commit; remote CI acceptance remains pending |
 
-**Next exact action:** execute checkpoint 12 only: perform the desktop acceptance checklist, including Pong menu return/re-entry, audio, layout, and settings persistence. Reuse checkpoint 11's recorded 77-test full-suite pass if tested inputs and environment remain unchanged. When published, verify both jobs in `.github/workflows/mdclassic-games-tests.yml` and record their run URL/results; Ubuntu/Xvfb prerequisites remain unverified on that runner. Phase 2 acceptance still requires actual remote CI evidence. Phase 3 must add the deferred ICO packaging assertion.
+**Next exact action:** publish the approved commits on branch `MDclassic_games` with `git push origin MDclassic_games`, then open the repository's Actions tab and select the latest **MDclassic games tests** run for that branch/commit. Both `unit` and `gui` must pass; record the run URL and results, or investigate the first failing job step and its logs/artifacts. No push was performed by the assistant. Reuse checkpoint 12's 80-test result while tested inputs and environment remain unchanged. Preserve local user settings outside the checkpoint commit. Once remote CI passes, close checkpoint 12 and Phase 2 and hand off to Phase 3 toolchain selection. Phase 3 must add the deferred ICO packaging assertion.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Checkpoint 11 permits a user-approved handoff with unavailable remote CI explicitly pending; this does not complete the Phase 2 CI gate. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
@@ -310,11 +310,11 @@ git diff --stat
 ### Phase 2 completion gate
 
 - [x] Framework resources install reproducibly from declared locked inputs.
-- [ ] Shell, seven games, controls, settings, sounds, and resources pass desktop acceptance.
-- [ ] Unit and GUI suites collect meaningful tests and pass.
-- [ ] Tests preserve tracked configuration and isolate state.
+- [x] Shell, seven games, controls, settings, sounds, and resources pass desktop acceptance (user checklist and post-repair visual confirmation).
+- [x] Unit and GUI suites collect meaningful tests and pass (checkpoint 12: 17 unit, 63 GUI, 80 full-suite).
+- [x] Tests preserve tracked configuration and isolate state (checkpoint 11 subprocesses and digest guard).
 - [ ] Focused CI passes. If remote execution is unavailable, record it as pending and keep Phase 2 acceptance partial.
-- [ ] Validation record contains commands, counts, observations, failures, decisions, and the next action.
-- [ ] Review and commit Phase 2 as the final checkpoint.
+- [x] Validation record contains commands, counts, observations, failures, decisions, and the next action.
+- [x] Review and commit Phase 2 as the final checkpoint (user approved the local deliverables and requested their commit; remote CI remains pending).
 
 Only then hand off to Phase 3A: select the Android toolchain. Phase 3 builds one combined APK; Phase 4 installs that APK on a suitable device/emulator and repeats the relevant gameplay checks with Android-specific lifecycle, touch, rotation, and audio validation.

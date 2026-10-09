@@ -34,7 +34,7 @@ Builder.load_string(
 
 <CardSample>:
     source: f'game_15puzzle/images/themes/{self.theme}/{self.board_size}/{self.name}.jpg'
-    allow_stretch: True
+    fit_mode: 'contain'
 
 """)
 

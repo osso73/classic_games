@@ -1,18 +1,18 @@
 # MDclassic_games modernization execution plan
 
-Original review: 2026-09-13. Progress updated: 2026-10-09. Status: **Phase 1 complete; Phase 2 in progress**.
+Original review: 2026-09-13. Progress updated: 2026-10-10. Status: **Phase 1 complete; Phase 2 in progress**.
 
 ## Progress summary
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; checkpoints 1-11 complete; checkpoint 12 (desktop acceptance and handoff) is next; 77 local tests pass; remote CI acceptance pending |
+| 2 | Desktop compatibility and validation | In progress; checkpoints 1-11 complete; checkpoint 12 desktop/visual acceptance approved and commit requested; 80 tests pass; remote CI is the remaining acceptance gate |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
 
-See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Local unit and GUI suites pass; desktop acceptance and remote CI acceptance remain pending.
+See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Local unit and GUI suites and desktop acceptance pass; remote CI acceptance remains pending.
 
 **Baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Commit `a1beac1` subsequently selected the released PyPI `kivymd==2.0.0` artifact instead; checkpoint 3 and Pong automated checks were rerun successfully against that locked artifact. Python 3.11 and Kivy 2.3.1 remain the baseline. Android compatibility is still unvalidated.
 

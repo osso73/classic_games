@@ -49,6 +49,39 @@ __version__ = '1.2'
 
 KV = r"""
 
+# Preserve the classic DeepPurple toolbar across the menu and every game.
+<MDTopAppBar>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
+
+<MDTopAppBarTitle>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDActionTopAppBarButton>:
+    theme_icon_color: "Custom"
+    icon_color: "#FFFFFF"
+
+<MDChip>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
+
+<MDChipText>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDButton>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
+
+<MDButtonText>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDButtonIcon>:
+    theme_icon_color: "Custom"
+    icon_color: "#FFFFFF"
+
 Screen:
     
     MDNavigationLayout:

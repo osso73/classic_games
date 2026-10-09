@@ -46,6 +46,7 @@ def run_shell_script(tmp_path, body):
         timeout=30,
     )
     assert result.returncode == 0, result.stderr
+    return result
 
 
 @pytest.mark.gui
