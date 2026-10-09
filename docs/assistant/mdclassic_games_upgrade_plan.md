@@ -7,12 +7,12 @@ Original review: 2026-09-13. Progress updated: 2026-10-10. Status: **Phase 1 com
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; desktop/visual acceptance committed; 80 tests pass; user reports both CI jobs green; Node.js 24 workflow cleanup and final CI evidence pending |
+| 2 | Desktop compatibility and validation | In progress; desktop/visual acceptance and Node.js 24 actions committed; 80 tests pass; user reports CI green again; per-job cache cleanup and final CI evidence pending |
 | 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
 
-See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Local unit and GUI suites and desktop acceptance pass; both remote jobs passed per user screenshot. Final CI acceptance awaits a recorded run URL/commit and recheck of the Node.js 24 workflow update.
+See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Local unit and GUI suites and desktop acceptance pass; both remote jobs passed again per user report after the Node.js 24 update. Final CI evidence awaits a recorded run URL/commit and recheck of the per-job cache cleanup.
 
 **Baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Commit `a1beac1` subsequently selected the released PyPI `kivymd==2.0.0` artifact instead; checkpoint 3 and Pong automated checks were rerun successfully against that locked artifact. Python 3.11 and Kivy 2.3.1 remain the baseline. Android compatibility is still unvalidated.
 

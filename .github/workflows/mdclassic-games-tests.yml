@@ -17,6 +17,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           version: '0.12.10'
+          cache-suffix: ${{ github.job }}
       - name: Install Cairo build prerequisites
         run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
       - run: uv sync --locked --group dev
@@ -48,6 +49,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           version: '0.12.10'
+          cache-suffix: ${{ github.job }}
       - name: Install display, software OpenGL, SDL audio and Cairo prerequisites
         # Kivy's Linux wheel bundles SDL2; Mesa supplies software GL, Xvfb the display.
         run: >-
