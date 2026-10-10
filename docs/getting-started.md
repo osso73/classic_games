@@ -60,7 +60,7 @@ env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
     --sdk_root="$HOME/.local/share/classic-games-android/sdk" --licenses
 ```
 
-To inspect the installed SDK, repeat that command with `--list_installed` instead of `--licenses`. Buildozer 1.6.0 expects the legacy `sdk/tools/bin/sdkmanager` location; the provisioning script creates a small launcher pointing to the canonical `sdk/cmdline-tools/19.0/bin/sdkmanager`, without duplicating SDK package metadata.
+To inspect the installed SDK, repeat that command with `--list_installed` instead of `--licenses`. Buildozer 1.6.0 expects the legacy `sdk/tools/bin/sdkmanager` location and p4a's API check runs `sdk/tools/bin/avdmanager`; the provisioning script creates small launchers for both that point to the canonical `sdk/cmdline-tools/19.0/bin/` binaries, without duplicating SDK package metadata.
 
 The project's `android` dependency group pins host build tools; `uv.lock` does not lock OS packages, Java, SDK/NDK binaries or p4a's cross-compiled Python environment. The APK's selected Python 3.11.14 is separate from the host interpreter. The next spec checkpoint will use the immutable p4a revision, explicit APIs/NDK, isolated SDK paths and disabled SDK auto-updates. Building is still gated by that spec/resource review.
 

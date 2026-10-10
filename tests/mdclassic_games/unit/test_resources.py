@@ -164,9 +164,9 @@ def test_android_toolchain_is_immutable_and_arm64(app_spec):
 
 def test_android_requirements_keep_runtime_pins_and_omit_host_tools(app_spec):
     requirements = spec_list(app_spec, "requirements")
-    assert {"python3==3.11.14", "hostpython3==3.11.14", "harfbuzz",
+    assert {"python3==3.11.14", "hostpython3==3.11.14",
             "chardet==5.2.0", "six==1.17.0", "setuptools==79.0.1"} <= requirements
-    assert all("==" in requirement or requirement == "harfbuzz" for requirement in requirements)
+    assert all("==" in requirement for requirement in requirements)
     assert not any("master" in requirement or "://" in requirement for requirement in requirements)
     names = {requirement.split("==")[0].lower() for requirement in requirements}
     assert "sdl2_ttf" not in names

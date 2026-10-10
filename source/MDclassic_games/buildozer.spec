@@ -37,8 +37,10 @@ version.filename = %(source.dir)s/main.py
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
 # Reviewed runtime pins; native transitives use the immutable p4a recipes below.
-# HarfBuzz is explicit because Pillow uses its build paths via FreeType.
-requirements = python3==3.11.14, hostpython3==3.11.14, kivy==2.3.1, kivymd==2.0.0, pillow==11.3.0, pycairo==1.28.0, materialyoucolor==3.0.4, asynckivy==0.6.4, asyncgui==0.6.3, materialshapes==0.3, kivy-garden==0.1.5, docutils==0.23, pygments==2.21.0, filetype==1.2.0, requests==2.34.2, urllib3==2.7.0, idna==3.19, certifi==2026.7.22, charset-normalizer==3.5.1, chardet==5.2.0, six==1.17.0, setuptools==79.0.1, harfbuzz
+# freetype and Pillow build without HarfBuzz; harfbuzz 2.6.4's autotools
+# -Werror build fails under NDK r28c Clang 19 and the app uses no complex text
+# shaping.
+requirements = python3==3.11.14, hostpython3==3.11.14, kivy==2.3.1, kivymd==2.0.0, pillow==11.3.0, pycairo==1.28.0, materialyoucolor==3.0.4, asynckivy==0.6.4, asyncgui==0.6.3, materialshapes==0.3, kivy-garden==0.1.5, docutils==0.23, pygments==2.21.0, filetype==1.2.0, requests==2.34.2, urllib3==2.7.0, idna==3.19, certifi==2026.7.22, charset-normalizer==3.5.1, chardet==5.2.0, six==1.17.0, setuptools==79.0.1
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

@@ -122,12 +122,18 @@ def main():
         tools.unlink()
     legacy_bin = tools / "bin"
     legacy_bin.mkdir(parents=True, exist_ok=True)
-    launcher = legacy_bin / "sdkmanager"
-    content = '#!/bin/sh\nexec "$(dirname "$0")/../../cmdline-tools/19.0/bin/sdkmanager" "$@"\n'
-    if launcher.exists() and launcher.read_text() != content:
-        raise RuntimeError(f"Existing SDK launcher cannot be replaced: {launcher}")
-    launcher.write_text(content)
-    launcher.chmod(0o755)
+    # Buildozer 1.6.0 expects sdk/tools/bin/sdkmanager, and p4a's API check calls
+    # sdk/tools/bin/avdmanager; expose both without duplicating SDK metadata.
+    for name in ("sdkmanager", "avdmanager"):
+        launcher = legacy_bin / name
+        content = (
+            '#!/bin/sh\n'
+            f'exec "$(dirname "$0")/../../cmdline-tools/19.0/bin/{name}" "$@"\n'
+        )
+        if launcher.exists() and launcher.read_text() != content:
+            raise RuntimeError(f"Existing SDK launcher cannot be replaced: {launcher}")
+        launcher.write_text(content)
+        launcher.chmod(0o755)
     print(f"Provisioning complete. SDK root: {base / 'sdk'}", flush=True)
     print("Review/accept SDK licenses with sdk/tools/bin/sdkmanager --licenses.", flush=True)
 
