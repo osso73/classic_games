@@ -918,3 +918,48 @@ Phase 4 handoff inputs:
 - Known issues/limits passed to Phase 4: (a) the display-cutout safe inset is not padded (only `WindowInsets.Type.systemBars()`), so a wide-notch device could render the top app bar near the cutout; neither test device exercises this. (b) The final clean-build artifact `7d3416aa…` has not itself been installed; the prior interactive pass used the content-identical `4c45da83…`, so the Phase 4 fresh install must confirm startup and audio on `7d3416aa…`. (c) Phase 4 devices already available: Google Pixel 10 and Samsung Galaxy S24 `SM-S921B` (both Android 16 / API 36 / arm64-v8a).
 
 Next exact action: Phase 3 is complete. Execute Phase 4 checkpoint 1 only on explicit instruction: verify the local artifact hash equals `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, record package/version/launcher/API/ABI/signing from the APK manifest, confirm no unbuilt runtime/spec/dependency change exists, then identify and preserve an authorized, compatible, fresh-data target (Pixel 10 and/or Samsung S24 `SM-S921B`). Do not begin another Phase 3 checkpoint or rebuild.
+
+Phase / task: Phase 4 - Checkpoint 1: identify the target and preserve existing data (2026-10-10)
+
+Status: passed - one authorized, explicitly selected, compatible physical target and a safe fresh-data strategy exist, and the local artifact matches its recorded hash. The target's Android platform differs from the Phase 3 handoff note (Android 17 / API 37, not 16 / 36); the APK's minSdk 24 and targetSdk 36 remain compatible and the device ABI is the built `arm64-v8a`.
+
+Files changed: this record, the Phase 4 tracker (`mdclassic_games_phase4_device_plan.md`) and the master summary (`mdclassic_games_upgrade_plan.md`). No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: repository root `/home/oriol/Nextcloud/Programacion/GitHub/classic_games` on branch `MDclassic_games`; HEAD `524e02b` ("Review Phase 3 final artifact and hand off to Phase 4"). Host Manjaro Linux x86_64; `adb` 1.0.41 (37.0.0-android-tools) at `/usr/bin/adb`; Android SDK build-tools `35.0.0` at `/home/oriol/Android/sdk/build-tools/35.0.0/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+git status --short --untracked-files=all
+sha256sum /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+"/home/oriol/Android/sdk/build-tools/35.0.0/aapt" dump badging "<apk>"
+"/home/oriol/Android/sdk/build-tools/35.0.0/apksigner" verify --verbose "<apk>"
+adb devices -l
+adb -s 61190DLCR000VV shell getprop ro.product.model   # and release/sdk/abilist/manufacturer/display.id
+adb -s 61190DLCR000VV shell wm size ; adb -s 61190DLCR000VV shell wm density
+adb -s 61190DLCR000VV shell settings get secure navigation_mode
+adb -s 61190DLCR000VV shell pm path org.games.clasicgames
+adb -s 61190DLCR000VV shell dumpsys package org.games.clasicgames   # versionName/Code/abi/timestamps
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames ls -la /data/data/org.games.clasicgames
+```
+
+Expected / observed result: PASS for the artifact gate and device gate.
+
+Artifact gate:
+1. The local artifact hash equals the Phase 3 record: SHA-256 `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, 53,223,301 bytes, at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk` (`apk.sha256` in the same directory records the identical hash). It is the checkpoint-6 clean-build artifact accepted by Phase 3 checkpoint 7.
+2. Manifest read back from the APK with build-tools `35.0.0` (not copied from earlier notes): package `org.games.clasicgames`; `versionName='1.2'`; `versionCode='1024102'`; `compileSdkVersion`/`targetSdkVersion` 36; `sdkVersion:'24'`; label `Classic games`; `application-debuggable`; launchable activity `org.kivy.android.PythonActivity`; `native-code: 'arm64-v8a'`. `apksigner verify --verbose` reports `Verifies` using APK Signature Scheme v2 (`true`), 1 signer (v1/v3/v3.1/v4 `false`, expected for a debug build).
+3. No unbuilt runtime/spec/dependency change: `git status --short --untracked-files=all` is empty at HEAD `524e02b`; the tracked `source/MDclassic_games/main.ini` is unchanged. There are no application edits pending a rebuild, so the artifact corresponds to the reviewed input state.
+
+Device gate:
+1. `adb devices -l` lists exactly one authorized target: `61190DLCR000VV device product:frankel model:Pixel_10 device:frankel` (physical hardware, not an emulator). No other device is attached, so `-s "<serial>"` is used on every command to avoid selecting another target accidentally.
+2. Recorded device identity: Google Pixel 10, `ro.build.version.release` 17, `ro.build.version.sdk` 37, `ro.product.cpu.abilist` `arm64-v8a`, build `CP3A.260905.009`. Screen 1080x2424, physical density 420 with an override density of 460; navigation mode `0` (3-button). API 37 is at least the APK minimum 24, and the device's `arm64-v8a` ABI is the only ABI built, so the target is compatible. The device is the same physical unit recorded during the earlier interactive pass, but its OS was upgraded since then from Android 16 / API 36 to Android 17 / API 37, so the Phase 4 matrix will be exercised on API 37 rather than the earlier API 36.
+3. The package already exists from the earlier interactive pass: `data/app/~~0MSy6lqI93lfb4y32a4VSA==/org.games.clasicgames-.../base.apk`, `versionName=1.2`, `versionCode=1024102`, `primaryCpuAbi=arm64-v8a`, `firstInstallTime=2026-10-10 16:47:44`, `lastUpdateTime=2026-10-10 17:42:42`. `run-as` shows a live data directory (`cache`, `code_cache`, `files`, `shared_prefs`) holding the prior interactive-pass test data (this is the content-identical interim build `4c45da83…2102bf44`; the final artifact `7d3416aa…` has never been installed). The user explicitly consented to uninstall / clear this disposable test installation to obtain a clean fresh-default startup; the exact removal is deferred to checkpoint 2 so this checkpoint preserves the starting state.
+4. Fresh-data strategy: because the target holds only prior test data and the user approved its removal, the fresh-install path is an explicit `adb uninstall org.games.clasicgames` (or `pm clear`) followed by a plain `adb install` of the exact artifact in checkpoint 2, not a reinstall over the existing installation and not `-r`.
+
+Automated checks: not applicable at this checkpoint (device targeting and artifact hashing only; no pytest change).
+
+Failure: none. Two observations to carry forward: (a) the device OS drifted to Android 17 / API 37 after the Phase 3 handoff recorded Android 16 / API 36, so results must be recorded as API 37 and not conflated with the earlier API 36 repair pass; (b) `wm density` shows an override density of 460 over the physical 420, so touch-target/layout observations are at 460 dpi.
+
+Decision: Select the Google Pixel 10 `61190DLCR000VV` (Android 17 / API 37 / `arm64-v8a`, 1080x2424, 3-button navigation) as the authorized target for Phase 4, and treat its existing installation as a disposable test install the user approved clearing for a clean fresh-default scenario. The exact final artifact `7d3416aa…e9d3cc91` is available, matches its hash, and is compatible with the target.
+
+Next exact action: checkpoint 1 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 2 only: start a full-device `adb -s 61190DLCR000VV logcat -v threadtime` capture in a separate terminal, uninstall the existing test installation (recording exactly what was removed), `adb -s 61190DLCR000VV install` the exact artifact `7d3416aa…e9d3cc91`, launch `org.kivy.android.PythonActivity` with `am start -W`, and record startup duration, seven tiles, drawer, About/CLOSE, fresh-default settings versus `MainApp.build_config`, and startup logcat for tracebacks/missing resources. Do not begin checkpoint 3.
