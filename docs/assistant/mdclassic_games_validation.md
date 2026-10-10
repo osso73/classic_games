@@ -552,3 +552,129 @@ Failure: no unresolved source/native-version selection conflict after the approv
 Decision: approve the source-based candidate toolchain for a build attempt after host setup. Checkpoint 1 technical selection checks pass; keep its tracker In progress until review/commit. Apply project-local Python adjustments and provision user-local JDK/SDK in checkpoint 2 only after the reviewed checkpoint is committed. Keep the reviewed one-checkpoint-at-a-time workflow.
 
 Next exact action: review this selection and the execution-document diffs; commit only on explicit request. Once checkpoint 1 is reviewed and committed, execute checkpoint 2: generate the Android host group/lock, apply approved common supporting pins in `.venv`, provision the exact user-local JDK/SDK/NDK, verify host commands/prerequisites, run the full desktop suite and obtain affected manual resource/widget observations. Then stop for checkpoint-2 review before changing the spec.
+
+### Phase 3 checkpoint 2 - Project-local host setup and desktop revalidation
+
+Phase / task: Phase 3 - Checkpoint 1 requested commit, then checkpoint 2 host setup (2026-10-10)
+
+Status: blocked - checkpoint 1 reviewed/committed; checkpoint 2 project setup and automated desktop checks PASS, but OS zip, SDK licenses and affected manual visual recheck remain pending.
+
+Commit: user explicitly requested commit and the next step. Reviewed `git status --short`, complete documentation diff, `git log --oneline -10` and `git diff --check`; committed the four reviewed execution documents as **`8cb288f`**, `Select reproducible Android toolchain and supporting versions`. No push requested/performed. Checkpoint 1 is now complete. Checkpoint 2 changes are separate, uncommitted work awaiting its own review.
+
+Files changed: `pyproject.toml`, generated `uv.lock`, `docs/getting-started.md`, new standard-library provisioning script `docs/assistant/mdclassic_games_install_android_tools.py`, and this record/master/Phase 3 tracker. User tools and archive cache installed outside the repository at `/home/oriol/.local/share/classic-games-android`. No application/KV/spec/assets/requirements/sibling-game edits. `main.ini` remains unchanged.
+
+Environment: Manjaro Linux 7.2.3-2-MANJARO x86_64; host CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0; Pillow **11.3.0**; pycairo **1.28.0**; materialyoucolor 3.0.4. `pycairo==1.28.0` built successfully on this host during uv sync using Cairo 1.18.4. Host package inventory: base-devel 1-3, autoconf 2.73-1, automake 1.18.1-1, libtool 2.6.2-5, pkgconf 3.0.7-1, cmake 4.4.3-2, gettext 1.0-2, unzip 6.0-23, openssl 3.6.4-1, libffi 3.8.0-1, zlib 1:1.3.2-3, cairo 1.18.4-1, lld 22.1.8-1. `pkg-config --modversion cairo libffi openssl zlib` returns 1.18.4 / 3.8.0 / 3.6.4 / 1.3.2. **zip is missing** from PATH and pacman inventory. No privileged package installation was attempted.
+
+Command and working directory: repository root for:
+
+```bash
+uv lock
+uv sync --locked --group android
+uv pip check
+uv lock --check
+uv run --locked --group android python --version
+uv run --locked --group android buildozer --version
+uv run --locked --group android python -m pip --version
+uv run --locked --group android python docs/assistant/mdclassic_games_install_android_tools.py
+uv run --locked --group dev --group android pytest --junitxml=/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml
+```
+
+Also inspected installed package metadata and executable paths under uv; audited OS tools with `command -v`, `pacman -Q`, `pacman -Qo /usr/bin/lld` and pkg-config; verified user config digest and backup; checked normal system Java and remaining disk space. Provisioning stdout/stderr saved with `pipefail` and `tee` at `/tmp/opencode/mdclassic-phase3-checkpoint2-tools.log`. Layout correction/idempotent reprovisioning log: `/tmp/opencode/mdclassic-phase3-checkpoint2-tools-layout.log`.
+
+Expected / observed result: uv generated a 44-package universal lock, changing only the approved runtime versions (Pillow 12.3.0 -> 11.3.0 and pycairo 1.29.1 -> 1.28.0) and adding the selected host dependencies/transitives. Declared pycairo as an exact direct runtime pin so the common desktop/Android version is retained rather than floating through materialshapes. Sync installed all selected host dependencies in the root `.venv`. `uv pip check` PASS: 38 installed Linux packages compatible. Python/Buildozer/pip version checks PASS: 3.11.14 / 1.6.0 / 25.1.1. Metadata confirms Cython 0.29.34, setuptools 79.0.1, meson 1.4.0, ninja 1.11.1.4 and wheel 0.43.0. `VIRTUAL_ENV` points at the root `.venv`; installed Buildozer source confirms its subprocess pip call omits `--user` in this environment. No system Python package installation was used.
+
+#### Installed user-local tools
+
+All six downloaded archive checksums match the exact selection in checkpoint 1. The new tracked provisioning script can recreate them after an OS reinstall; a second run reused all matching installation records without downloads. Scripts do not change shell profiles or Java alternatives and do not accept licenses. SDK/NDK/JDK/archive cache directories are outside version control and app source staging.
+
+| Tool | Installed location under `/home/oriol/.local/share/classic-games-android` | Verification |
+| --- | --- | --- |
+| Temurin JDK 17.0.20.1+1 | `jdk-17.0.20.1+1` | Scoped `java -version`: Temurin-17.0.20.1+1, OpenJDK 17.0.20.1; `javac -version`: 17.0.20.1; resolved Java executable is inside that directory |
+| SDK command-line tools 19.0 | `sdk/cmdline-tools/19.0` | `sdk/tools/bin/sdkmanager --version`: 19.0; package inventory: cmdline-tools;19.0, version 19.0.0 |
+| Platform-tools 37.0.1 | `sdk/platform-tools` | `adb version`: 37.0.1-15733141 (ADB 1.0.41); package inventory: 37.0.1; version-only command, no device operations |
+| Build-tools 36.0.0 | `sdk/build-tools/36.0.0` | Package inventory: 36.0.0; `aapt version`: v0.2-13193326; `apksigner version`: 0.9 |
+| Platform android-36 revision 2 | `sdk/platforms/android-36` | `sdkmanager --list_installed`: Android SDK Platform 36, rev 2 |
+| NDK r28c | `android-ndk-r28c` | source.properties: 28.2.13676358 / r28c; bundled Clang --version: 19.0.1 (Android build 13624864) |
+
+Java/tool verification used a process-scoped environment:
+
+```bash
+env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
+    PATH="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1/bin:$PATH" \
+    "$HOME/.local/share/classic-games-android/sdk/tools/bin/sdkmanager" \
+    --sdk_root="$HOME/.local/share/classic-games-android/sdk" --list_installed
+```
+
+Normal `java -version` after these checks still selects OpenJDK **26.0.2.1**. SDK license directory does not exist; license acceptance NOT RUN. No global Java selection was changed.
+
+Initial provision followed checkpoint 1's proposed `sdk/tools` directory symlink. SDK package discovery reported that cmdline-tools;19.0 appeared both there and in its canonical directory. Replaced only this installer-owned symlink with a small executable `sdk/tools/bin/sdkmanager` launcher that executes the canonical binary. Re-ran provisioning and `--list_installed`: PASS with the expected four SDK packages and no duplicate/inconsistent-location warnings. This is a reproducible host-layout correction in the tracked installer; no generated p4a recipe or app cache was patched.
+
+Free disk space after archives and extraction: 20 GiB available, 98% used (previously 24 GiB). Retained archives under the user-local `downloads/` directory for reproducibility. Recheck space before building and before clean-app reproduction; no caches/files were deleted.
+
+Automated checks: full desktop suite **PASS: collected 80, passed 80 (17 unit, 63 GUI), failed 0, skipped 0, xfailed 0 in 28.45s**, report `/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml`. This result supersedes the old Pillow/pycairo baseline for local automated validation. It includes actual runtime ICO/GIF decoding, menu images, purple app bars/chips/About controls, puzzle reference fitting, settings, game behavior and config isolation. The command retains both dev and android groups to avoid uv removing installed host tools. Desktop tests used the available display `DISPLAY=:1`; no missing provider was counted as a passing skip. No redundant repeat after installer/docs-only changes. Final-state remote CI is NOT RUN; the preceding Phase 2 green run applies to its historical dependency state, not these new pins.
+
+Manual checks: **NOT RUN** after the Pillow/pycairo adjustment. User must visually confirm Memory cartoons ICOs, Pong's football skin (GIF ball), 15 puzzle theme/reference images, menu images/font, purple material controls/chips and About/CLOSE. These are the affected checks, not a repeat of all gameplay. Config backup is byte-identical at `/tmp/opencode/mdclassic-phase3-checkpoint2-main.ini.backup`; source and backup SHA-256 `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`. The initial backup missed the source's final blank line; corrected the external backup and verified equality before handoff. Preserve intentional user setting changes and restore only changes caused by this recheck.
+
+Failure / blockers: missing OS `zip`; unaccepted SDK licenses; required affected manual desktop observations not yet supplied. All other audited host executables resolve (gcc/g++/make/git/unzip/patch/autoconf/automake/libtool/pkg-config/cmake/autopoint/gettext/lld, plus project-local Cython/meson/ninja). No application traceback, dependency conflict or Android recipe build failure occurred. No APK build was attempted; the old spec remains gated by checkpoint 3.
+
+Decision: stop checkpoint 2 at the remaining host/manual gate. Project-local Python and user-local JDK/SDK/NDK setup is ready for review, with missing prerequisites explicit. Updated provisional combined-app instructions in `docs/getting-started.md` with reproducible Arch-based prerequisite commands, locked sync/provisioning, scoped Java/license commands and OS reinstall guidance. EndeavourOS remains untested. Do not commit checkpoint 2 or proceed to the spec without its review and remaining checks.
+
+Next exact action:
+
+1. User runs `sudo pacman -S --needed zip`, then reports installation result.
+2. User runs the scoped SDK command above with `--licenses` instead of `--list_installed`, reviews license prompts and reports completion.
+3. From `source/MDclassic_games`, launch `uv run --locked --group android python main.py` and visually recheck the affected images/font/controls listed above, including Memory cartoons and Pong's football skin; report PASS/FAIL and first traceback if any. Config backup path is recorded above.
+4. Verify zip and accepted SDK license state, preserve/restore only test-generated settings changes, append observations and review checkpoint 2. Commit only on explicit request; after that reviewed checkpoint is committed, checkpoint 3 may update the spec/resources.
+
+### Phase 3 checkpoint 2 - Host and visual acceptance follow-up
+
+Phase / task: Phase 3 - Checkpoint 2 user acceptance and remaining prerequisite verification (2026-10-10)
+
+Status: in progress - all required host/desktop checks passed; review/commit pending.
+
+Files changed: acceptance/status entries in this record, Phase 3 tracker, master summary and combined-app setup status in `docs/getting-started.md`. The existing checkpoint 2 metadata, lock and installer changes remain uncommitted. User-modified `main.ini` was inspected and preserved; it must be excluded from the checkpoint commit.
+
+Environment: same project-local Python/Android tool baseline as the preceding record. OS zip is now installed: `pacman -Q zip` reports **3.0-14**, `command -v zip` resolves `/usr/bin/zip`, and `zip -v` reports Info-ZIP **3.0**. SDK license directory now contains eight license files, including `android-sdk-license`.
+
+Command and working directory: repository root for `git status --short`, `git diff -- source/MDclassic_games/main.ini`, `command -v zip`, `zip -v`, `pacman -Q zip`, `uv lock --check`, `uv pip check` and documentation diff checks. Verified SDK acceptance using the selected JDK 17 only for this process:
+
+```bash
+env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
+    PATH="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1/bin:$PATH" \
+    "$HOME/.local/share/classic-games-android/sdk/tools/bin/sdkmanager" \
+    --sdk_root="$HOME/.local/share/classic-games-android/sdk" --licenses < /dev/null
+```
+
+Expected / observed result: command exited successfully and reported **All SDK package licenses accepted**. Standard input was closed so the verification could not accept a pending license automatically. The user performed installation/license acceptance; this check only verified the resulting state. Lock and installed dependency consistency PASS (38 packages compatible).
+
+Manual checks: **PASS**, user reports "Just checked step 3, all everything passes" for the requested focused visual check: Memory cartoons ICOs, Pong football/GIF skin, 15 puzzle tile/reference images, menu images/drawer font, purple material controls/chips and About/CLOSE. This closes the required affected manual checks after the supporting-version adjustment.
+
+Settings: saved changes are Pong skin original -> football, Ahorcado keyboard keyboard6 -> keyboard2, 15 puzzle level 2 -> 1 and theme bike -> carnival. Memory and Snake settings are unchanged. Treat these as the user's current choices and preserve them unless the user explicitly requests restoration; the byte-identical pre-check backup remains at `/tmp/opencode/mdclassic-phase3-checkpoint2-main.ini.backup`. No source/config restoration was performed.
+
+Automated checks: reuse the unchanged adjusted-baseline full-suite result from the preceding entry: **80 passed (17 unit, 63 GUI), failed/skipped/xfailed 0, 28.45s**, report `/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml`. Tests isolate actual config and do not rely on the user's saved settings; runtime code/dependencies/test provider state have not changed. No redundant suite rerun for OS zip, license acceptance, user config choices or evidence-only updates. New-baseline remote CI remains NOT RUN; APK builds remain NOT RUN.
+
+Failure: prior zip/license/manual blockers are resolved; no new application or host failure observed.
+
+Decision: checkpoint 2 technical and manual gates pass. Keep its tracker In progress until changes are reviewed and committed. Preserve user settings outside the commit.
+
+Next exact action: review checkpoint 2's project metadata/lock, user-local provisioning script, setup instructions and validation notes. Commit only when explicitly requested, excluding `source/MDclassic_games/main.ini`. Once that reviewed checkpoint is committed, execute checkpoint 3 only: update the Android spec and packaging/resource regressions, then stop for review.
+
+### Phase 3 checkpoint 2 - Approval and requested commit
+
+Phase / task: Phase 3 - Checkpoint 2 completion and commit handoff (2026-10-10)
+
+Status: passed - user explicitly validated checkpoint 2 and requested its plan update and commit.
+
+Files changed: reviewed checkpoint 2 `pyproject.toml`, generated `uv.lock`, `docs/assistant/mdclassic_games_install_android_tools.py`, `docs/getting-started.md`, Phase 3/master trackers and validation record. User's `source/MDclassic_games/main.ini` settings are preserved and excluded from staging.
+
+Environment: unchanged adjusted baseline and verified host tools from the preceding entries: host Python 3.11.14, uv 0.12.10, Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4; project-local Android Python group; user-local Temurin JDK 17.0.20.1+1 and pinned SDK/NDK. System Java remains 26.
+
+Command and working directory: repository root for status, complete tracked diff and new-script review, `git log --oneline -10`, `git diff --check`, explicit staging of the seven checkpoint files and the requested commit. Commit identity is available from Git history; this entry is included in that checkpoint commit.
+
+Manual checks: PASS - retained user-confirmed affected images/fonts/material widgets and About/CLOSE checks. Host zip and accepted SDK licenses were verified in the preceding follow-up.
+
+Automated checks: reuse the unchanged 80-test pass (17 unit, 63 GUI; failed/skipped/xfailed 0; 28.45s), lock/dependency checks and installer/tool verification recorded above. Only completion/handoff documentation changed after acceptance. No redundant pytest rerun for the requested commit. Remote CI for the adjusted pins and APK build/device checks remain NOT RUN.
+
+Decision: close checkpoint 2 with the approved deliverables and set checkpoint 3 as next. Phase 3 remains in progress; host setup does not establish an APK build or Android runtime support.
+
+Next exact action: execute Phase 3 checkpoint 3 only: update `source/MDclassic_games/buildozer.spec` using the reviewed toolchain and runtime matrix, add scoped output ignores and meaningful packaging/resource regressions, run the required unit checks, update evidence and stop for review.

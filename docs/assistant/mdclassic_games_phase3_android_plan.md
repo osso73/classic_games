@@ -1,6 +1,6 @@
 # MDclassic_games Phase 3 runbook - Android toolchain and debug APK
 
-Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **checkpoint 1 selection/source checks passed; review and commit pending**.
+Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **checkpoints 1-2 complete; checkpoint 3 spec/resource update is next**.
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 2 runbook](mdclassic_games_phase2_desktop_plan.md), and [the validation record](mdclassic_games_validation.md) before editing. This runbook expands master-plan Phase 3 only. Build one combined debug APK containing all seven games. Installation and interactive Android acceptance belong to [Phase 4](mdclassic_games_phase4_device_plan.md).
 
@@ -8,15 +8,15 @@ Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 2 runbook](m
 
 | Checkpoint | Task | Status | Evidence / remaining work |
 | --- | --- | --- | --- |
-| 1 | Verify entry gate and select a coherent toolchain | In progress | User approved common Pillow 11.3.0 / pycairo 1.28.0 and user-local JDK 17; 7 patch checks pass; exact selection matrix recorded, host candidate resolution passes; review/commit pending |
-| 2 | Declare and verify the host build environment | Pending | Locked `android` group; OS/JDK/SDK prerequisites |
+| 1 | Verify entry gate and select a coherent toolchain | Complete | Reviewed and committed `8cb288f`; approved common supporting pins, source checks and exact matrix |
+| 2 | Declare and verify the host build environment | Complete | User validated and requested this checkpoint commit; locked host group, user-local JDK/SDK/NDK, zip and licenses verified; 80 desktop tests and affected visual checks PASS |
 | 3 | Update spec and packaging regressions | Pending | Immutable p4a, Python recipes, arm64, runtime assets |
 | 4 | Build the first debug APK | Pending | Complete log, recipe versions, artifact identity |
 | 5 | Inspect APK contents | Pending | Manifest, native libraries, nested Python bundle, assets |
 | 6 | Reproduce from a clean app build directory | Pending | Second build and inspection; desktop regression gate |
 | 7 | Review and hand off the final artifact | Pending | Final evidence, review/commit, Phase 4 inputs |
 
-**Next exact action:** review the checkpoint-1 [approved toolchain selection](mdclassic_games_validation.md#phase-3-checkpoint-1---approved-supporting-versions-and-toolchain-selection). Commit only when explicitly requested. After reviewed checkpoint 1 is committed, execute checkpoint 2: apply Pillow 11.3.0 / pycairo 1.28.0 only in the project uv environment, declare the selected Android host group, provision user-local Temurin JDK 17 and SDK tools, verify prerequisites, and revalidate desktop tests/affected manual images and widgets. No installation, dependency/spec edit or build has executed in checkpoint 1.
+**Next exact action:** execute checkpoint 3 only: update the spec to the reviewed immutable p4a/Python/runtime/API/NDK matrix and user-local tool paths, add arm64 and ICO inclusion, and extend the packaging/resource regressions. Run the required unit checks and stop for review. Checkpoint 2 acceptance and approval are recorded in the validation record; user's `main.ini` choices are preserved outside its commit. No APK build has executed.
 
 Use Pending / In progress / Blocked / Complete in this table. Complete means the checkpoint checks passed and its changes were reviewed and committed. Update this tracker and the master plan's summary at each handoff; append actual results to the validation record. Selected, built, inspected, and device-tested are different statuses.
 
