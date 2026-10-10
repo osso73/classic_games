@@ -1120,3 +1120,44 @@ Failure: none. The win outcome is reachable by code but was not exercised live; 
 Decision: accept checkpoint 5. Ahorcado passes its required touch checks (including a live loss) on Android 17 / API 37. Proceed to checkpoint 6 (Memory).
 
 Next exact action: checkpoint 5 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 6 (Memory) only: read `memory/screen.py`/`mat.py` first, then reveal a mismatching pair (both return hidden under the existing timing), find a match (remains revealed, count updates), restart, exercise level/theme chips and settings, cycle every selectable theme at a 20-pair board verifying backs/faces exist, explicitly reveal cartoons `.ico` faces, and check match/mismatch/completion sound where reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 7.
+
+Phase / task: Phase 4 - Checkpoint 6: Memory touch validation (2026-10-10)
+
+Status: passed - Memory builds, mismatches hide under the existing 2 s timing, matches stay revealed and increment Moves, restart works, level/theme chips and settings apply, every selectable theme builds a 20-pair board with all backs/faces rendered (including cartoons `.ico`), and the start/match/completion sounds plus mute work.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `4fef5a5` and host as checkpoint 5. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `memory/screen.py`/`mat.py` read before testing: theme/level chips, mute, start; mismatch hides after `sleep(2)`, match plays `ok`, completion plays `win-short` and shows the "all pairs" popup. Selectable themes (>=20 `image*` files and `back.jpg`) are `animals`(23 png), `cartoons`(22 ico+png), `food`(25), `misc`(30), `starwars`(30), `technology`(24). Evidence `/home/oriol/android-build/evidence/phase4-checkpoint6/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint6
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-memory.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[Memory\]'
+```
+
+Expected / observed result: PASS for all checkpoint 6 rows (user-observed touch on the device).
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. Start: tapping play builds the board (starting at the configured level/theme) with visible card backs.
+3. Mismatch: two non-matching cards return hidden after the existing ~2 s timing; Moves increments per pair attempt.
+4. Match: a matching pair stays revealed, Moves increments, and the match sound plays.
+5. Chips/settings: the theme and level chips cycle their values and the next round reflects them; the Memory settings panel applies with visible effect. Persisted result `[Memory] level=20, theme=animals` (level raised to 20).
+6. All themes at max level: each selectable theme (`animals`, `cartoons`, `food`, `misc`, `starwars`, `technology`) built a 20-pair board with every back and face rendered, no blank/placeholder tiles.
+7. Cartoons ICO: the `cartoons` theme's `.ico` faces were revealed and decoded correctly (img provider).
+8. Sound/mute: start, match, and completion sounds behave as expected and the mute control silences them (completion popup reachable).
+9. Restart/return: restart works; returned via drawer and reopened via drawer with working controls.
+
+Log scan: `logcat-full.txt` (25,820 lines, 23:09Z-23:16Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none.
+
+Decision: accept checkpoint 6. Memory passes all required touch checks including the max-level all-theme sweep and ICO decoding on Android 17 / API 37. Proceed to checkpoint 7 (15 puzzle).
+
+Next exact action: checkpoint 6 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 7 (15 puzzle) only: read `game_15puzzle/screen.py`/`sample.py` first, then move an adjacent tile into the gap and confirm a nonadjacent tap does not move tiles, shuffle/restart, cycle all 3x3/4x4/5x5 sizes and selectable complete themes verifying numbered/image tiles plus the matching reference image and usable chips/touch targets, and return/re-enter to make another legal move; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 8.
