@@ -735,3 +735,63 @@ Failure: no checkpoint 3 failure. First implementation issue was documentation/w
 Decision: apply exactly the checkpoint 1 matrix to the spec, add `ico`, keep `resources` excluded and `main.ini` unpackaged, and pin the runtime/pure-Python dependency set while retaining recipe-managed native transitives through the immutable p4a revision. Add a display-independent regression helper plus per-theme asset coverage instead of duplicating the whole spec as a fixture. Treat these source assertions as spec/staging checks, not APK inspection.
 
 Next exact action: review the three-file diff, the new unit tests and this evidence, and commit checkpoint 3 only on explicit request. After that reviewed checkpoint is committed, execute Phase 3 checkpoint 4 only: build the first debug APK from `source/MDclassic_games` with the pinned toolchain, capturing the complete log, the p4a checkout revision, actual recipe/host versions and the exact artifact path/hash. Do not build before checkpoint 3 is committed.
+
+---
+
+Phase / task: Phase 3 - Checkpoint 4: Build the first debug APK (2026-10-10)
+
+Status: build gate complete - `buildozer -v android debug` exited 0 in the non-synced local worktree; checkpoint-4 checks pass (build success, actual recipe/host versions match the matrix, exact artifact path/hash recorded), and the checkpoint-4 changes await review/commit.
+
+User decision: approved removing `harfbuzz` from `source/MDclassic_games/buildozer.spec` `requirements` after harfbuzz 2.6.4 failed to build under NDK r28c of Clang 19 (chose "Remove harfbuzz" over a custom local recipe with `-Wno-error` and over stopping without change). This is the documented plan decision required by the runbook's unsupported-native-combination rule.
+
+Files changed: this record, the Phase 3 tracker, the master summary, plus the checkpoint-4 diff under review: `source/MDclassic_games/buildozer.spec` (removed `harfbuzz` requirement and updated the explanation comment), `tests/mdclassic_games/unit/test_resources.py` (dropped the `harfbuzz` pin assertion and bare-token allowance), `docs/assistant/mdclassic_games_install_android_tools.py` (now also creates the `sdk/tools/bin/avdmanager` launcher mirroring `sdkmanager`, fixing p4a's SDK target check), and `docs/getting-started.md` (launcher wording). The build logs, script and evidence live outside the repository at `/home/oriol/android-build/`.
+
+Environment: non-synced local worktree `/home/oriol/android-build/mdclassic_games` (app commit `e247e97`, detached, outside Nextcloud sync); uv 0.12.10; Buildozer 1.6.0; Temurin JDK 17.0.20.1+1 at `~/.local/share/classic-games-android/jdk-17.0.20.1+1`; SDK with cmdline-tools 19.0 / platform android-36 / build-tools 36.0.0 / platform-tools 37.0.1 plus the `tools/bin/avdmanager` launcher; NDK r28c; API 36, minapi/ndk_api 24, `arm64-v8a`; Gradle 8.14.3; disk ~15-18 GiB free (99% used) during the successful build.
+
+Command and working directory (worktree `source/MDclassic_games`):
+
+```bash
+uv run --locked --group android buildozer -v android debug
+```
+
+launched via `/home/oriol/android-build/run-checkpoint4-build.sh checkpoint4-build-retry2` with `JAVA_HOME` and `PATH` prepended; full stdout/stderr to `/home/oriol/android-build/evidence/checkpoint4-build-retry2.log` with exit file `checkpoint4-build-retry2.exit` = 0. Two earlier attempts are preserved with their logs and exit files (`checkpoint4-build` = missing `avdmanager`; `checkpoint4-build-retry1` = harfbuzz failure; both exit 1).
+
+Expected / observed result: build succeeded end-to-end (log timestamps 2026-10-10, final `build exit 0 2026-10-10T16:40:03+02:00`, "Android packaging done!"). Artifact: `bin/clasicgames-1.2-arm64-v8a-debug.apk` under the worktree, 53,219,941 bytes, SHA-256 `db19bc9e82116333ba224415364f1a4ae3e1a0075250fc3bdc2b46e7f5419148`. Input revision/state: worktree app commit `e247e97` plus the uncommitted spec requirement change; p4a checkout `git rev-parse HEAD` = `58d21141f17c889bf8585f5665921d72028f8831` (matches `p4a.commit`). Actual recipe/host versions from the log match the matrix: python3/hostpython3 3.11.14 (recipe "requested" lines), Kivy 2.3.1 (Cython 3.0.11), Pillow 11.3.0, KivyMD 2.0.0, materialyoucolor 3.0.4, pycairo 1.28.0, cairo 1.18.4 + pixman 0.43.4, freetype 2.14.1, SDL2 2.30.11 / SDL2_image 2.8.2 / SDL2_mixer 2.6.3 / SDL2_ttf 2.22.0, openssl 3.3.1, libffi 3.4.2, libjpeg-turbo 2.0.1, libpng 1.6.37, sqlite3 3.50.4; pip `Collecting` lines confirm every pure-Python pin (asynckivy 0.6.4, asyncgui 0.6.3, certifi 2026.7.22, chardet 5.2.0, charset-normalizer 3.5.1, docutils 0.23, filetype 1.2.0, idna 3.19, kivy-garden 0.1.5, materialshapes 0.3, pygments 2.21.0, requests 2.34.2, setuptools 79.0.1, six 1.17.0, urllib3 2.7.0). No harfbuzz build step ran.
+
+Automated checks: `uv run --locked --group dev pytest tests` (repository root) PASS: 103 collected/passed, 0 failed in ~27s; `git diff --check` PASS; build success verified from the recorded exit file and `ps` process table (the initial `pgrep -f` self-match gotcha avoided).
+
+Reference data: full build log `/home/oriol/android-build/evidence/checkpoint4-build-retry2.log` (50,271 lines); APK left in the worktree `bin/` with its input state preserved for checkpoint 6 clean-build reproduction; complete logs retained through checkpoint 6.
+
+Failure: two checkpoint-4 attempt failures, each repaired with one bounded change before success. (1) p4a `create` abort: "Could not find `android` or `sdkmanager` binaries in Android SDK" because p4a's `get_targets` looks for `tools/bin/avdmanager` (or cmdline-tools/latest) and the isolated SDK only had `tools/bin/sdkmanager`; fixed by adding an `avdmanager` launcher (provisioning script rerun idempotent). (2) harfbuzz 2.6.4 native compilation: Clang 19 (NDK r28c) under harfbuzz's internal `-Werror` - `hb-ft.cc:665/671/877` errors `-Wcast-function-type-strict` and `hb-subset-cff1.cc:472` `-Wunused-but-set-variable`, first failure in `build/other_builds/harfbuzz-freetype/arm64-v8a__ndk_target_24/harfbuzz`. Evidence: no `--enable-werror` configure option exists, p4a sets no global `-Werror`, and harfbuzz 2.7+ dropped autotools, so no supported recipe-version route existed.
+
+Decision: apply the documented plan decision to remove `harfbuzz` from Android `requirements` (user-approved; freetype builds with `--with-harfbuzz=no` and Pillow degrades gracefully; the app and tests use no complex text shaping / no ImageFont-raqm path). Changed spec and tests rerun the full desktop regression suite. The `avdmanager` launcher is a reproducible host-prerequisite fix recorded in the provisioning instructions. No custom p4a recipes and no `.buildozer` manual patches were used.
+
+Next exact action: review the checkpoint-4 diff (spec `harfbuzz` removal + comment, unit test assertion update, `avdmanager` launcher in `mdclassic_games_install_android_tools.py`, getting-started wording) and commit only on explicit request. After the reviewed checkpoint is committed, execute Phase 3 checkpoint 5 on the recorded artifact `bin/clasicgames-1.2-arm64-v8a-debug.apk` (SHA-256 `db19bc9e82116333ba224415364f1a4ae3e1a0075250fc3bdc2b46e7f5419148`) using the SDK's `aapt`, `apksigner`, and a ZIP/nested-bundle reader.
+
+---
+
+Phase / task: Phase 4 - Android device validation: audio guard and edge-to-edge system bars (2026-10-10)
+
+Status: two runtime defects found on the first interactive pass, fixed, rebuilt and interactively confirmed on two devices; the remaining manual checkpoint matrix (startup defaults, per-game touch acceptance, lifecycle) is still pending.
+
+Devices (both Android 16 / API 36 / arm64-v8a): Google Pixel 10 (1080x2424, density 460, centred punch-hole cutout 173 px, 3-button navigation) and Samsung Galaxy S24 `SM-S921B`, serial `RFCWC0ZFEFD` (1080x2340, density 480, cutout 103 px, gesture navigation). Device/ABI/API gate passes for both.
+
+Files changed: `source/MDclassic_games/main.py`, new `source/MDclassic_games/audio_env.py`, new `source/MDclassic_games/android_insets.py`, new `tests/mdclassic_games/unit/test_audio_env.py`, new `tests/mdclassic_games/unit/test_android_insets.py`, `docs/assistant/mdclassic_games_phase4_device_plan.md`, `docs/assistant/mdclassic_games_upgrade_plan.md`, this record.
+
+Environment: worktree `/home/oriol/android-build/mdclassic_games` (app commit `e247e97` plus the uncommitted Phase 3 checkpoint-4 spec change and these Phase 4 source changes, outside Nextcloud sync); Buildozer 1.6.0; Temurin JDK 17.0.20.1+1; SDK platform android-36 / build-tools 36.0.0; NDK r28c; Kivy 2.3.1 / KivyMD 2.0.0.
+
+Command and working directory (worktree `source/MDclassic_games`): `env JAVA_HOME=~/.local/share/classic-games-android/jdk-17.0.20.1+1 PATH=...:$JAVA_HOME/bin uv run --locked --group android buildozer -v android debug`, exit 0 for both rebuilds; logs `/home/oriol/android-build/evidence/build-phase4-fix.log` and `build-phase4-immersive.log`. Installed the same-signature update with `adb -s <serial> install -r` (Success) on both devices; launched with `am start -n org.games.clasicgames/org.kivy.android.PythonActivity`.
+
+Expected / observed result: after the fixes, tapping Play plays sound without crashing and the immersive layout hides both Android system bars. On both devices `dumpsys window displays` reports `type=statusBars ... visible=false` and `type=navigationBars ... visible=false` while the app is foreground; the menu top bar sits at the screen top with no clock overlap and its hamburger/actions respond; the user confirmed menu, drawer, settings/help, game entry and audio all work. `displayCutout` remains `visible=true` (punch-hole) and does not collide with the left-aligned top bar. Screenshots: `/home/oriol/android-build/evidence/pixel10-after-insets.png`, `s24-menu-immersive.png`.
+
+Failure (defect 1): every `SoundLoader.load()` returned `None` and `MainApp.play()` crashed with `AttributeError: 'NoneType' object has no attribute 'play'`. Root cause: `main.py` selected `SDL_AUDIODRIVER=alsa` behind `sys.platform.startswith('linux')`, which is true on Android, so `AudioSDL2` could not initialise. Classification: application compatibility (desktop guard leaking into Android).
+
+Failure (defect 2): the system status bar clock overlapped the app's `MDTopAppBar` and its buttons received no touches, and the navigation bar overlapped the bottom of a game board. Root cause: the app targets API 36, so Android 15+ forces edge-to-edge drawing while neither Kivy 2.3.1 nor the pinned p4a bootstrap pads for system bars. Classification: application compatibility.
+
+Decision: repair both minimally in `source/MDclassic_games`. (1) Extract the driver choice into `audio_env.configure_audio_environment(platform_name, environ)`, which sets `SDL_AUDIODRIVER=alsa` only when `sys.platform` is linux and `kivy.utils.platform != 'android'`, using `setdefault` so a user's explicit driver wins. (2) Add `android_insets.hide_system_bars` (immersive mode via `WindowInsetsController` on API 30+, `setSystemUiVisibility` fallback below) plus `system_bar_insets` (systemBars insets as a padding fallback) and wrap the root KV in a `BoxLayout id="content"` whose padding is set from the insets after hiding. Both are display-independent no-ops off Android. Known limit: the display-cutout safe inset is not padded, so a wide-notch device could place the top bar near the cutout; not exercised by the two punch-hole test devices.
+
+Automated checks: `uv run --locked --group dev pytest` (repository root) PASS: 110 collected/passed, 0 failed, 0 skipped in ~27s; targeted `tests/mdclassic_games/unit` PASS: 47 passed; GUI `test_shell_startup_preloads_audio` PASS on desktop (still loads 15 sounds). `git diff --check` PASS.
+
+Artifact: rebuilt debug APK `source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `4c45da83721aaf2f0bd6f8e7319ea99e7371534a23714ab650e2c5ce2102bf44`, 53,223,137 bytes. Interim rebuilt hash after defect 1: `c47a457d3bfa208ba16c6824a9740d8a2af86a2c8ccef5133406a56d7f3dd07c`; pre-fix Phase 3 artifact: `db19bc9e…f5419148`. This runtime change invalidates the Phase 3 checkpoint-5/6 inspection of the pre-fix artifact; the final artifact still needs its own inspection and a clean-build reproduction.
+
+Next exact action: review and commit the Phase 4 fixes and these records (and, if approved, the pending Phase 3 checkpoint-4 spec/launcher changes needed to reproduce the artifact). Then resume the Phase 4 checkpoint matrix from checkpoint 2/3 against SHA-256 `4c45da83…2102bf44`, capturing a full logcat and per-game evidence before checkpoint 12.

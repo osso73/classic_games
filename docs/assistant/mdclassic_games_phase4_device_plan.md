@@ -1,6 +1,6 @@
 # MDclassic_games Phase 4 runbook - Android device validation
 
-Reviewed: 2026-10-09. Status: **not executed; requires the Phase 3 inspected APK**.
+Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **started on a Google Pixel 10 and a Samsung Galaxy S24 using the Phase 3 debug APK; two Android runtime defects (audio guard, edge-to-edge system bars) were found, fixed, rebuilt and interactively confirmed; the full manual checkpoint matrix remains pending**.
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](mdclassic_games_phase3_android_plan.md), and [the validation record](mdclassic_games_validation.md). This runbook expands master-plan Phase 4 only. Use the final inspected Phase 3 artifact, not an older APK from `releases/`.
 
@@ -8,8 +8,8 @@ Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](m
 
 | Checkpoint | Task | Status | Evidence / remaining work |
 | --- | --- | --- | --- |
-| 1 | Identify device, artifact, and isolated test data | Pending | ABI/API match; authorized ADB target; artifact hash |
-| 2 | Install fresh and validate startup/defaults | Pending | Installation, full logcat, usable shell, default configuration |
+| 1 | Identify device, artifact, and isolated test data | In progress | Authorized ADB targets identified: Pixel 10 (Android 16/API 36) and Samsung S24 `SM-S921B` (Android 16/API 36); final rebuilt artifact hash recorded in the repair log; isolated-test-data sign-off pending |
+| 2 | Install fresh and validate startup/defaults | In progress | Both devices installed and launched to a responsive menu; full-logcat capture and the defaults comparison remain pending |
 | 3 | Validate shell/navigation/settings on touch | Pending | All routes; five panels before/after game creation; persistence |
 | 4 | Pong | Pending | Touch control, score, pause, settings, sound |
 | 5 | Ahorcado | Pending | Keyboard/man, word/image, correct/wrong input |
@@ -21,7 +21,24 @@ Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](m
 | 11 | Lifecycle, rotation, audio, and external Help | Pending | Back, background/foreground, relaunch, layout, native logs |
 | 12 | Final artifact regression and handoff | Pending | Device matrix, final desktop suite, build provenance, review |
 
-**Next exact action:** complete Phase 3, then execute checkpoint 1 only. Without device/emulator access, record Phase 4 as blocked and request the checkpoint-1 information; do not infer runtime success from an APK or desktop tests.
+**Next exact action:** continue the checkpoint matrix against the final rebuilt APK (SHA-256 `4c45da83…2102bf44`): record checkpoints 2-3 (startup, shell/navigation/settings) and 4-10 (one per game) with per-scenario evidence, then checkpoint 11 (lifecycle/rotation/audio/Help) and checkpoint 12 (final artifact regression). Two defects already found on the first interactive pass were fixed; see the repair log below. The known display-cutout gap (only `systemBars()` insets are padded) is recorded as a limit, not yet a defect.
+
+## Phase 4 repair log - Android compatibility fixes (2026-10-10)
+
+Two Android runtime defects surfaced on the first interactive pass and were repaired under the repair loop. Each has a display-independent desktop regression and a rebuilt, reinstalled, retested APK.
+
+| # | Symptom | Root cause | Fix | Regression |
+| --- | --- | --- | --- | --- |
+| 1 | Tapping Play (or any sound) crashed; every `SoundLoader.load()` returned `None` | `main.py` set `SDL_AUDIODRIVER=alsa` for any platform reporting `sys.platform == 'linux'`, which includes Android, so `AudioSDL2` failed to initialise and no OGG loaded | Moved the guard into `source/MDclassic_games/audio_env.py:configure_audio_environment`, which skips `kivy.utils.platform == 'android'` before Kivy import and keeps `setdefault` so a user's explicit driver is preserved | `tests/mdclassic_games/unit/test_audio_env.py` |
+| 2 | Status bar clock overlapped the top app bar and its buttons were unclickable; the navigation bar overlapped the bottom of a game board | The app targets API 36, so Android 15+ forces edge-to-edge drawing; no system-bar handling existed and Kivy 2.3.1 exposes no insets | Added `source/MDclassic_games/android_insets.py`: `hide_system_bars` requests immersive mode (both bars hidden, swipe-to-reveal), `system_bar_insets` pads `content` as a fallback; the root KV was wrapped in a `BoxLayout id="content"` | `tests/mdclassic_games/unit/test_android_insets.py` |
+
+Devices / interactive acceptance (both Android 16 / API 36 / `arm64-v8a`):
+- **Google Pixel 10** - 1080x2424, punch-hole cutout 173 px, 3-button navigation: menu, drawer, settings/help, game entry and audio confirmed working; status and navigation bars hidden (`dumpsys window displays` shows `visible=false`). Screenshot `/home/oriol/android-build/evidence/pixel10-after-insets.png`.
+- **Samsung Galaxy S24 `SM-S921B`** (serial `RFCWC0ZFEFD`) - 1080x2340, cutout 103 px, gesture navigation: same checks confirmed working; bars hidden. Screenshot `/home/oriol/android-build/evidence/s24-menu-immersive.png`.
+
+Artifact: `source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `4c45da83721aaf2f0bd6f8e7319ea99e7371534a23714ab650e2c5ce2102bf44`, 53,223,137 bytes (interim rebuilt hash after fix 1: `c47a457d3bfa208ba16c6824a9740d8a2af86a2c8ccef5133406a56d7f3dd07c`). Build logs: `/home/oriol/android-build/evidence/build-phase4-fix.log`, `build-phase4-immersive.log`.
+
+Known limit: only `WindowInsets.Type.systemBars()` is padded, not the display-cutout safe inset. On a wide-notch (non-punch-hole) device the top app bar could render near the cutout; neither test device exercises this.
 
 Complete means required checks passed and the checkpoint was reviewed and committed. Pending / In progress / Blocked describe remaining work. Update this tracker and the master summary at every handoff. Record each manual row as PASS / FAIL / NOT RUN with an observation, tester, date, device, and artifact hash.
 

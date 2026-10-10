@@ -10,22 +10,26 @@ This is a temporary script file.
 import os
 import sys
 
-# Kivy's bundled SDL mixer deadlocks through this host's PulseAudio bridge.
-if sys.platform.startswith('linux'):
-    os.environ.setdefault('SDL_AUDIODRIVER', 'alsa')
-
 # non-std libraries
 from kivy.config import Config
+from kivy.utils import platform
+
+from android_insets import hide_system_bars, system_bar_insets
+from audio_env import configure_audio_environment
+
+# Kivy's bundled SDL mixer deadlocks through this host's PulseAudio bridge, so
+# Linux desktops use ALSA. Android also reports sys.platform as 'linux' but only
+# exposes its native audio backend, so its SDL audio driver is left untouched.
+configure_audio_environment(platform)
 
 # Reserve right-click for Buscaminas flags instead of Kivy's red multitouch markers.
-if sys.platform.startswith('linux'):
+if sys.platform.startswith('linux') and platform != 'android':
     Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.uix.settings import SettingsWithSpinner
-from kivy.utils import platform
 from kivy.lang import Builder
 from kivy.clock import Clock
 
@@ -83,19 +87,25 @@ KV = r"""
     icon_color: "#FFFFFF"
 
 Screen:
-    
-    MDNavigationLayout:
 
-        ScreenManager:
-            id: screen_manager
-            
-            Menu:
-                id: menu
-        
-        MyDrawer:
-            id: my_drawer
-            
-            on_screen: app.change_screen(self.screen)
+    # Android 15+ forces edge-to-edge drawing, so insets are applied here to
+    # keep the toolbar and content clear of the status and navigation bars.
+    BoxLayout:
+        id: content
+        orientation: 'vertical'
+
+        MDNavigationLayout:
+
+            ScreenManager:
+                id: screen_manager
+
+                Menu:
+                    id: menu
+
+            MyDrawer:
+                id: my_drawer
+
+                on_screen: app.change_screen(self.screen)
                     
 
 <TempMsg>:
@@ -132,8 +142,15 @@ class MainApp(MDApp):
     
     def on_start(self):
         self.sm = self.root.ids.screen_manager
+        hide_system_bars(platform)
+        Clock.schedule_once(self.apply_system_bar_insets, 0.5)
         Clock.schedule_once(self.load_sounds)
         
+
+    def apply_system_bar_insets(self, *args):
+        top, bottom = system_bar_insets(platform)
+        self.root.ids.content.padding = [0, top, 0, bottom]
+
 
     def build_config(self, config):
         config.setdefaults('Pong', {
