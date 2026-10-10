@@ -1003,3 +1003,36 @@ Failure: none. The only app-process `[ERROR]` is the non-fatal Kivy logo-copy me
 Decision: accept checkpoint 2. The exact final artifact `7d3416aa…e9d3cc91` fresh-installs, reaches a responsive menu with correct defaults and the SDL2 audio provider on Android 17 / API 37 / arm64-v8a, with immersive bars and no app-fatal errors. Proceed to checkpoint 3 (shell/navigation/settings through touch).
 
 Next exact action: checkpoint 2 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 3 only: from a menu-only process, open each of the five settings panels (Pong, Ahorcado, Memory, 15 puzzle, Snake), change one visible setting before opening its game and confirm it applies, change it again after the screen exists, relaunch and confirm persistence, then run the seven-game tile/drawer/re-entry navigation matrix with the first-entry loading notification; record per-scenario PASS/FAIL and logcat. Do not begin checkpoint 4.
+
+Phase / task: Phase 4 - Checkpoint 3: shell, navigation, and settings through touch (2026-10-10)
+
+Status: passed - all five settings panels work before/after game creation and persist across a cold relaunch; all seven games pass the tile route, drawer route, and re-entry, and the About/CLOSE/settings-dismissal/drawer-Exit shell controls work.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `4b206d6` and host as checkpoint 2. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button navigation. Artifact `7d3416aa…e9d3cc91`. Evidence directory `/home/oriol/android-build/evidence/phase4-checkpoint3/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint3
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture, no -c
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini   # before/after relaunch
+```
+
+Expected / observed result: PASS for every checkpoint 3 row.
+
+1. Settings before and after game creation (user-observed touch on the device, all PASS). Starting from a menu-only process, each panel was opened via drawer -> Settings (spinner), one setting changed before opening its game and confirmed applied, then changed again after the game screen existed and confirmed updated (restarting a round where needed). Resulting persisted `.main.ini` after the exercise: `[Pong] speed=10, max-speed=50, skin=tennis`; `[Ahorcado] man=man2, keyboard=keyboard1`; `[Memory] level=8, theme=animals`; `[fifteen] level=2, theme=eve`; `[Snake] speed=1, size=11, mode=1, level_start=5`. Every panel shows at least one changed value, confirming each panel's `on_config_change` path created/updated its lazy screen.
+2. Persistence: a targeted `am force-stop` + cold relaunch of `org.games.clasicgames` (no `pm clear`, no data deletion) reported `Status: ok`, `LaunchState: COLD`, `TotalTime: 180`; `files/.main.ini` read back after the relaunch is byte-identical to the pre-relaunch content, so the chosen values persist independently of in-memory screen state. The user then reopened the panels and confirmed the values are still shown.
+3. Navigation matrix (user-observed touch, all PASS): for `pong`, `ahorcado`, `memory`, `fifteen`, `2048`, `buscaminas`, and `snake`, the menu tile route opens the correct screen/title with the first-entry loading notification, the drawer route opens the same game, and re-entry reuses the existing screen with working controls and no duplicate screen or accelerated update. Shell controls confirmed: About shows version `v1.2` and CLOSE dismisses it, the settings panel dismisses, and drawer Exit works. Help's browser/Back behaviour is deferred to checkpoint 11 as the runbook specifies.
+4. Log scan: `logcat-full.txt` (382,754 lines, 20:30:47Z-22:56:12Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session. The only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2 as belonging to the earlier interactive pass.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110 on the Phase 3 final input state).
+
+Failure: none.
+
+Decision: accept checkpoint 3. All seven tile/drawer/re-entry routes pass using touch, all five settings panels work before/after screen creation and persist across a cold relaunch, and the About/CLOSE/settings-dismissal/Exit shell controls work on Android 17 / API 37 with no session log errors. Proceed to checkpoint 4 (Pong).
+
+Next exact action: checkpoint 3 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 4 (Pong) only: read `pong/screen.py` and its handlers first, then from a fresh process start/restart, observe ball movement, drag both paddles with touch, let a ball exit and verify the score increment/serve, tap pause/resume and confirm the icon/motion, change speed/max-speed/skin and verify effect on a new round, and hear a representative sound and exercise mute if present; return via drawer and reopen via drawer. Record per-row evidence and logcat. Do not begin checkpoint 5.
