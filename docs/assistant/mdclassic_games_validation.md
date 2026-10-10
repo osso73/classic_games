@@ -1077,3 +1077,46 @@ Failure: none.
 Decision: accept checkpoint 4. Pong passes all required touch checks on Android 17 / API 37. Proceed to checkpoint 5 (Ahorcado).
 
 Next exact action: checkpoint 4 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 5 (Ahorcado) only: read `ahorcado/screen.py`/`general.py` first, then start a new word, use the on-screen keyboard for a correct and a wrong letter, verify repeated occurrences reveal and wrong input changes the man image, exercise keyboard/man settings, confirm Spanish characters render, and observe a win/loss if reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 6.
+
+Phase / task: Phase 4 - Checkpoint 5: Ahorcado touch validation (2026-10-10)
+
+Status: passed - all required Ahorcado items pass: tile/drawer entry, new word, correct-letter reveal (including all occurrences), wrong-letter failed-list plus man-image change, readable Spanish characters, the one-hint control, mute toggle, keyboard/man settings effect, restart, and a loss outcome; the win popup was not separately observed.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `120b8ba` and host as checkpoint 4. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `ahorcado/screen.py` read before testing: play/start, hint (one per game), mute toggle, help; correct letter reveals all occurrences, wrong letter increments errors and adds a drawing piece, 10 errors loses, win when the word is complete. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint5/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint5
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-ahorcado.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[Ahorcado\]'
+```
+
+Expected / observed result: PASS for the required checkpoint 5 rows (user-observed touch on the device).
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. New word: tapping play starts a fresh word shown as blanks with the on-screen keyboard.
+3. Correct letter: a correct on-screen key reveals its place(s); where a letter occurs more than once, repeated occurrences reveal.
+4. Wrong letter: a wrong key appears in the failed-letters area and the man drawing gains a piece (image updates).
+5. Spanish characters: accented/Ñ characters render legibly in the word and keyboard (no missing glyphs).
+6. Hint: the hint control reveals one letter; a second request shows the "You cannot get more hints!" popup.
+7. Mute: the mute control toggles its icon (volume-high/off) and silences the end-of-game sound.
+8. Settings: the Ahorcado panel changed values with visible effect; persisted result `[Ahorcado] man=man2, keyboard=keyboard5` (keyboard skin changed).
+9. Restart: tapping play again starts a new word.
+10. Outcome: a loss is reachable and was observed - 10 wrong letters produced the "End / you've been HANGED" popup with the lose sound. A win exists in code (all letters found) but was not separately observed in this session; recorded honestly rather than claimed.
+11. Return/reopen: returned via the drawer and reopened via the drawer entry with working controls.
+
+Log scan: `logcat-full.txt` (41,388 lines, 23:01Z-23:08Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none. The win outcome is reachable by code but was not exercised live; this is an observational limit, not a failure.
+
+Decision: accept checkpoint 5. Ahorcado passes its required touch checks (including a live loss) on Android 17 / API 37. Proceed to checkpoint 6 (Memory).
+
+Next exact action: checkpoint 5 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 6 (Memory) only: read `memory/screen.py`/`mat.py` first, then reveal a mismatching pair (both return hidden under the existing timing), find a match (remains revealed, count updates), restart, exercise level/theme chips and settings, cycle every selectable theme at a 20-pair board verifying backs/faces exist, explicitly reveal cartoons `.ico` faces, and check match/mismatch/completion sound where reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 7.
