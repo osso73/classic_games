@@ -92,6 +92,33 @@ def test_fifteen_uses_only_complete_themes_and_repairs_stale_config(gui_environm
 
 
 @pytest.mark.gui
+def test_fifteen_reference_picture_leaves_the_controls_usable(gui_environment, tmp_path):
+    """In portrait the bottom row splits, so the reference picture cannot cover the chips."""
+
+    run_fifteen_script(
+        tmp_path,
+        """
+        from kivy.clock import Clock
+
+        Window.size = (540, 1212)
+        for _ in range(10):
+            Clock.tick()
+
+        half = sample.parent.width / 2
+        assert abs(sample.window_size - min(sample.parent.height, half)) <= 1
+        controls = next(
+            child for child in sample.parent.children
+            if child.__class__.__name__ == "FloatLayout"
+        )
+        assert 0 < controls.width <= half + 1
+        for chip in controls.children:
+            assert chip.x >= controls.x - 1
+            assert chip.right <= controls.right + 1
+        """,
+    )
+
+
+@pytest.mark.gui
 def test_fifteen_moves_only_an_adjacent_tile(gui_environment, tmp_path):
     """An adjacent tile occupies the blank space and increments the score."""
 

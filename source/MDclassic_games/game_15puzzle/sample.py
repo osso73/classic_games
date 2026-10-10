@@ -77,9 +77,13 @@ class Sample(MDGridLayout):
     
     def initialize_grid(self, *args):
         '''
-        Establish the width and height of the widget, based on parent's size
+        Establish the width and height of the widget, based on parent's size.
+        The reference picture shares the bottom row with the theme/level chips,
+        so it is capped at half the parent width to leave the other half for
+        the controls (in portrait the parent is taller than it is wide, so
+        using the full width would otherwise fill the row).
         '''
-        self.window_size = min(self.parent.height, self.parent.width)
+        self.window_size = min(self.parent.height, self.parent.width / 2)
         
 
     def load_theme(self, *args):
