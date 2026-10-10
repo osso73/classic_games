@@ -875,3 +875,46 @@ Failure: none. One inspection quirk: the nested bundles' directory members are s
 Decision: accept the clean-build APK `7d3416aa…e9d3cc91` (53,223,301 bytes) as manifest-, signing-, ABI- and bundle-correct, and record it as the final Phase 4 artifact per the checkpoint gate (the earlier `4c45da83…2102bf44` is superseded, not passed along by habit). An asset present in the bundle is still not proof it decodes on Android; ICO/GIF decoding, native imports, audible OGG playback and real startup remain Phase 4 device checks.
 
 Next exact action: checkpoint 6 is complete and committed. Execute Phase 3 checkpoint 7 (final artifact review and Phase 4 handoff) only on explicit instruction: run `git diff --check`, `git status --short --untracked-files=all` and `git diff --stat`, review new files as well as tracked diffs, restore only known test-generated configuration changes while preserving user edits, and confirm no APKs, caches, SDKs or keys are staged.
+
+Phase / task: Phase 3 - Checkpoint 7: review and Phase 4 handoff (2026-10-10)
+
+Status: complete - final review PASS and the Phase 4 inputs are handed off. The working tree is clean, no artifact/cache/SDK/key is staged, the frozen inputs are unchanged, and the full desktop suite passes (110/110) on the final input state. Phase 3 is complete; Phase 4 checkpoint 1 is next.
+
+Files changed: this record, the Phase 3 tracker (`mdclassic_games_phase3_android_plan.md`), the master summary/tracker (`mdclassic_games_upgrade_plan.md`) and the Phase 4 handoff/reconciliation (`mdclassic_games_phase4_device_plan.md`). No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: repository root `/home/oriol/Nextcloud/Programacion/GitHub/classic_games` on branch `MDclassic_games`; HEAD `f11a0e31f5b83cf7ddde540c4b5e328d1a065bc5` (checkpoint 6). Host Manjaro Linux x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; `DISPLAY=:1`. Final artifact preserved at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk`; checkpoint 6 evidence `/home/oriol/android-build/evidence/checkpoint6-*`; new checkpoint 7 evidence `/home/oriol/android-build/evidence/checkpoint7-desktop-gate.log`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+git diff --check
+git status --short --untracked-files=all
+git diff --stat
+git ls-files | grep -Ei '\.(apk|jks|keystore|pem|key)$'   # only historical releases/*.apk, no new artifact
+sha256sum /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+uv lock --check && uv sync --locked --group dev && uv pip check && uv run --locked --group dev pytest
+```
+
+Expected / observed result: PASS for every checkpoint 7 and Phase 3 completion-gate item.
+
+1. Input-state review: `git diff --check` exit 0 (no whitespace errors); `git status --short --untracked-files=all` and `git diff --stat` are both empty, so there is no tracked or untracked diff and no new file to review at this checkpoint. The only changes since the last commit (head `f11a0e3`) are this checkpoint's documentation edit. The checkpoint-5 (`84f0254`) and checkpoint-6 (`f11a0e3`) commits are documentation-only (three `docs/assistant/*.md` files each). No test-generated configuration change needed restoring; the tracked `source/MDclassic_games/main.ini` digest is still `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` and matches HEAD.
+2. Staging review: `git ls-files` lists only the historical `releases/*.apk` and `buildozer.spec` files, which the runbook requires to be left alone. No `.buildozer/`, `bin/`, SDK, JDK, NDK, keystore, `.jks` or `.pem` path is tracked, and `git check-ignore` confirms `/source/MDclassic_games/.buildozer/` and `/source/MDclassic_games/bin/` remain ignored (`.gitignore:5-6`). The generated `bin/` directory is not present in the repository worktree; the only APK copies live outside tracked source under `/home/oriol/android-build/evidence/`.
+3. Final artifact verification: the preserved clean-build artifact hash is `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` at 53,223,301 bytes, exactly matching the checkpoint-6 record. It is the artifact handed to Phase 4.
+4. Final desktop gate (`checkpoint7-desktop-gate.log`, HEAD `f11a0e3`, `DISPLAY=:1`): `uv lock --check` exit 0; `uv sync --locked --group dev` exit 0; `uv pip check` "All installed packages are compatible"; `uv run --locked --group dev pytest` collected 110, passed 110, failed 0, skipped 0, xfailed 0 in 28.12s, exit 0. No required check passed via a skip and none was waived.
+
+Automated checks: the desktop suite above is the automated acceptance for this checkpoint (110 passed). The git review commands are the display-independent review.
+
+Failure: none.
+
+Decision: close Phase 3. Accept the clean-build APK `7d3416aa…e9d3cc91` as the final Phase 4 artifact. The earlier device-confirmed `4c45da83…2102bf44` is superseded; because the two builds' nested bundle listings are byte-for-byte identical and differ only in signing/build timestamps, the final artifact carries the same verified content. Android runtime support (startup, ICO/GIF decoding, native imports, audible OGG playback, rotation/lifecycle) remains unvalidated until the Phase 4 device gate passes on this exact artifact.
+
+Phase 4 handoff inputs:
+- Artifact: `clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, 53,223,301 bytes; preserved at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/` (an in-tree copy rebuilds from `source/MDclassic_games` with the pinned toolchain).
+- Package: `org.games.clasicgames`; versionName `1.2`; versionCode `1024102`; label `Classic games`; launcher `org.kivy.android.PythonActivity`; `application-debuggable`; debug-signed (APK Signature Scheme v2, 1 signer; v1/v3/v4 expected false).
+- APIs: compile/target SDK 36; minSdk 24. ABI: `arm64-v8a` only. Native libs: 17 `ARM aarch64` `.so` files plus the `libpybundle.so` gzip framework bundle.
+- Build provenance: Buildozer 1.6.0; p4a tag `v2026.05.09` commit `58d21141f17c889bf8585f5665921d72028f8831`; Temurin JDK `17.0.20.1+1`; Android SDK build-tools `36.0.0`; NDK r28c (NDK API 24); target/host CPython `3.11.14`; Kivy 2.3.1; KivyMD 2.0.0; Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4.
+- Evidence/logs: checkpoint 4 `checkpoint4-build-retry2.log`/`.exit`; checkpoint 5 `checkpoint5-*`; checkpoint 6 `checkpoint6-*` (build, inspection, desktop gate); checkpoint 7 `checkpoint7-desktop-gate.log`; all under `/home/oriol/android-build/evidence/`.
+- Desktop/CI: 110 tests pass on the final input state (`f11a0e3`); Phase 2 remote CI run [38006783012](https://github.com/osso73/classic_games/actions/runs/38006783012) is the last published green run.
+- Known issues/limits passed to Phase 4: (a) the display-cutout safe inset is not padded (only `WindowInsets.Type.systemBars()`), so a wide-notch device could render the top app bar near the cutout; neither test device exercises this. (b) The final clean-build artifact `7d3416aa…` has not itself been installed; the prior interactive pass used the content-identical `4c45da83…`, so the Phase 4 fresh install must confirm startup and audio on `7d3416aa…`. (c) Phase 4 devices already available: Google Pixel 10 and Samsung Galaxy S24 `SM-S921B` (both Android 16 / API 36 / arm64-v8a).
+
+Next exact action: Phase 3 is complete. Execute Phase 4 checkpoint 1 only on explicit instruction: verify the local artifact hash equals `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, record package/version/launcher/API/ABI/signing from the APK manifest, confirm no unbuilt runtime/spec/dependency change exists, then identify and preserve an authorized, compatible, fresh-data target (Pixel 10 and/or Samsung S24 `SM-S921B`). Do not begin another Phase 3 checkpoint or rebuild.
