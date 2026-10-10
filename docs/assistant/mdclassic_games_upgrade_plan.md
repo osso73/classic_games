@@ -1,18 +1,18 @@
 # MDclassic_games modernization execution plan
 
-Original review: 2026-09-13. Progress updated: 2026-10-10. Status: **Phase 1 complete; Phase 2 in progress**.
+Original review: 2026-09-13. Progress updated: 2026-10-10. Status: **Phases 1-2 complete; Phase 3 checkpoint 1 selection passed, review/commit pending**.
 
 ## Progress summary
 
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 | Reproducible desktop environment | Complete; recorded environment checks passed, committed `763f139` |
-| 2 | Desktop compatibility and validation | In progress; desktop/visual acceptance and Node.js 24 actions committed; 80 tests pass; user reports CI green again; per-job cache cleanup and final CI evidence pending |
-| 3 | Android toolchain and debug APK | Pending; requires Phase 2 gates |
+| 2 | Desktop compatibility and validation | Complete; desktop/visual acceptance approved; 80 local tests pass; final CI run [38006783012](https://github.com/osso73/classic_games/actions/runs/38006783012) passed at `3d55d2b` |
+| 3 | Android toolchain and debug APK | In progress; checkpoint 1 source/selection checks pass with approved supporting-version candidates; review/commit pending |
 | 4 | Android device validation | Pending; requires built APK |
 | 5 | Final documentation and handoff | Pending |
 
-See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and remaining work, and the [validation record](mdclassic_games_validation.md) for evidence. Update this summary at checkpoint handoffs. Local unit and GUI suites and desktop acceptance pass; both remote jobs passed again per user report after the Node.js 24 update. Final CI evidence awaits a recorded run URL/commit and recheck of the per-job cache cleanup.
+See the [Phase 2 progress tracker](mdclassic_games_phase2_desktop_plan.md#progress-tracker) for completed tasks and the [validation record](mdclassic_games_validation.md) for evidence. Desktop acceptance, local unit/GUI tests, and final remote CI pass. Phase 3 checkpoint 1's approved Pillow 11.3.0 / pycairo 1.28.0 candidates pass source-patch feasibility; the exact toolchain selection includes a user-local JDK 17. Next: review and, when requested, commit checkpoint 1, then perform checkpoint 2's project-local dependency/host setup and desktop revalidation. Android builds and runtime acceptance remain unvalidated.
 
 **Baseline change:** Phase 2 checkpoint 1 replaced the defective KivyMD 1.2.0 source build with official KivyMD 2.0.0 at immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. Commit `a1beac1` subsequently selected the released PyPI `kivymd==2.0.0` artifact instead; checkpoint 3 and Pong automated checks were rerun successfully against that locked artifact. Python 3.11 and Kivy 2.3.1 remain the baseline. Android compatibility is still unvalidated.
 
@@ -26,7 +26,7 @@ Detailed runbooks:
 - [Phase 4 - Android device validation](mdclassic_games_phase4_device_plan.md)
 - [Phase 5 - Final documentation and handoff](mdclassic_games_phase5_handoff_plan.md)
 
-The Phase 3-5 runbooks are planning documents, not evidence that those phases have executed. They follow Phase 2's one-checkpoint-at-a-time review workflow; commits require an explicit user request.
+The Phase 3 runbook tracks its partially executed first checkpoint; Phase 4-5 runbooks remain planning documents. Runbook instructions are not execution evidence: consult the validation record for observed results. These phases follow Phase 2's one-checkpoint-at-a-time review workflow; commits require an explicit user request.
 
 ## 1. Objective and boundaries
 

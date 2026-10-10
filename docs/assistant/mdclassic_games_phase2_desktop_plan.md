@@ -1,17 +1,17 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
-Progress updated: 2026-10-10. Status: **desktop acceptance and Node.js 24 actions committed; user reports both CI jobs passed again; cache-key collision cleanup awaits review/commit and remote recheck**.
+Progress updated: 2026-10-10. Status: **checkpoints 1-12 complete; Phase 2 acceptance passed; Phase 3 checkpoint 1 is next**.
 
 ## Progress tracker
 
-**Current position:** desktop acceptance is committed as `3efd3cf`, and Node.js 24 actions as `bfaacd1`. User reports both CI jobs passed again; the new screenshot shows only a GUI cache-save reservation warning. Both jobs used the same uv cache key, so their concurrent saves could collide. The workflow now scopes the cache suffix to each job; this cleanup needs review/commit and remote recheck. The run URL and tested commit still need recording before Phase 2 closure.
+**Current position:** Phase 2 acceptance passed. Desktop acceptance is committed as `3efd3cf`, Node.js 24 actions as `bfaacd1`, and cache suffixes as `3d55d2b`. The final [CI run](https://github.com/osso73/classic_games/actions/runs/38006783012) succeeded for the exact current commit. User confirms all is good after the cache fix; the public run summary confirms Success, `unit` 56s and `gui` 1m 44s. The unchanged application/test/dependency state retains the 80-test local full-suite pass.
 
 **Active baseline:** Python 3.11, Kivy 2.3.1, and the PyPI `KivyMD 2.0.0` artifact locked by uv. This replaced the earlier checkpoint-1 Git commit source in commit `a1beac1`; checkpoint 3 was revalidated against the current lock. See the [validation record](mdclassic_games_validation.md) for installation evidence and test results.
 
 | Checkpoint | Task | Status | Evidence / remaining work |
 | --- | --- | --- | --- |
 | 1 | Repair framework installation | Complete | Fresh resource installation verified; committed `f1d0148` |
-| 2 | Establish test foundation | Complete | 10 unit tests passed; committed `0f5642d`; GUI fixtures still need executable isolation checks |
+| 2 | Establish test foundation | Complete | 10 initial unit tests passed; committed `0f5642d`; GUI isolation subsequently exercised by shell/lifecycle/settings tests |
 | 3 | Repair shell startup | Complete | Committed `b5e27b1`; revalidated against the current PyPI KivyMD lock with 10 unit, 3 GUI, and 13 full-suite tests passing |
 | 4 | Pong | Complete | Real-widget behavior regression and full manual exercise pass, including repaired pause/resume; committed `b4406c4` |
 | 5 | Ahorcado | Complete | Five real-widget behavior regressions and full manual exercise pass; committed `e7662c9` |
@@ -20,10 +20,10 @@ Progress updated: 2026-10-10. Status: **desktop acceptance and Node.js 24 action
 | 8 | 2048 | Complete | KivyMD 2 migration, seven real-widget behavior regressions, and manual desktop exercise pass |
 | 9 | Buscaminas | Complete | Toolbar callback and desktop right-click multitouch repairs, six behavior regressions, and the required desktop exercise passed; committed `511cd0a` |
 | 10 | Snake | Complete | KivyMD 2 screen repair, five behavior regressions, and the required desktop exercise passed |
-| 11 | Cross-app regressions and CI | Complete | User approved completion and commit; 17 unit, 60 GUI, and 77 full-suite tests pass locally; Pong menu-return defect repaired; workflow added; Ubuntu/Xvfb/remote CI acceptance remains pending |
-| 12 | Desktop acceptance and handoff | In progress | Desktop/visual acceptance committed `3efd3cf`; 80 tests pass; Node.js 24 update committed `bfaacd1`; CI passed again per user; cache-suffix cleanup review/commit, remote recheck and run URL pending |
+| 11 | Cross-app regressions and CI | Complete | Cross-app tests, Pong menu-return repair and workflow committed; final remote unit/GUI success recorded in checkpoint 12 |
+| 12 | Desktop acceptance and handoff | Complete | Desktop/visual acceptance committed `3efd3cf`; 80 local tests pass; final workflow committed `3d55d2b`; CI run [38006783012](https://github.com/osso73/classic_games/actions/runs/38006783012) succeeds |
 
-**Next exact action:** review the per-job uv cache suffix and commit only when requested. After publication, verify both jobs pass and the cache-reservation annotation no longer appears; supply the run URL and tested commit. Cache-save warnings are non-blocking and do not invalidate the reported passing tests. Reuse checkpoint 12's local 80-test result because application/test/dependency inputs are unchanged. Once current CI success and its evidence are recorded, close checkpoint 12 and Phase 2 and hand off to Phase 3 toolchain selection. Phase 3 must add the deferred ICO packaging assertion.
+**Next exact action:** review the final evidence documentation, then execute Phase 3 checkpoint 1 only: verify the accepted entry state and select a coherent Android toolchain/native-dependency matrix using the Phase 3 runbook. Do not build or change the spec before those selections are supported by evidence. Phase 3 must add the deferred ICO packaging assertion. Commit documentation only when requested.
 
 **Status convention:** Complete means required checkpoint checks passed and changes were reviewed and committed. Checkpoint 11 permits a user-approved handoff with unavailable remote CI explicitly pending; this does not complete the Phase 2 CI gate. Use In progress or Blocked for partial work, distinguishing implementation, automated checks, manual checks, and review/commit in the evidence column. Pending means the checkpoint has not been executed; Next identifies the immediate pending checkpoint. These are checkpoint counts, not an estimate of effort or overall percentage complete.
 
@@ -256,7 +256,7 @@ Add `.github/workflows/mdclassic-games-tests.yml`, triggered by push and pull re
 
 Both jobs must use an explicit runner image and run `uv sync --locked --group dev` before testing. The GUI job must document the verified Linux SDL/OpenGL/software-rendering prerequisites, set a finite timeout, and preserve failure logs. Xvfb is a display server, not proof that required GL/audio providers work. Missing required providers are failures/blockers, not passing skips. Automated interaction tests may stub audible playback as described above; CI does not verify audible output.
 
-Checkpoint 11 implementation uses `ubuntu-24.04`, Python 3.11, and uv 0.12.10. Cairo development headers and pkg-config support the locked pycairo dependency. The GUI job installs Xvfb/xauth, Mesa GL/EGL and software-rendering drivers, ALSA's library, and xclip; Kivy's Linux wheel supplies SDL2. It selects `KIVY_WINDOW=sdl2`, `KIVY_GL_BACKEND=sdl2`, `LIBGL_ALWAYS_SOFTWARE=1`, and `SDL_AUDIODRIVER=dummy`. Local tests verified that provider combination on the existing desktop display, including real decoding of all 15 OGGs; the dummy output is not audible acceptance. Xvfb is unavailable on the current host, so the Ubuntu package list and Xvfb command require the first remote job result before being considered verified. Failed jobs upload JUnit reports and the GUI console log, including subprocess traceback output.
+Checkpoint 11 implementation uses `ubuntu-24.04`, Python 3.11, and uv 0.12.10. Cairo development headers and pkg-config support the locked pycairo dependency. The GUI job installs Xvfb/xauth, Mesa GL/EGL and software-rendering drivers, ALSA's library, and xclip; Kivy's Linux wheel supplies SDL2. It selects `KIVY_WINDOW=sdl2`, `KIVY_GL_BACKEND=sdl2`, `LIBGL_ALWAYS_SOFTWARE=1`, and `SDL_AUDIODRIVER=dummy`. Local tests verified that provider combination on the existing desktop display, including real decoding of all 15 OGGs; the dummy output is not audible acceptance. The final remote GUI job passes the declared Ubuntu prerequisites and exact Xvfb command in run [38006783012](https://github.com/osso73/classic_games/actions/runs/38006783012). Failed jobs upload JUnit reports and the GUI console log, including subprocess traceback output. Actions now declare Node.js 24 and use separate per-job uv cache suffixes.
 
 Run from repository root:
 
@@ -313,7 +313,7 @@ git diff --stat
 - [x] Shell, seven games, controls, settings, sounds, and resources pass desktop acceptance (user checklist and post-repair visual confirmation).
 - [x] Unit and GUI suites collect meaningful tests and pass (checkpoint 12: 17 unit, 63 GUI, 80 full-suite).
 - [x] Tests preserve tracked configuration and isolate state (checkpoint 11 subprocesses and digest guard).
-- [ ] Focused CI passes. If remote execution is unavailable, record it as pending and keep Phase 2 acceptance partial.
+- [x] Focused CI passes (run 38006783012 at commit `3d55d2b`, unit and GUI success).
 - [x] Validation record contains commands, counts, observations, failures, decisions, and the next action.
 - [x] Review and commit Phase 2 as the final checkpoint (user approved the local deliverables and requested their commit; remote CI remains pending).
 
