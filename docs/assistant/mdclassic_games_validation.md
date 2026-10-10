@@ -1161,3 +1161,56 @@ Failure: none.
 Decision: accept checkpoint 6. Memory passes all required touch checks including the max-level all-theme sweep and ICO decoding on Android 17 / API 37. Proceed to checkpoint 7 (15 puzzle).
 
 Next exact action: checkpoint 6 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 7 (15 puzzle) only: read `game_15puzzle/screen.py`/`sample.py` first, then move an adjacent tile into the gap and confirm a nonadjacent tap does not move tiles, shuffle/restart, cycle all 3x3/4x4/5x5 sizes and selectable complete themes verifying numbered/image tiles plus the matching reference image and usable chips/touch targets, and return/re-enter to make another legal move; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 8.
+
+Phase / task: Phase 4 - Checkpoint 7: 15 puzzle touch validation (2026-10-11)
+
+Status: passed after repair - the first attempt on artifact `7d3416aa…` failed a required row (the bottom reference picture filled the row and left the Theme/Level chips unusable in portrait); the defect was reproduced, root-caused, fixed, the APK rebuilt to `be6e6196…`, and every checkpoint-7 row then passed.
+
+Files changed: this record, the Phase 4 tracker and the master summary; plus the in-scope app fix `source/MDclassic_games/game_15puzzle/sample.py` and its regression `tests/mdclassic_games/integration/test_15puzzle.py` (commit `92a185f`). The fix rebuilt `bin/clasicgames-1.2-arm64-v8a-debug.apk`; no spec, dependency, or asset change.
+
+Environment: repository branch `MDclassic_games`, fix commit `92a185f`. Build worktree `/home/oriol/android-build/mdclassic_games` synced to `92a185f`. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi. Artifacts: first attempt `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` (53,223,301 bytes); fixed `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1` (53,223,341 bytes). `game_15puzzle/screen.py`/`sample.py` read before testing. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint7/` and `/home/oriol/android-build/evidence/phase4-fix-fifteen-layout/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint7
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full-fixed.txt" 2>&1 &
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-fifteen-before.png"   # and -after.png
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[fifteen\]'
+# rebuild after the fix (working dir source/MDclassic_games; backgrounded; JAVA_HOME jdk-17.0.20.1+1):
+uv run --locked --group android buildozer -v android debug
+adb -s 61190DLCR000VV install -r source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk
+```
+
+First attempt (artifact `7d3416aa…`, session 23:17:16Z, `logcat-full.txt`): the user reported all gameplay rows worked (adjacent move and Moves count, non-adjacent ignored, restart/shuffle, 3x3/4x4/5x5 sizes, all 14 complete themes with matching reference image and no blank tiles), but FAILED the required "usable chips/touch targets" row: the bottom reference picture rendered almost the size of the board and the Theme/Level chips were barely visible. Recorded as a checkpoint failure, not accepted.
+
+Root cause (reproduced without a device): `game_15puzzle/sample.py:initialize_grid` set `self.window_size = min(self.parent.height, self.parent.width)`. The bottom row is a horizontal `BoxLayout` holding a chip `FloatLayout` and the fixed-size `Sample`; sizing the square to the full parent width only leaves room for the chips when that row is wider than it is tall. In portrait the row is taller than half its width, so the square took the full width (a 540x1212 logical window gave `sample.window_size == 540`, equal to the board, with the chip `FloatLayout` overlapping at full width). A Kivy layout harness loaded the real screen in a 540x1212 window and printed `sample.window_size=540`, `chip FloatLayout width fraction=1.0`.
+
+Fix: cap the reference square at half the parent width - `self.window_size = min(self.parent.height, self.parent.width / 2)` - so the bottom row is half reference image and half chip area. Same harness after the fix printed `sample.window_size=270`, bottom box 540 wide, chip `FloatLayout` 270x540 with both `MDChip`s on-screen and tappable.
+
+Regression: `tests/mdclassic_games/integration/test_15puzzle.py::test_fifteen_reference_picture_leaves_the_controls_usable` sets a portrait window, forces a layout tick, and asserts the reference square is `min(parent.height, parent.width/2)`, the chip `FloatLayout` is at most half the row and non-zero, and no chip exceeds the control area. It fails on the old sizing (assertion on `window_size`) and passes on the fix. Full desktop suite after the fix: 111 passed / 0 failed.
+
+Rebuild and inspection: `92a185f` built by `uv run --locked --group android buildozer -v android debug` (start `2026-10-11T01:33:32+02:00`, exit 0 `2026-10-11T01:33:59+02:00`, log `/home/oriol/android-build/evidence/build-phase4-fix-fifteen-layout.log`). New APK SHA-256 `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`, 53,223,341 bytes. `aapt dump badging` unchanged (`org.games.clasicgames`, versionName 1.2, versionCode 1024102, min 24 / target 36, `arm64-v8a`); `apksigner verify` v2 true, 1 signer. The bundled `assets/private.tar` `game_15puzzle/sample.pyc` was disassembled (Python 3.11 host) and `initialize_grid` contains `LOAD_CONST 2; BINARY_OP /`, confirming the fix is packaged. Reinstalled with `adb install -r` (Success, same debug key, data preserved).
+
+Retest (artifact `be6e6196…`, session 23:36:54Z-23:42:23Z, `logcat-full-fixed.txt`): PASS for every checkpoint-7 row:
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. Layout fix: the bottom row is half reference picture, half chips; both Theme and Level chips fully visible and tappable; reference image about half the board.
+3. Adjacent/non-adjacent: an adjacent tile moves into the gap and Moves increments; a non-adjacent tap changes nothing.
+4. Restart: play reshuffles and resets Moves.
+5. Sizes: the Level chip cycles 3x3 -> 4x4 -> 5x5 with matching tile counts and reference grid.
+6. Themes: all 14 complete themes (`bike, blonde, breakfast, bulb, carnival, eve, landscape, milky_way, money, numbers, ship, shore, squirrel, tree`) render numbered tiles and a matching reference image with no blank tiles.
+7. Return/re-enter: returned via drawer, reopened via drawer, made another legal move.
+Persisted result `[fifteen] level=1, theme=bulb`.
+
+Log scan: `logcat-full-fixed.txt` (35,922 lines) has no `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session. The startup traceback at `01:36:58.943` is the already-classified non-fatal Kivy "Error when copying logo directory" (`shutil.Error` from a SELinux `relabelfrom` denial on kivy icon files); Kivy catches it and the app proceeds to the main loop, so it is not a defect. The pre-session 17:16 `SDLActivity` SIGABRT belongs to an earlier pass.
+
+Automated checks: `uv run pytest tests/mdclassic_games` -> 111 passed / 0 failed / 0 skipped after the fix (was 110 before adding the regression).
+
+Failure: one required checkpoint-7 row failed on the first artifact and is now fixed; the root cause was device-independent and is covered by a desktop regression.
+
+Decision: accept checkpoint 7 on artifact `be6e6196…`. The 15-puzzle layout is fixed and its regression is green. Because the artifact changed, checkpoints 1-6 remain valid on `7d3416aa…` and checkpoint 12 must re-confirm the current hash. Proceed to checkpoint 8 (2048).
+
+Next exact action: checkpoint 7 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 8 (2048) only on artifact `be6e6196e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `game_2048/screen.py`/`board.py` first, then exercise the four swipe controls, merges and score, undo, and the target control, return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 9.
