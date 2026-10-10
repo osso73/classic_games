@@ -1036,3 +1036,44 @@ Failure: none.
 Decision: accept checkpoint 3. All seven tile/drawer/re-entry routes pass using touch, all five settings panels work before/after screen creation and persist across a cold relaunch, and the About/CLOSE/settings-dismissal/Exit shell controls work on Android 17 / API 37 with no session log errors. Proceed to checkpoint 4 (Pong).
 
 Next exact action: checkpoint 3 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 4 (Pong) only: read `pong/screen.py` and its handlers first, then from a fresh process start/restart, observe ball movement, drag both paddles with touch, let a ball exit and verify the score increment/serve, tap pause/resume and confirm the icon/motion, change speed/max-speed/skin and verify effect on a new round, and hear a representative sound and exercise mute if present; return via drawer and reopen via drawer. Record per-row evidence and logcat. Do not begin checkpoint 5.
+
+Phase / task: Phase 4 - Checkpoint 4: Pong touch validation (2026-10-10)
+
+Status: passed - all seven Pong items pass on the recorded device/artifact: tile entry, ball movement on start, both paddles respond to touch, side exits score and re-serve, pause/resume toggles motion and icon without speed stacking, speed/skin settings visibly change the game, and drawer return/reopen works.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `d8f8c18` and host as checkpoint 3. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `pong/screen.py` and `pong/pongboard.py` read before testing: play/start, pause toggle (`pause_button`), help; touch move uses the left/right thirds; first to 5 shows the "End" popup. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint4/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint4
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-pong.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A3 '\[Pong\]'
+```
+
+Expected / observed result: PASS for all seven checkpoint 4 rows (user-observed touch on the device).
+
+1. Entry: Pong opens correctly from the menu tile and from the drawer, and re-entry reuses the screen (also confirmed at checkpoint 3).
+2. Start/restart: tapping the play icon serves the ball and it visibly moves; re-tapping restarts the round.
+3. Paddle touch: dragging in the left third moves the left paddle and dragging in the right third moves the right paddle, following the finger.
+4. Scoring/serve: letting the ball exit a side increments the correct player's score and re-serves; the game ends at 5 with the "End" popup.
+5. Pause/resume: the pause icon stops motion and switches to the play icon; tapping again resumes motion, restores the pause icon, and the ball continues at normal speed (no accelerated/duplicated update stream).
+6. Settings effect: from the fresh process the Pong panel changed values and the new round reflected them. Persisted result `[Pong] speed=30, max-speed=50, skin=jupiter` (initial speed raised `10`→`30` and skin changed `tennis`→`jupiter`; the user reported the effects as observed). The GIF ball/paddle assets for the selected skin render (img provider decoding).
+7. Return/reopen: returned to the menu via the drawer and reopened Pong via the drawer entry with working controls.
+
+Sound: Pong has no sound playback and no mute control in the source (`grep` for `app.play`/`SoundLoader`/`mute` under `pong/` returns nothing), so this optional row is recorded as not present rather than failed.
+
+Log scan: `logcat-full.txt` (21,764 lines, 20:57Z-23:00Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none.
+
+Decision: accept checkpoint 4. Pong passes all required touch checks on Android 17 / API 37. Proceed to checkpoint 5 (Ahorcado).
+
+Next exact action: checkpoint 4 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 5 (Ahorcado) only: read `ahorcado/screen.py`/`general.py` first, then start a new word, use the on-screen keyboard for a correct and a wrong letter, verify repeated occurrences reveal and wrong input changes the man image, exercise keyboard/man settings, confirm Spanish characters render, and observe a win/loss if reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 6.
