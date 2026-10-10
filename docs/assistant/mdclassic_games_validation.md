@@ -963,3 +963,43 @@ Failure: none. Two observations to carry forward: (a) the device OS drifted to A
 Decision: Select the Google Pixel 10 `61190DLCR000VV` (Android 17 / API 37 / `arm64-v8a`, 1080x2424, 3-button navigation) as the authorized target for Phase 4, and treat its existing installation as a disposable test install the user approved clearing for a clean fresh-default scenario. The exact final artifact `7d3416aa…e9d3cc91` is available, matches its hash, and is compatible with the target.
 
 Next exact action: checkpoint 1 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 2 only: start a full-device `adb -s 61190DLCR000VV logcat -v threadtime` capture in a separate terminal, uninstall the existing test installation (recording exactly what was removed), `adb -s 61190DLCR000VV install` the exact artifact `7d3416aa…e9d3cc91`, launch `org.kivy.android.PythonActivity` with `am start -W`, and record startup duration, seven tiles, drawer, About/CLOSE, fresh-default settings versus `MainApp.build_config`, and startup logcat for tracebacks/missing resources. Do not begin checkpoint 3.
+
+Phase / task: Phase 4 - Checkpoint 2: fresh install and startup/defaults validation (2026-10-10)
+
+Status: passed - the exact final artifact fresh-installs and cold-launches to a responsive menu on the Pixel 10, all seven tiles/drawer/About/CLOSE and a first control respond to touch, the fresh defaults match `MainApp.build_config`, and the app-fatal log scan is clean.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `6e0e276` and host as checkpoint 1. Device: Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ override density 460, 3-button navigation, immersive status/navigation bars. Evidence directory `/home/oriol/android-build/evidence/phase4-checkpoint2/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint2
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # full-device capture, no -c
+adb -s 61190DLCR000VV uninstall org.games.clasicgames
+adb -s 61190DLCR000VV install /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-menu.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini
+adb -s 61190DLCR000VV shell dumpsys window displays | grep -i insetsource   # bar visibility
+```
+
+Expected / observed result: PASS for every checkpoint 2 row.
+
+1. Before-launch capture: a bounded full-device `logcat -v threadtime` capture ran for the whole session (`logcat-full.txt`, 69,434 lines, captured 20:12:14Z-20:29:57Z host / 22:12-22:29 device); `logcat -c` was **not** used.
+2. Removal and fresh install: the prior disposable test installation (`versionName=1.2`, `versionCode=1024102`, `primaryCpuAbi=arm64-v8a`, `firstInstallTime=2026-10-10 16:47:44`, `lastUpdateTime=17:42:42`, data dirs `cache/code_cache/files/shared_prefs`) was uninstalled (`Success`) under the user's recorded consent; the logcat `beginning of crash` FATAL SIGABRT at 17:16 (device time) predates this session and belongs to the earlier interactive pass. Then `adb install` of the exact artifact (`sha256sum` re-verified as `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`) without `-r` returned `Performing Streamed Install` / `Success` (exit 0); `pm path` then resolved to a new `base.apk`. This is a genuine fresh install, not a reinstall over existing state.
+3. Launch: `am start -W` reported `Status: ok`, `LaunchState: COLD`, `TotalTime: 299`, `WaitTime: 302`, `Complete`. After a 15 s settle the process was alive (PID 7979) and focused. The user's visible observation is that the app reaches a usable menu; the activity-start timing is not treated as full startup success.
+4. Providers and versions (from logcat, app PID 7979): Window `sdl2`; **Audio `audio_sdl2` (audio_android, audio_ffpyplayer ignored)**; Image `img_tex, img_dds, img_sdl2, img_pil`; Text `sdl2`; Clipboard `android`; GL ES 3.2 (Imagination PowerVR). Kivy 2.3.1, KivyMD 2.0.0, Python 3.11.14. The SDL2 audio provider on Android confirms the earlier ALSA-leak repair holds: the app no longer selects a desktop ALSA driver on Android.
+5. Fresh defaults: `files/.main.ini` created fresh on Android reads `[Pong] speed=10, max-speed=50, skin=original`; `[Ahorcado] man=man1, keyboard=keyboard2`; `[Memory] level=6, theme=starwars`; `[fifteen] level=1, theme=numbers`; `[Snake] speed=1, size=11, mode=1, level_start=1` - an exact match to the runbook's `MainApp.build_config` defaults. No packaged `main.ini` overrode them (the spec excludes it; the created `.main.ini` is a fresh runtime file).
+6. Startup log scan: no Python traceback, native crash, `FATAL EXCEPTION`, ANR or `Shutting down VM` occurs after the 22:12 launch (the only fatal marker is the pre-session 17:16 entry above). The one Python `[ERROR]` is Kivy's packaged `Error when copying logo directory` (`shutil.Error: ... .kivy/icon ... Permission denied`) during `kivy/__init__.py`; it is non-fatal (main loop starts afterward), pre-existing p4a behaviour, and unrelated to the app. Benign-only messages also present: `[WARNING] [Base] Unknown <android> provider`, `hidapi` `RECEIVER_EXPORTED` hint, `E mes.clasicgames: Invalid resource ID 0x00000000`, and audio HAL chatter - none app-fatal.
+7. Immersive/system bars: `dumpsys window displays` shows `InsetsSource type=statusBars ... visible=false` (frame `[0,0][1080,173]`) and `type=navigationBars ... visible=false` - the earlier edge-to-edge repair holds on API 37.
+8. Touch/visual acceptance (user-observed on the device, all PASS): all seven menu tiles render with images and labels; the drawer opens/closes with readable font/icons; About shows the app version `v1.2` and CLOSE dismisses it; tapping a tile responds after first render with the loading notification. Audible output remains a checkpoint 11 check.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110 on the Phase 3 final input state).
+
+Failure: none. The only app-process `[ERROR]` is the non-fatal Kivy logo-copy message above; it is classified as pre-existing/unrelated, not an app compatibility defect.
+
+Decision: accept checkpoint 2. The exact final artifact `7d3416aa…e9d3cc91` fresh-installs, reaches a responsive menu with correct defaults and the SDL2 audio provider on Android 17 / API 37 / arm64-v8a, with immersive bars and no app-fatal errors. Proceed to checkpoint 3 (shell/navigation/settings through touch).
+
+Next exact action: checkpoint 2 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 3 only: from a menu-only process, open each of the five settings panels (Pong, Ahorcado, Memory, 15 puzzle, Snake), change one visible setting before opening its game and confirm it applies, change it again after the screen exists, relaunch and confirm persistence, then run the seven-game tile/drawer/re-entry navigation matrix with the first-entry loading notification; record per-scenario PASS/FAIL and logcat. Do not begin checkpoint 4.
