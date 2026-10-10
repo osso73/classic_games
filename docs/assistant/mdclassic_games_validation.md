@@ -678,3 +678,60 @@ Automated checks: reuse the unchanged 80-test pass (17 unit, 63 GUI; failed/skip
 Decision: close checkpoint 2 with the approved deliverables and set checkpoint 3 as next. Phase 3 remains in progress; host setup does not establish an APK build or Android runtime support.
 
 Next exact action: execute Phase 3 checkpoint 3 only: update `source/MDclassic_games/buildozer.spec` using the reviewed toolchain and runtime matrix, add scoped output ignores and meaningful packaging/resource regressions, run the required unit checks, update evidence and stop for review.
+
+### Phase 3 checkpoint 3 - Spec and resource/packaging regressions
+
+Phase / task: Phase 3 - Checkpoint 3: update the Android spec and packaging/resource regressions (2026-10-10)
+
+Status: in progress - all checkpoint 3 checks PASS; review/commit pending. Checkpoint 2 is committed as `c29c7b0` (`Complete reproducible Android host setup`), and checkpoints 1-2 are complete.
+
+Files changed: `source/MDclassic_games/buildozer.spec`, `.gitignore`, `tests/mdclassic_games/unit/test_resources.py`, this record and the Phase 3/master trackers. Uncommitted awaiting review. No application `.py`/`.kv`, asset, `resources/`, `requirements.txt`, iOS, release-signing or `releases/` changes. User-edited `source/MDclassic_games/main.ini` is untouched and excluded from staging.
+
+Environment: unchanged checkpoint 2 baseline: Manjaro Linux x86_64; host CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0; Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4; project-local android dependency group and user-local JDK/SDK/NDK. No APK has been built.
+
+Command and working directory: repository root for the required checkpoint commands, and the Android dependency group for the staging audit:
+
+```bash
+uv run --locked --group dev pytest tests/mdclassic_games/unit --junitxml=/tmp/opencode/mdclassic-phase3-checkpoint3-unit.xml
+git diff --check
+git status --short --untracked-files=all
+uv run --locked --group android python /tmp/opencode/mdclassic-phase3-checkpoint3-staging-audit.py
+```
+
+The staging audit invokes only Buildozer 1.6.0's own `_copy_application_sources` with the real `SpecParser`, so it exercises Buildozer's actual source-filter semantics without initializing or building anything. Its stdout/stderr log is `/tmp/opencode/mdclassic-phase3-checkpoint3-staging.log`, and its inventory/result JSON and staged copies are under `/tmp/opencode/mdclassic-phase3-checkpoint3-staging/`. The script is an external evidence aid; the durable record is below. The static assertion helper also parses the spec with `ConfigParser(interpolation=None)` so `%(source.dir)s` is not expanded.
+
+Expected / observed result: the spec now matches the reviewed checkpoint 1 matrix.
+
+#### Applied spec changes
+
+| Setting | Before -> after |
+| --- | --- |
+| `source.include_exts` | `...,gif` -> `...,gif,ico` (adds ICO; keeps recursive image paths) |
+| `source.exclude_dirs` | `tests, bin, resources` -> `tests, bin, build, resources, .buildozer, .venv` |
+| `requirements` | floating master KivyMD ZIP + `kivy==2.0.0` + `sdl2_ttf==2.0.15` + unpinned `pillow,requests,urllib3,chardet,idna` -> exact reviewed pins `python3==3.11.14, hostpython3==3.11.14, kivy==2.3.1, kivymd==2.0.0, pillow==11.3.0, pycairo==1.28.0, materialyoucolor==3.0.4`, explicit pure-Python transitives (`asynckivy==0.6.4, asyncgui==0.6.3, materialshapes==0.3, kivy-garden==0.1.5, docutils==0.23, pygments==2.21.0, filetype==1.2.0, requests==2.34.2, urllib3==2.7.0, idna==3.19, certifi==2026.7.22, charset-normalizer==3.5.1, chardet==5.2.0, six==1.17.0, setuptools==79.0.1`) and explicit `harfbuzz`; the master ZIP and `sdl2_ttf==2.0.15` are removed |
+| `android.api` / `android.minapi` | unset -> `36` / `24` |
+| `android.ndk` / `android.ndk_api` | unset -> `28c` / `24` |
+| `android.ndk_path` / `android.sdk_path` | unset -> `~/.local/share/classic-games-android/android-ndk-r28c` / `.../sdk` |
+| `android.skip_update` | commented -> `True` |
+| `android.arch` -> `android.archs` | `armeabi-v7a` -> plural `arm64-v8a` |
+| p4a | unset -> `p4a.url = https://github.com/kivy/python-for-android.git`, `p4a.branch = v2026.05.09`, `p4a.commit = 58d21141f17c889bf8585f5665921d72028f8831`, `p4a.bootstrap = sdl2` |
+
+Preserved unchanged: `package.name = clasicgames`, `package.domain = org.games`, `title = Classic games`, regex-based version from `main.py` (`1.2`), icon/splash, `orientation = all`, `fullscreen = 0`, `source.dir = .`, and the commented-out `android.permissions` (INTERNET is not enabled). Verified in the installed Buildozer 1.6.0 source that `p4a.url`, `p4a.branch`, `p4a.commit` (clone branch/tag then `git reset --hard <commit>`), `p4a.bootstrap`, `android.archs`, `android.sdk_path`, `android.ndk_path` and `android.skip_update` are the supported option names.
+
+`.gitignore` adds root-anchored generated-output ignores `/source/MDclassic_games/.buildozer/` and `/source/MDclassic_games/bin/`. The file uses mixed historical CRLF line endings; the added lines are LF, so `git diff --check` passes without unrelated churn.
+
+#### Regression coverage added to `tests/mdclassic_games/unit/test_resources.py`
+
+The shared `assert_packaged_resource` helper now rejects any runtime resource whose extension is not in `source.include_exts`, that falls under a `source.exclude_dirs` root prefix, or that lives under a hidden path; this mirrors Buildozer's extension filter, source-relative directory-prefix exclusions, and hidden-skip behavior rather than assuming basename matching. New/expanded display-independent checks cover: the required extensions (`py, png, jpg, kv, ogg, json, ttf, txt, gif, ico`) and excluded directories (`tests, bin, build, resources, .buildozer, .venv`); all five settings JSONs; Ahorcado word data; the seven menu images derived from `menu.kv`; icon/splash; drawer font; all 15 OGGs (plus every `app.play('...')` literal resolves to an OGG); every game image/font recursively for all seven games; all six Memory themes including the five `cartoons` ICOs (>=20 cards each); every 3x3/4x4/5x5 tile and the reference JPGs for all 14 puzzle themes; package identity/version/appearance; plural `arm64-v8a` with no singular `android.arch`; immutable p4a pins and `sdl2` bootstrap; and requirements that keep the shared runtime pins equal to the real `uv.lock`, omit host tools (`pytest, buildozer, cython, pip, meson, ninja, build, wheel`), and contain no `sdl2_ttf`/URL/master entries.
+
+Manual checks: NOT RUN - checkpoint 3 is display-independent and changes no runtime behavior; Phase 2 desktop acceptance and checkpoint 2 affected visual checks remain the applicable manual evidence. APK contents/decoding remain unvalidated until checkpoints 4-5 and Phase 4.
+
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected **40**, passed **40**, failed 0, skipped 0, xfailed 0 in 0.08s; report `/tmp/opencode/mdclassic-phase3-checkpoint3-unit.xml` (was 10 tests at the Phase 2 baseline). `git diff --check` PASS. `git status --short --untracked-files=all` lists only the three intended files.
+
+Staging audit PASS (`/tmp/opencode/mdclassic-phase3-checkpoint3-staging.log`): using real `SpecParser` + Buildozer `_copy_application_sources`, the app staged **1190 files**; extensions `.gif` 10, `.ico` 5, `.jpg` 744, `.json` 5, `.kv` 2, `.ogg` 15, `.png` 368, `.py` 37, `.ttf` 3, `.txt` 1; **1160 required runtime paths** were present with SHA-256 equal to source; `main.ini` was **not** staged; and no `resources/, tests/, bin/, build/` path was staged. A synthetic sentinel tree confirmed `main.ini, buildozer.spec, tests/, bin/, build/, resources/, .venv/, .buildozer/, .hidden*` and `__pycache__` are excluded while nested `memory/images/themes/cartoons/image001.ico`, `game_15puzzle/images/themes/bike/5/25.jpg` and `audio/start.ogg` are included. Root `.venv/pytest.py`, root `tests/test_resources.py` and sibling `source/pong/main.py` were confirmed outside the staged scope. `source/MDclassic_games/main.ini` SHA-256 remained `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` before and after.
+
+Failure: no checkpoint 3 failure. First implementation issue was documentation/whitespace only: adding CRLF lines to the CRLF `.gitignore` made `git diff --check` flag trailing whitespace; switching the added lines to LF resolved it without reformatting the file.
+
+Decision: apply exactly the checkpoint 1 matrix to the spec, add `ico`, keep `resources` excluded and `main.ini` unpackaged, and pin the runtime/pure-Python dependency set while retaining recipe-managed native transitives through the immutable p4a revision. Add a display-independent regression helper plus per-theme asset coverage instead of duplicating the whole spec as a fixture. Treat these source assertions as spec/staging checks, not APK inspection.
+
+Next exact action: review the three-file diff, the new unit tests and this evidence, and commit checkpoint 3 only on explicit request. After that reviewed checkpoint is committed, execute Phase 3 checkpoint 4 only: build the first debug APK from `source/MDclassic_games` with the pinned toolchain, capturing the complete log, the p4a checkout revision, actual recipe/host versions and the exact artifact path/hash. Do not build before checkpoint 3 is committed.

@@ -13,7 +13,7 @@ package.domain = org.games
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,ogg,json,ttf,txt,gif
+source.include_exts = py,png,jpg,kv,atlas,ogg,json,ttf,txt,gif,ico
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas,ogg,json,ttf,txt,gif
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = tests, bin, resources
+source.exclude_dirs = tests, bin, build, resources, .buildozer, .venv
 
 # (list) List of exclusions using pattern matching
 #source.exclude_patterns = license,images/*/*.jpg
@@ -36,7 +36,9 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.0.0, https://github.com/kivymd/KivyMD/archive/master.zip, sdl2_ttf==2.0.15, pillow, requests, urllib3, chardet, idna
+# Reviewed runtime pins; native transitives use the immutable p4a recipes below.
+# HarfBuzz is explicit because Pillow uses its build paths via FreeType.
+requirements = python3==3.11.14, hostpython3==3.11.14, kivy==2.3.1, kivymd==2.0.0, pillow==11.3.0, pycairo==1.28.0, materialyoucolor==3.0.4, asynckivy==0.6.4, asyncgui==0.6.3, materialshapes==0.3, kivy-garden==0.1.5, docutils==0.23, pygments==2.21.0, filetype==1.2.0, requests==2.34.2, urllib3==2.7.0, idna==3.19, certifi==2026.7.22, charset-normalizer==3.5.1, chardet==5.2.0, six==1.17.0, setuptools==79.0.1, harfbuzz
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -88,28 +90,28 @@ fullscreen = 0
 #android.permissions = INTERNET
 
 # (int) Target Android API, should be as high as possible.
-#android.api = 27
+android.api = 36
 
 # (int) Minimum API your APK will support.
-#android.minapi = 21
+android.minapi = 24
 
 # (int) Android SDK version to use
 #android.sdk = 20
 
 # (str) Android NDK version to use
-#android.ndk = 19b
+android.ndk = 28c
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
-#android.ndk_api = 21
+android.ndk_api = 24
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 #android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
-#android.ndk_path =
+android.ndk_path = ~/.local/share/classic-games-android/android-ndk-r28c
 
 # (str) Android SDK directory (if empty, it will be automatically downloaded.)
-#android.sdk_path =
+android.sdk_path = ~/.local/share/classic-games-android/sdk
 
 # (str) ANT directory (if empty, it will be automatically downloaded.)
 #android.ant_path =
@@ -117,7 +119,7 @@ fullscreen = 0
 # (bool) If True, then skip trying to update the Android sdk
 # This can be useful to avoid excess Internet downloads or save time
 # when an update is due and you just want to test/build your package
-# android.skip_update = False
+android.skip_update = True
 
 # (bool) If True, then automatically accept SDK license
 # agreements. This is intended for automation only. If set to False,
@@ -218,8 +220,8 @@ android.logcat_filters = *:S python:D
 # (bool) Copy library instead of making a libpymodules.so
 #android.copy_libs = 1
 
-# (str) The Android arch to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
-android.arch = armeabi-v7a
+# (list) The Android archs to build for, choices: armeabi-v7a, arm64-v8a, x86, x86_64
+android.archs = arm64-v8a
 
 # (int) overrides automatic versionCode computation (used in build.gradle)
 # this is not the same as app version and should only be edited if you know what you're doing
@@ -231,9 +233,13 @@ android.arch = armeabi-v7a
 
 # (str) python-for-android fork to use, defaults to upstream (kivy)
 #p4a.fork = kivy
+p4a.url = https://github.com/kivy/python-for-android.git
 
 # (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
+p4a.branch = v2026.05.09
+
+# (str) Immutable revision within the selected release tag
+p4a.commit = 58d21141f17c889bf8585f5665921d72028f8831
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 #p4a.source_dir =
@@ -245,7 +251,7 @@ android.arch = armeabi-v7a
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+p4a.bootstrap = sdl2
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
 #p4a.port =

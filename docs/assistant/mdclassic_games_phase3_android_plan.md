@@ -1,6 +1,6 @@
 # MDclassic_games Phase 3 runbook - Android toolchain and debug APK
 
-Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **checkpoints 1-2 complete; checkpoint 3 spec/resource update is next**.
+Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **checkpoints 1-2 complete; checkpoint 3 changes are implemented with all checks passing and await review/commit**.
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 2 runbook](mdclassic_games_phase2_desktop_plan.md), and [the validation record](mdclassic_games_validation.md) before editing. This runbook expands master-plan Phase 3 only. Build one combined debug APK containing all seven games. Installation and interactive Android acceptance belong to [Phase 4](mdclassic_games_phase4_device_plan.md).
 
@@ -10,13 +10,13 @@ Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 2 runbook](m
 | --- | --- | --- | --- |
 | 1 | Verify entry gate and select a coherent toolchain | Complete | Reviewed and committed `8cb288f`; approved common supporting pins, source checks and exact matrix |
 | 2 | Declare and verify the host build environment | Complete | User validated and requested this checkpoint commit; locked host group, user-local JDK/SDK/NDK, zip and licenses verified; 80 desktop tests and affected visual checks PASS |
-| 3 | Update spec and packaging regressions | Pending | Immutable p4a, Python recipes, arm64, runtime assets |
-| 4 | Build the first debug APK | Pending | Complete log, recipe versions, artifact identity |
+| 3 | Update spec and packaging regressions | In progress | Spec updated to the reviewed matrix, ICO added, scoped ignores added; unit checks (40) and a Buildozer staging audit PASS; awaiting review/commit |
+| 4 | Build the first debug APK | Pending | First build log, recipe versions, artifact identity |
 | 5 | Inspect APK contents | Pending | Manifest, native libraries, nested Python bundle, assets |
 | 6 | Reproduce from a clean app build directory | Pending | Second build and inspection; desktop regression gate |
 | 7 | Review and hand off the final artifact | Pending | Final evidence, review/commit, Phase 4 inputs |
 
-**Next exact action:** execute checkpoint 3 only: update the spec to the reviewed immutable p4a/Python/runtime/API/NDK matrix and user-local tool paths, add arm64 and ICO inclusion, and extend the packaging/resource regressions. Run the required unit checks and stop for review. Checkpoint 2 acceptance and approval are recorded in the validation record; user's `main.ini` choices are preserved outside its commit. No APK build has executed.
+**Next exact action:** review and commit checkpoint 3's spec, `.gitignore` and resource/packaging regressions (only on explicit request). Checkpoint 2 is committed as `c29c7b0`; checkpoint 3 edits are uncommitted and all its required checks pass: 40 unit tests, `git diff --check`, a clean status limited to the intended files, and a Buildozer source-copy staging audit confirming ICO/theme/audio assets package while `main.ini`, `tests`, `bin`, `.buildozer`, `.venv` and `resources` do not. After the reviewed checkpoint 3 is committed, begin checkpoint 4. No APK build has executed.
 
 Use Pending / In progress / Blocked / Complete in this table. Complete means the checkpoint checks passed and its changes were reviewed and committed. Update this tracker and the master plan's summary at each handoff; append actual results to the validation record. Selected, built, inspected, and device-tested are different statuses.
 

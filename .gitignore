@@ -1,6 +1,10 @@
 # project exclusions
 resources/examples/
 
+# Combined-app Android generated output
+/source/MDclassic_games/.buildozer/
+/source/MDclassic_games/bin/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
