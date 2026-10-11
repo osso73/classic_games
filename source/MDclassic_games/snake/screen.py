@@ -15,6 +15,14 @@ from kivy.lang import Builder
 from kivy.properties import NumericProperty
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
+from kivymd.uix.progressindicator import MDLinearProgressIndicator
 
 # my app imports
 from snake.gameboard import GameBoard
@@ -30,13 +38,30 @@ Builder.load_string(
     MDBoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
     
-        MDToolbar:
-            title: 'Snake'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", game.start_game], ["pause", game.pause_button], ["volume-high", game.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Snake'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: game.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'pause'
+                    on_release: game.pause_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: game.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         BoxLayout:
             orientation: 'horizontal'
@@ -46,15 +71,17 @@ Builder.load_string(
             MDLabel:
                 id: score
                 text: 'Score: ' + str(game.score)
-                font_style: 'H5'
+                font_style: 'Headline'
+                role: 'small'
                 halign: 'center'
 
             MDLabel:
                 text: 'Level: ' + str(game.num_level)
-                font_style: 'H5'
+                font_style: 'Headline'
+                role: 'small'
                 halign: 'center'
 
-        MDProgressBar:
+        MDLinearProgressIndicator:
             value: 100 * game.level_progress_bar
             size_hint: 0.9, None
             pos_hint: {'center_x': 0.5, 'center_y': 0.5}

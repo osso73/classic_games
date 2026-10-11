@@ -8,17 +8,32 @@ This is a temporary script file.
 
 # std libraries
 import os
-
+import sys
 
 # non-std libraries
+from kivy.config import Config
+from kivy.utils import platform
+
+from android_insets import hide_system_bars, system_bar_insets
+from audio_env import configure_audio_environment
+
+# Kivy's bundled SDL mixer deadlocks through this host's PulseAudio bridge, so
+# Linux desktops use ALSA. Android also reports sys.platform as 'linux' but only
+# exposes its native audio backend, so its SDL audio driver is left untouched.
+configure_audio_environment(platform)
+
+# Reserve right-click for Buscaminas flags instead of Kivy's red multitouch markers.
+if sys.platform.startswith('linux') and platform != 'android':
+    Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.core.audio import SoundLoader
 from kivy.uix.settings import SettingsWithSpinner
-from kivy.utils import platform
 from kivy.lang import Builder
+from kivy.clock import Clock
 
-from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 
 # my app imports
 from drawer import MyDrawer
@@ -38,20 +53,59 @@ __version__ = '1.2'
 
 KV = r"""
 
-Screen:
-    
-    MDNavigationLayout:
+# Preserve the classic DeepPurple toolbar across the menu and every game.
+<MDTopAppBar>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
 
-        ScreenManager:
-            id: screen_manager
-            
-            Menu:
-                id: menu
-        
-        MyDrawer:
-            id: my_drawer
-            
-            on_screen: app.change_screen(self.screen)
+<MDTopAppBarTitle>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDActionTopAppBarButton>:
+    theme_icon_color: "Custom"
+    icon_color: "#FFFFFF"
+
+<MDChip>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
+
+<MDChipText>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDButton>:
+    theme_bg_color: "Custom"
+    md_bg_color: "#673AB7"
+
+<MDButtonText>:
+    theme_text_color: "Custom"
+    text_color: "#FFFFFF"
+
+<MDButtonIcon>:
+    theme_icon_color: "Custom"
+    icon_color: "#FFFFFF"
+
+Screen:
+
+    # Android 15+ forces edge-to-edge drawing, so insets are applied here to
+    # keep the toolbar and content clear of the status and navigation bars.
+    BoxLayout:
+        id: content
+        orientation: 'vertical'
+
+        MDNavigationLayout:
+
+            ScreenManager:
+                id: screen_manager
+
+                Menu:
+                    id: menu
+
+            MyDrawer:
+                id: my_drawer
+
+                on_screen: app.change_screen(self.screen)
                     
 
 <TempMsg>:
@@ -77,18 +131,26 @@ class MainApp(MDApp):
     version = __version__
     
     def build(self):
+        self.sounds = {}
         screen = Builder.load_string(KV)
         self.icon = 'images/icon.png'
-        self.theme_cls.primary_palette = 'DeepPurple'
+        self.theme_cls.primary_palette = '#673AB7'
         self.settings_cls = SettingsWithSpinner
         self.use_kivy_settings = False
         return screen
     
     
     def on_start(self):
-        self.sounds = self.load_sounds()
         self.sm = self.root.ids.screen_manager
+        hide_system_bars(platform)
+        Clock.schedule_once(self.apply_system_bar_insets, 0.5)
+        Clock.schedule_once(self.load_sounds)
         
+
+    def apply_system_bar_insets(self, *args):
+        top, bottom = system_bar_insets(platform)
+        self.root.ids.content.padding = [0, top, 0, bottom]
+
 
     def build_config(self, config):
         config.setdefaults('Pong', {
@@ -161,7 +223,7 @@ class MainApp(MDApp):
             self.sm.get_screen('pong').config_change(config, section, key, value)
         
 
-    def load_sounds(self):
+    def load_sounds(self, *args):
         '''
         Load all sounds of the game, and put them into the dictionary.
 
@@ -176,6 +238,7 @@ class MainApp(MDApp):
         for s in soundlist:
             sound[s] = SoundLoader.load(os.path.join(folder, s))
 
+        self.sounds = sound
         return sound
 
 
@@ -206,7 +269,7 @@ class MainApp(MDApp):
         if not self.sm.has_screen(new_screen):
             if new_screen == 'pong':
                 TempMsg(text='Loading pong...').open()
-                self.sm.switch_to(ScreenPong())
+                self.sm.add_widget(ScreenPong())
             elif new_screen == 'ahorcado':
                 TempMsg(text='Loading ahorcado...').open()
                 self.sm.add_widget(ScreenAhorcado())
@@ -229,8 +292,15 @@ class MainApp(MDApp):
         self.sm.current = new_screen
 
 
-class TempMsg(Snackbar):
-    pass
+class TempMsg(MDSnackbar):
+    def init_fbos(self):
+        # Loading messages have no interactive ripple, avoiding KivyMD's invalid FBO.
+        pass
+
+    def __init__(self, text, **kwargs):
+        kwargs.setdefault('size_hint_y', None)
+        kwargs.setdefault('height', 48)
+        super().__init__(MDSnackbarText(text=text), **kwargs)
 
 
 if __name__ == '__main__':
@@ -238,4 +308,3 @@ if __name__ == '__main__':
         Window.size = (400, 750)
     
     MainApp().run()
-

@@ -14,6 +14,13 @@ import webbrowser
 from kivy.lang import Builder
 
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 
 # my app imports
@@ -32,38 +39,52 @@ Builder.load_string(
     BoxLayout:
         orientation: 'vertical'
     
-        MDToolbar:
-            title: 'Memory'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", mat_area.start_game], ["volume-high", mat_area.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: 'Memory'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: mat_area.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: mat_area.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         MDBoxLayout:
             orientation: 'horizontal'
             padding: '10dp'
             size_hint_y: None
             height: score.texture_size[1] + dp(10)*2
-            md_bg_color: app.theme_cls.primary_light
+            md_bg_color: app.theme_cls.primaryColor
             
             BoxLayout:
                 orientation: 'horizontal'
                 spacing: '10dp'
 
                 MDChip:
-                    text: mat_area.current_theme
-                    valign: 'center'
-                    icon: ''
                     on_release: mat_area.change_theme()
+                    MDChipText:
+                        text: mat_area.current_theme
                 MDChip:
-                    text: str(mat_area.num_pairs)
-                    icon: ''
                     on_release: mat_area.change_level()
+                    MDChipText:
+                        text: str(mat_area.num_pairs)
 
             MDLabel:
                 id: score
                 text: 'Moves: ' + str(mat_area.moves)
                 halign: "center"
-                font_style: 'H4'
+                font_style: 'Headline'
+                role: 'large'
         
         Mat:
             id: mat_area
@@ -80,7 +101,7 @@ class ScreenMemory(MDScreen):
     '''  
     def config_change(self, config, section, key, value):
         if key == 'theme':
-            self.ids.mat_area.tema_actual = value
+            self.ids.mat_area.current_theme = value
 
         elif key == 'level':
             num = int(value)

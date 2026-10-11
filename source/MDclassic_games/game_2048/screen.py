@@ -15,6 +15,13 @@ from kivy.lang import Builder
 from kivy.uix.button import Button
 from kivy.properties import StringProperty
 from kivymd.uix.screen import MDScreen
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 # my app imports
 from game_2048.board import Board
@@ -31,14 +38,31 @@ Builder.load_string(
     
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
         on_size: board.initialize_grid()
     
-        MDToolbar:
-            title: '2048'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", board.start_game], ["backup-restore", board.back_button], ["volume-high", board.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: '2048'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: board.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'backup-restore'
+                    on_release: board.back_button()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: board.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         BoxLayout:
             orientation: 'horizontal'
@@ -46,14 +70,15 @@ Builder.load_string(
             spacing: 20
             size_hint_y: 0.5
             MDChip:
-                text: str(board.win_score)
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                icon: ''
                 on_release: board.change_win_score()
+                MDChipText:
+                    text: str(board.win_score)
             MDLabel:
                 text: 'Score: {:,}'.format(board.score)
                 halign: "center"
-                font_style: 'H4'
+                font_style: 'Headline'
+                role: 'small'
 
         Board:
             id: board

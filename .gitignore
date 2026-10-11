@@ -1,6 +1,10 @@
 # project exclusions
 resources/examples/
 
+# Combined-app Android generated output
+/source/MDclassic_games/.buildozer/
+/source/MDclassic_games/bin/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -87,6 +91,7 @@ ipython_config.py
 
 # pyenv
 .python-version
+!/.python-version
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.

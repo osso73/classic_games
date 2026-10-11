@@ -388,6 +388,11 @@ class Board(RelativeLayout):
             self.remove_widget(tile)
             self.add_widget(tile)  # to ensure it in on top
             tile_to_remove = self.get_tile(final_position)
+            # Reserve this merge before its animation completes so another tile
+            # in the same move cannot merge into it a second time.
+            if tile_to_remove.value:
+                tile_to_remove.merged = True
+                tile.merged = True
             tile.position = final_position
             Clock.schedule_once(partial(self.end_of_move_tile, tile_to_remove, tile), 
                                 G2048.MOVE_TILE)

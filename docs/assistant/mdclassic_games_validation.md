@@ -1,0 +1,1416 @@
+# MDclassic_games validation record
+
+Phase / task: Phase 1 - Reproducible desktop environment
+Status: passed
+Files changed: `.gitignore`, `.python-version`, `pyproject.toml`, `uv.lock`, `README.md`, `docs/getting-started.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; Kivy 2.3.1; KivyMD 1.2.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root unless noted below
+Expected / observed result: `uv python install 3.11` provisioned CPython 3.11.14. `uv add --bounds exact pillow materialyoucolor` selected `pillow==12.3.0` and `materialyoucolor==3.0.4`; `uv add --group dev --bounds exact pytest` selected `pytest==9.1.1`. KivyMD metadata requires Pillow; materialyoucolor metadata requires Pillow. Both remain explicit runtime dependencies.
+Manual checks: FAIL - startup attempted from `source/MDclassic_games`; the window, OpenGL, and SDL2 audio providers initialized, but the application did not construct. `main.ini` was unchanged.
+Automated checks: `uv lock --check` PASS; `uv sync --locked --group dev` PASS; `uv pip check` PASS; `uv run --locked --group dev pytest --version` reported pytest 9.1.1. No test discovery was run in Phase 1.
+Failure: `FileNotFoundError: .../site-packages/kivymd/uix/label/label.kv` while importing `kivymd.uix.snackbar.Snackbar` from `source/MDclassic_games/main.py:21`. `importlib.metadata.files('kivymd')` confirms the installed distribution does not contain that resource. Kivy log: `/home/oriol/.kivy/logs/kivy_26-09-13_0.txt`. Classification: Phase 2 desktop compatibility input.
+Decision: Use `kivy==2.3.1` and `kivymd==1.2.0` as specified. The resolver selected exact available supporting versions compatible with Python 3.11. The generated lockfile pins packages but not the CPython patch, OS libraries, or Android SDK.
+Next exact action: Phase 2 - inspect the pinned KivyMD 1.2.0 release/resource packaging and resolve the first desktop startup failure without changing the framework major or Python minor version.
+
+Phase / task: Phase 2 - Checkpoint 1: Repair the KivyMD resource installation
+Status: blocked
+Files changed: `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; Kivy 2.3.1; KivyMD 1.2.0; Pillow 12.3.0; materialyoucolor 3.0.4; pytest 9.1.1
+Command and working directory: repository root unless noted below. `git status --short` was clean before and after the checkpoint. `uv lock --check` PASS; `uv sync --locked --group dev` PASS; `uv pip check` PASS. The lock selects the PyPI KivyMD 1.2.0 source distribution `https://files.pythonhosted.org/packages/20/81/0b1154f5e581d5910702d9fadb3217f56cb186f72c8b36de0271e7ff9b5c/kivymd-1.2.0.tar.gz`, SHA-256 `2d33e2c59259998e93aee55acde647a4a20e5a0f962469db24ee4c9ec586962e`, size 2,160,842 bytes, uploaded 2024-01-21T10:49:26.401Z.
+Expected / observed result: The current locked environment has KivyMD Python sources but no KV resources: `kivymd/uix/label/label.py` exists, `kivymd/uix/label/label.kv` does not, and the installed distribution manifest contains zero `.kv` files. A downloaded copy of the exact locked sdist matched its locked SHA-256 and contains both `kivymd/uix/label/label.py` and `kivymd/uix/label/label.kv`. Its `setup.py` builds package data with `glob_paths('.kv')`. A fresh `/tmp/opencode/kivymd-1.2.0-isolated` CPython 3.11.14 environment installed KivyMD 1.2.0 from source with `UV_NO_CACHE=1` and `--no-binary kivymd`; it again contained `label.py`, omitted `label.kv`, and reported zero KV files in the distribution manifest. This rules out local environment damage and cached-wheel contamination, and reproduces a source-build/package-data defect in the published 1.2.0 sdist.
+Manual checks: NOT RUN - the application cannot construct because the required framework resource is absent. The desktop runtime did initialize SDL2 Window, OpenGL 4.6 Mesa Intel, and SDL2 audio before the import failure. Missing `xclip`/`xsel` only produced clipboard-provider diagnostics and is not the startup blocker.
+Automated checks: No pytest suite exists yet; checkpoint 2 establishes it. Installation checks passed as above. The isolated-install resource assertion failed: `label.kv` was absent and the manifest count was zero.
+Failure: `FileNotFoundError` opening `.venv/lib/python3.11/site-packages/kivymd/uix/label/label.kv` from `kivymd.uix.label.label` during `from kivymd.uix.snackbar import Snackbar` at `source/MDclassic_games/main.py:21`. Reproduced from working directory `source/MDclassic_games` with `uv run --locked python main.py`; captured log: `/tmp/opencode/mdclassic-games-phase2-checkpoint1-startup.log`; Kivy log: `/home/oriol/.kivy/logs/kivy_26-09-13_1.txt`. `source/MDclassic_games/main.ini` SHA-256 remained `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` before and after launch. Classification: published KivyMD 1.2.0 source-build/package-data defect; not an application API failure or local installation defect.
+Decision: No dependency or source change was made. The locked PyPI artifact is immutable and reproducibly fails to install required KV resources. Manually copying resources into `.venv` is not acceptable. A replacement immutable KivyMD 1.2.0 source/build remedy must be selected, declared in project metadata, locked, and verified from a fresh environment before application compatibility work can begin.
+Next exact action: Review and decide whether to adopt a specific immutable KivyMD 1.2.0 source/build remedy. If approved, declare it in project metadata, regenerate `uv.lock`, run locked sync and `uv pip check`, repeat the fresh-install resource verification, then retry startup. Do not begin checkpoint 2 or application API changes while checkpoint 1 remains blocked.
+
+Phase / task: Phase 2 - Checkpoint 1 continuation: official KivyMD source remedy
+Status: passed
+Files changed: `pyproject.toml`, `uv.lock`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; Kivy 2.3.1; KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4; pytest 9.1.1; KivyMD transitive dependencies asyncgui 0.6.3, asynckivy 0.6.4, materialshapes 0.3, pycairo 1.29.1
+Command and working directory: repository root unless noted below. The official `kivymd/KivyMD` tag `2.0.0` resolves to immutable commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`. A fresh `/tmp/opencode/kivymd-2.0.0-isolated` CPython 3.11.14 environment installed that exact Git commit with `UV_NO_CACHE=1`; its distribution contains 36 `.kv` files and imports `kivymd.uix.snackbar.MDSnackbar` successfully. After declaring `kivymd==2.0.0` and its exact official Git source in `pyproject.toml`, `uv lock`, `uv lock --check`, `uv sync --locked --group dev`, and `uv pip check` all passed. The project environment has 36 KivyMD KV files, and `kivymd/uix/label/label.kv` exists.
+Expected / observed result: The resource-installation gate passes from the declared immutable source. The app startup attempt from `source/MDclassic_games` exits 1 only after framework resource installation and provider initialization, at a new application compatibility error: `ImportError: cannot import name 'Snackbar' from 'kivymd.uix.snackbar'` in `main.py:21`. This is input for checkpoint 3, not repaired in checkpoint 1.
+Manual checks: NOT RUN - the shell cannot construct until the recorded Snackbar API migration. SDL2 Window, OpenGL 4.6 Mesa Intel, and SDL2 audio initialized. `xclip`/`xsel` remain non-blocking clipboard-provider diagnostics.
+Automated checks: No pytest suite exists yet; checkpoint 2 establishes it. Fresh resource verification PASS: 36 KivyMD KV files and `label.kv` present. Locked environment checks PASS: lock check, sync, and pip consistency.
+Failure: First post-remedy application traceback: `ImportError: cannot import name 'Snackbar' from 'kivymd.uix.snackbar'` at `source/MDclassic_games/main.py:21`. Captured from working directory `source/MDclassic_games` with `uv run --locked python main.py` at `/tmp/opencode/mdclassic-games-phase2-checkpoint1-kivymd2-startup.log`; Kivy log: `/home/oriol/.kivy/logs/kivy_26-09-13_3.txt`. `source/MDclassic_games/main.ini` SHA-256 remained `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`. Classification: application API incompatibility, deferred to checkpoint 3.
+Decision: Per user direction, replace the defective PyPI KivyMD 1.2.0 source build with official KivyMD 2.0.0 tag commit `2d8a7b458897a01a400770e3bc10ebffd946b91d`, declared in project metadata and locked by uv. This intentionally supersedes the original 1.2.0 baseline; KivyMD 2.0 API migrations are now in scope for later compatibility checkpoints.
+Next exact action: Review checkpoint 1 and commit these dependency, lockfile, and validation changes if approved. After the reviewed changes are committed, execute checkpoint 2 only to establish the test foundation; defer the recorded Snackbar and other KivyMD 2.0 API migrations to checkpoint 3.
+
+Phase / task: Phase 2 - Checkpoint 2: Establish the test foundation
+Status: passed
+Files changed: `pyproject.toml`, `tests/mdclassic_games/conftest.py`, `tests/mdclassic_games/integration/conftest.py`, `tests/mdclassic_games/unit/test_ahorcado_general.py`, `tests/mdclassic_games/unit/test_resources.py`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root. Added `[tool.pytest.ini_options]` with `testpaths = ["tests/mdclassic_games"]`, strict markers, and registered `gui` marker. Test paths resolve `source/MDclassic_games` relative to the test files and prepend only that directory for application imports.
+Expected / observed result: The shared conftest imports only standard-library modules and pytest, snapshots tracked `source/MDclassic_games/main.ini`, and verifies the unchanged digest at session teardown. Unit coverage imports only pure `ahorcado.general`; a clean subprocess verifies that import does not initialize Kivy. GUI fixture structure exists under `integration/`, sets temporary Kivy writable state and app-directory working directory before later GUI tests import Kivy, but no GUI lifecycle/config-isolation test exists or was claimed in this checkpoint.
+Manual checks: NOT RUN - this checkpoint is display-independent.
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. Coverage characterizes `replace_letter` replacement/error behavior, verifies that its module resolves only from the combined app, and verifies the selected KivyMD resource exists in the installed distribution. The initial run collected 9 with 2 failed test-harness assertions: an erroneous expected replacement value and a subprocess missing the app source path. Both were corrected without application changes; the final rerun passed.
+Failure: No remaining checkpoint failure. First relevant initial failure was test-only, at `tests/mdclassic_games/unit/test_ahorcado_general.py`: expected `ESTRRELLA` for a position that retained `R`, and subprocess `ModuleNotFoundError: ahorcado`; neither implicated production behavior.
+Decision: Retain behavior tests within the production helper rather than creating a parallel rules engine. Do not run or claim GUI fixture/app configuration isolation until shell construction is available in checkpoint 3.
+Next exact action: Review checkpoint 2 and commit its test-harness, unit tests, and validation note if approved. After the reviewed changes are committed, execute checkpoint 3 only, beginning with the recorded KivyMD 2.0 `Snackbar` import failure.
+
+Phase / task: Phase 2 - Checkpoint 3: Repair shell startup
+Status: blocked
+Files changed: `source/MDclassic_games/main.py`, `menu.py`, `menu.kv`, `drawer.py`, `drawer.kv`, all seven game `screen.py` modules, `tests/mdclassic_games/integration/test_shell.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0 at `2d8a7b458897a01a400770e3bc10ebffd946b91d`; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root unless noted below. Inspected the pinned KivyMD source for `MDSnackbar`, `MDSmartTile`, `MDTopAppBar`, list, drawer, dialog, and button composition. Startup and audio diagnostics ran from `source/MDclassic_games`.
+Expected / observed result: Replaced removed `Snackbar`, `SmartTileWithLabel`, `MDToolbar`, `MDFlatButton`, legacy list-item classes, legacy typography, and snake-case theme color APIs with their verified KivyMD 2.0 equivalents. `MyDrawer.screen` is now an explicit observable `StringProperty`. The original DeepPurple palette name is not a valid KivyMD 2.0 color input, so the equivalent Material color `#673AB7` is used. Shell construction succeeds with the real KV and temporary config; all seven menu tile routes and image sources are present.
+Manual checks: NOT RUN - the interactive app does not reach a usable shell. `uv run --locked python main.py` initializes SDL2 Window, Mesa OpenGL 4.6, SDL2 audio, builds the widget tree, and then remains blocked in `MainApp.on_start()`. `main.ini` SHA-256 remained `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` before and after attempts. Missing `xclip`/`xsel` remains non-blocking clipboard diagnostics.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_shell.py` PASS: collected 1, passed 1, failed 0, skipped 0, xfailed 0 in 0.32s. The subprocess-isolated GUI test builds the real shell with a temporary config, verifies all seven menu routes and image sources, drawer open/close calls and `screen` property, `TempMsg` inheritance from `MDSnackbar`, and the Help URL stub. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. The source `main.ini` digest guard passed in both runs.
+Failure: `MainApp._run_prepare()` and `MainApp.on_start()` do not complete within 20-40 seconds after `MainApp.build()`. Instrumentation localizes the block to `SoundLoader.load()` for the first file, `audio/bye.ogg`, when a widget tree exists. Loading every OGG with the same SDL2 provider before building the tree completes, including `bye.ogg`. No Python traceback is emitted. The runtime log is `/tmp/opencode/mdclassic-games-phase2-checkpoint3-startup.log`; Kivy logs include `/home/oriol/.kivy/logs/kivy_26-10-04_11.txt` through `_17.txt`. Classification: unresolved desktop audio/provider or application-lifecycle interaction; it is not evidence that audio assets are missing and prevents the shell startup gate.
+Decision: Keep the established Kivy/KivyMD/materialyoucolor pins because KivyMD's pinned source declares `materialyoucolor>=3.0.3` and `uv pip check` passes. Do not mask the blocker by skipping sound loading or by treating the timeout as a passing launch. The GUI test uses a finite-timeout subprocess because Kivy global Window/Clock state cannot be reliably reset in-process. Snackbar opening and About-dialog construction need a running render loop and remain manual checks once startup succeeds.
+Next exact action: Reproduce the `SoundLoader.load(audio/bye.ogg)` block with a built root using a bounded diagnostic, identify whether the SDL2 audio provider, loader thread pool, or app lifecycle order causes it, then apply the smallest evidenced repair. Rerun the GUI and unit commands plus an interactive `uv run --locked python main.py` launch before revisiting the checkpoint 3 manual checklist. Do not begin checkpoint 4.
+
+Phase / task: Phase 2 - Checkpoint 3 continuation: SDL2 audio startup repair
+Status: in progress
+Files changed: `source/MDclassic_games/main.py`, `tests/mdclassic_games/integration/test_shell.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_validation.md` in addition to the checkpoint 3 files above
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0 at `2d8a7b458897a01a400770e3bc10ebffd946b91d`; Pillow 12.3.0; materialyoucolor 3.0.4; PulseAudio on PipeWire 1.6.8; ALSA devices available
+Command and working directory: audio diagnostics and launches from `source/MDclassic_games`; pytest and dependency checks from repository root. `faulthandler.dump_traceback_later` and `strace -f` captured the default-driver hang. `SDL_AUDIODRIVER=dummy` and `SDL_AUDIODRIVER=alsa` were compared using a full app lifecycle that scheduled `app.stop`.
+Expected / observed result: The bundled Kivy SDL2 mixer hangs during `SoundSDL2.extensions()`/`Mix_OpenAudio` with the host default PulseAudio-on-PipeWire path. The process stays in a timed futex loop; it is not reading a corrupt OGG. The bundled SDL has no PipeWire driver. The dummy driver exits but cannot validate real audio. ALSA initializes real audio, preloads all 15 OGGs, accepts `app.play('bye')`, and exits cleanly. `main.py` therefore sets `SDL_AUDIODRIVER=alsa` only on Linux when the user has not already selected an SDL driver, before importing Kivy. It defers preload until the first Clock tick, assigns the completed inventory to `self.sounds`, and preserves an explicit user driver and Android behavior.
+Manual checks: NOT RUN - automated lifecycle verification confirms window/event-loop startup, sound preload, and a requested `bye` playback call, but cannot establish visible layout, dialog/snackbar appearance, external-browser behavior, or audible output. The tracked `main.ini` digest remains `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 2, passed 2, failed 0, skipped 0, xfailed 0 in 2.40s. The second subprocess lifecycle test runs the real app loop, schedules `app.play('bye')`, verifies all 15 sounds load, and stops in finite time. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest` PASS: collected 12, passed 12, failed 0, skipped 0, xfailed 0 in 2.44s. `uv lock --check`, `uv pip check`, and `git diff --check` PASS.
+Failure: Resolved startup blocker. The historical default PulseAudio-on-PipeWire failure is recorded above. Log locations: `/tmp/opencode/mdclassic-games-phase2-audio-deadlock.log`, `/tmp/opencode/mdclassic-games-phase2-deferred-audio-stop.log`, and `/home/oriol/.kivy/logs/kivy_26-10-04_18.txt` through `_34.txt`.
+Decision: Use a Linux-only ALSA default with `setdefault`, rather than the non-audible dummy driver, a hardcoded Android setting, a dependency change, or a global environment workaround. The existing user-selected SDL driver remains authoritative. No dependency or lockfile change is required.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, then record observations for seven menu tiles, drawer open/close, About/CLOSE, Help URL, loading snackbar on first game entry, and audible representative sound. If those pass, review the full checkpoint 3 diff and commit it before checkpoint 4; otherwise record the first failure and repair only that shell issue.
+
+Phase / task: Phase 2 - Checkpoint 3 continuation: About and loading snackbar repairs
+Status: in progress
+Files changed: `source/MDclassic_games/main.py`, `source/MDclassic_games/drawer.py`, `tests/mdclassic_games/integration/test_shell.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md` in addition to the checkpoint 3 files above
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0 at `2d8a7b458897a01a400770e3bc10ebffd946b91d`; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: manual observations supplied by the user from `source/MDclassic_games`. Reproductions ran there through bounded real-app lifecycle scripts. Logs: `/tmp/opencode/mdclassic-games-phase2-about.log`, `mdclassic-games-phase2-about-fixed.log`, `mdclassic-games-phase2-pong-entry.log`, `mdclassic-games-phase2-pong-entry-snackbar-fixed.log`, and `mdclassic-games-phase2-routes.log`.
+Expected / observed result: About crashed because KivyMD 2.0 `MDDialog` no longer accepts `title`, `text`, `type`, or `buttons` keyword properties. It now uses `MDDialogHeadlineText`, `MDDialogSupportingText`, and `MDDialogButtonContainer` composition; the existing CLOSE behavior is retained. Every first game entry crashed first while constructing `TempMsg`: `MDSnackbar` inherits a KivyMD ripple behavior that allocates an invalid framebuffer despite its noninteractive use. `TempMsg` suppresses that unused framebuffer, retains the pinned MDSnackbar/MDSnackbarText content, and opens successfully.
+Manual checks: FAIL - user reported About crash and every first game entry crash before these repairs. Recheck required after the repairs: About/CLOSE, loading snackbar plus entry for Pong, Ahorcado, and Buscaminas, and audible representative sound. The seven-tile menu, drawer, and Help observations remain PASS from the user's preceding review unless later regression is observed.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 2, passed 2, failed 0, skipped 0, xfailed 0 in 2.47s. The shell test now constructs/dismisses the real About dialog and snackbar; the lifecycle test enters Pong after its snackbar, preloads all 15 sounds, requests `bye`, and stops. Earlier route capture PASS: Pong, Ahorcado, Buscaminas. Deferred failures: Memory, 15 puzzle, and 2048 fail while instantiating their old interactive `MDChip` composition; Snake fails because `MDProgressBar` is removed. These are game-specific checkpoint 6, 7, 8, and 10 inputs, not shell failures. Unit and full-suite reruns are pending this continuation.
+Failure: Resolved: `TypeError: Properties ['buttons', 'text', 'title', 'type'] ... may not be existing property names` from `drawer.py:51`; and `Exception: FBO Initialization failed: Incomplete attachment (36054)` from `TempMsg` construction at `main.py:243`. Remaining lazy errors are recorded for their dedicated game checkpoints.
+Decision: Preserve the loading-notification behavior using the real pinned snackbar, but disable its unused touch ripple framebuffer only in `TempMsg`. Do not repair Memory, 15 puzzle, 2048, or Snake in checkpoint 3.
+Next exact action: Run the GUI, unit, and full pytest commands. Then manually recheck About/CLOSE plus first entry/loading snackbar for Pong, Ahorcado, and Buscaminas from `source/MDclassic_games`. If successful, review and commit checkpoint 3 before beginning checkpoint 4; otherwise record the first remaining shell failure.
+
+Phase / task: Phase 2 - Checkpoint 3 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 3 continuation.
+Command and working directory: user ran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user verified that About opens and CLOSE dismisses it. PASS - the first Pong, Ahorcado, and Buscaminas entries show their loading snackbars and open correctly. The preceding manual observations remain PASS for menu tiles, drawer, Help, and representative audio through ALSA.
+Manual checks: PASS - shell checkpoint requirements exercised by the user. Memory, 15 puzzle, 2048, and Snake remain recorded game-checkpoint inputs; their failures do not block this shell gate.
+Automated checks: Reused unchanged continuation results: GUI 2 passed, unit 10 passed, full suite 12 passed. Dependency and diff checks passed before manual recheck; no tested inputs changed afterward.
+Failure: No remaining checkpoint 3 failure.
+Decision: Preserve the recorded game-specific lazy-screen failures for checkpoints 6, 7, 8, and 10; do not include them in this shell checkpoint's pass claim.
+Next exact action: Review and commit all checkpoint 3 changes. After the reviewed changes are committed, execute checkpoint 4 (Pong) only.
+
+Phase / task: Phase 2 - Checkpoint 4: Pong compatibility and automated behavior checks
+Status: in progress
+Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root. Because commit `a1beac1` replaced the checkpoint-1 KivyMD Git source with the PyPI 2.0.0 artifact after checkpoint 3's recorded validation, ran `uv sync --locked --group dev` before revalidating the existing test layers.
+Expected / observed result: The existing Pong `MDTopAppBar` composition remains compatible with the current locked artifact, and Pong constructs from the real app shell. Added a subprocess-isolated real-widget regression that uses explicit board updates to cover start/reset, left/right scoring and serves, wall/paddle collisions, speed cap, pause/resume, and speed/max-speed/skin configuration changes. No production Pong change was required.
+Manual checks: NOT RUN - the required interactive desktop exercise remains: start/restart, pause/resume, paddle controls, ball movement and score change, plus skin and speed settings. Automated checks cannot establish visible layout, touch controls, or audible output.
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 3, passed 3, failed 0, skipped 0, xfailed 0 in 2.81s. `uv run --locked --group dev pytest` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 2.78s. Revalidation immediately after the PyPI source selection also passed: 10 unit, 2 GUI, and 12 full-suite tests. `uv lock --check`, `uv pip check`, and `git diff --check` PASS.
+Failure: No remaining automated failure. The initial test-only setup attempted to call nonexistent `PongBoard.do_layout()` and compared Kivy's list-valued velocity with tuples; corrected the new regression without production changes. Missing `xclip`/`xsel` remains a non-blocking Kivy clipboard diagnostic.
+Decision: Retain the current PyPI `kivymd==2.0.0` source selected in commit `a1beac1`; current checkpoint 3 and Pong automated results validate it. Preserve Pong behavior; do not rename its existing dynamic `max_vel` setting during this checkpoint.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Pong exercise, and record PASS/FAIL observations. If it passes, review the checkpoint 4 diff and request a commit before checkpoint 5; otherwise repair only the first Pong failure.
+
+Phase / task: Phase 2 - Checkpoint 4 continuation: Pong pause callback repair
+Status: in progress
+Files changed: `source/MDclassic_games/pong/screen.py`, `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 entry.
+Command and working directory: repository root for pytest. User reproduced the fault using the interactive app from `source/MDclassic_games`.
+Expected / observed result: FAIL before repair - clicking Pong's pause action crashed because the KV callback called `pong.pause_button()` even though the method requires the button to update its icon. The callback now passes itself as `pong.pause_button(self)`. The real pause action has a scoped KV id and the Pong GUI regression dispatches its actual `on_release` event, asserting active state and pause/play icon transitions in both directions.
+Manual checks: FAIL before repair - user reported that clicking pause crashed. Recheck required after repair: pause/resume and the remaining Pong checkpoint exercise. The tracked `main.ini` now has user-selected Pong speed `5` and skin `tennis`; preserve these manual-test settings and exclude them from the checkpoint change.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_pong.py` PASS: collected 1, passed 1, failed 0, skipped 0, xfailed 0 in 0.37s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 3, passed 3, failed 0, skipped 0, xfailed 0 in 2.87s. `uv run --locked --group dev pytest` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 2.83s. `git diff --check` PASS.
+Failure: Resolved `TypeError` from the missing `button` argument in `PongBoard.pause_button`. The first test implementation could not discover the app-bar control with `screen.walk()` before rendering; this was a test setup issue resolved by the KV id and did not affect the app.
+Decision: Preserve the existing pause logic and icon behavior. Pass the actual KivyMD control instead of making the production method accept a missing argument, so the action continues to switch its displayed icon.
+Next exact action: Manually relaunch from `source/MDclassic_games` with `uv run --locked python main.py`, confirm pause/resume no longer crashes, then complete and report the remaining Pong checkpoint exercise. Do not start checkpoint 5 until this manual gate passes.
+
+Phase / task: Phase 2 - Checkpoint 4 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 continuation.
+Command and working directory: user reran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed the repaired pause/resume action works. Together with the preceding report that all remaining Pong exercises passed, this completes start/restart, paddle control, ball movement/score changes, and skin/speed setting validation.
+Manual checks: PASS - the full Pong checkpoint exercise passes after the pause callback repair.
+Automated checks: Reused unchanged continuation results: 10 unit tests, 3 GUI tests, and 13 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 4 failure.
+Decision: Keep the minimal callback repair and its real-control regression. Preserve the user-selected tracked `main.ini` values outside the checkpoint change.
+Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.
+
+Phase / task: Phase 2 - Test reporting refinement: shell regressions
+Status: passed
+Files changed: `tests/mdclassic_games/integration/test_shell.py`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding Phase 2 entries.
+Command and working directory: repository root.
+Expected / observed result: Split the broad shell-construction regression into six focused subprocess-isolated GUI tests for menu tile routes/images, drawer state, loading snackbar, Help URL, About dialog, and temporary config isolation. Retained the existing audio lifecycle test as one coherent startup/preload scenario. Unit tests were already independently parameterized or focused and required no split.
+Manual checks: NOT RUN - this test-only reporting refinement changes no runtime behavior.
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 13, passed 13, failed 0, skipped 0, xfailed 0 in 6.02s. `uv run --locked --group dev pytest` PASS: collected 23, passed 23, failed 0, skipped 0, xfailed 0 in 6.02s. `git diff --check` PASS.
+Failure: No remaining failure. The focused shell test run passed: collected 7, passed 7, failed 0, skipped 0, xfailed 0 in 4.07s.
+Decision: Preserve real app/KV/widget coverage in each focused case, using subprocess isolation because Kivy global state cannot be reliably reset in-process.
+Next exact action: Review the test-reporting refinement. Checkpoint 5 (Ahorcado) remains the next game checkpoint after the review.
+
+Phase / task: Phase 2 - Checkpoint 5: Ahorcado compatibility and automated behavior checks
+Status: in progress
+Files changed: `tests/mdclassic_games/integration/test_ahorcado.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The existing Ahorcado app-bar composition constructs under the current pinned KivyMD artifact; no runtime compatibility change was required. Added five real-screen regressions: Spanish correct-letter reveal and win, wrong/repeated/invalid input, ten-error loss, keyboard-key and deterministic one-hint interaction, and keyboard/man settings. Each uses the real combined `MainApp`, screen, widgets, and game methods while setting a fixed target word.
+Manual checks: NOT RUN - required interactive desktop exercise remains: start a new word; make correct and wrong keyboard selections; change keyboard/man settings; verify word and image display; and check representative sounds.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_ahorcado.py` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 1.95s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 18, passed 18, failed 0, skipped 0, xfailed 0 in 7.88s. `uv run --locked --group dev pytest` PASS: collected 28, passed 28, failed 0, skipped 0, xfailed 0 in 7.94s. `git diff --check` PASS.
+Failure: No remaining automated failure.
+Decision: Preserve existing Ahorcado behavior and settings. The tests mute end-game sound only to avoid actual playback while still exercising win/loss logic; audible output remains a manual check.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Ahorcado checkpoint exercise, and report PASS/FAIL observations. If it passes, review the checkpoint 5 diff and request a commit before checkpoint 6; otherwise repair only the first Ahorcado failure.
+
+Phase / task: Phase 2 - Checkpoint 5 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 5 entry.
+Command and working directory: user ran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed the full Ahorcado exercise succeeds: new word, correct/wrong keyboard selections, keyboard/man settings, word/image display, and representative audio.
+Manual checks: PASS - all required Ahorcado checkpoint exercises passed. The tracked `main.ini` has the user-selected Ahorcado keyboard `keyboard1`; preserve this manual-test setting and exclude it from the checkpoint change.
+Automated checks: Reused unchanged checkpoint 5 results: 10 unit tests, 18 GUI tests, and 28 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 5 failure.
+Decision: Preserve existing Ahorcado behavior; no production compatibility edit was required.
+Next exact action: Review and commit checkpoint 5. After the reviewed changes are committed, execute checkpoint 6 (Memory) only.
+
+Phase / task: Phase 2 - Checkpoint 4 test reporting refinement
+Status: passed
+Files changed: `tests/mdclassic_games/integration/test_pong.py`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 4 entries.
+Command and working directory: repository root.
+Expected / observed result: Split the former single Pong GUI test into six independently reported subprocess-isolated real-widget tests: start/serve, scoring/reserves, wall/paddle collisions, speed limit, pause control, and settings application. Each scenario retains the real `MainApp`, KV, widgets, and temporary configuration setup.
+Manual checks: Reused preceding checkpoint 4 PASS. This test-only reporting change does not alter runtime behavior.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_pong.py` PASS: collected 6, passed 6, failed 0, skipped 0, xfailed 0 in 1.94s. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration` PASS: collected 8, passed 8, failed 0, skipped 0, xfailed 0 in 4.58s. `uv run --locked --group dev pytest` PASS: collected 18, passed 18, failed 0, skipped 0, xfailed 0 in 4.54s. `git diff --check` PASS.
+Failure: The first split generated indented subprocess source and failed all six cases with `IndentationError`; normalizing each scenario with `textwrap.dedent` before embedding fixed the test-only issue. The settings scenario initially referred to a helper-local path; it now checks the app's temporary config path directly.
+Decision: Keep separate pytest items so a failure identifies its Pong behavior directly, while preserving subprocess isolation for Kivy global state.
+Next exact action: Review and commit checkpoint 4. After the reviewed changes are committed, execute checkpoint 5 (Ahorcado) only.
+
+Phase / task: Phase 2 - Checkpoint 6: Memory compatibility and automated behavior checks
+Status: in progress
+Files changed: `source/MDclassic_games/memory/screen.py`, `source/MDclassic_games/memory/mat.py`, `tests/mdclassic_games/integration/test_memory.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: Memory initially failed at `app.theme_cls.primary_light`, which KivyMD 2.0 removed. Its two legacy text/icon `MDChip` declarations would also be unsupported. Replaced the removed color API with `primaryColor`, migrated both controls to the `MDChipText` composition, and replaced the removed H4 typography with the equivalent Headline/large role. Fixed the existing Memory theme settings callback to update `current_theme` rather than an undeclared `tema_actual` attribute. The screen now constructs and starts a game under the locked artifact.
+Manual checks: NOT RUN - required interactive desktop exercise remains: reveal matching and nonmatching pairs, restart, size/theme controls, cartoons ICO images, and representative sounds.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_memory.py` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 1.65s before the completion scenario was added; the later integration run PASS: collected 24, passed 24, failed 0, skipped 0, xfailed 0 in 10.08s. The Memory regressions use real screens/widgets and cover pair creation, matching, mismatch resolution, resolved cards, completion, and settings persistence in temporary config. `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest` PASS: collected 34, passed 34, failed 0, skipped 0, xfailed 0 in 10.08s. `git diff --check` PASS.
+Failure: Resolved KivyMD compatibility failures: `AttributeError: 'ThemeManager' object has no attribute 'primary_light'` from `memory/mat.py:37`, then `KeyError: 'H4'` from `memory/screen.py:86`. The initial pair-creation test used an invalid comparison of `dict_values` to a set; correcting that test-only assertion did not change production behavior.
+Decision: Preserve Memory game rules and its synchronous mismatch behavior. Use the KivyMD 2.0 documented interactive chip composition rather than static labels. Existing color/tile layout intent is preserved with the active primary color.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, complete the Memory checkpoint exercise, and report PASS/FAIL observations. If it passes, review checkpoint 6 before any commit or checkpoint 7 work; otherwise repair only the first Memory failure.
+
+Phase / task: Phase 2 - Checkpoint 6 continuation: Memory theme and level crash repair
+Status: in progress
+Files changed: `source/MDclassic_games/memory/mat.py`, `source/MDclassic_games/memory/settings.json`, `tests/mdclassic_games/integration/test_memory.py`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md` in addition to the checkpoint 6 files above
+Environment: Same as the preceding checkpoint 6 entry.
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The theme selector previously used every directory under `memory/images/themes`; empty legacy directories such as `varios`, `dibujos`, and `futbol` have no card images or `back.jpg`, so starting them failed. The settings typo `tecnology` also selected a nonexistent directory. Valid themes contain 22-30 images, while game levels permit 20 pairs; a theme with fewer images would make `random.sample` fail at higher levels. Memory now selects only sorted directories containing `back.jpg` and at least 20 card images, and it falls back to the first complete theme for stale configuration. The settings list now names `technology` correctly.
+Manual checks: FAIL before repair - user reported crashes for empty/nonexistent themes, sometimes dependent on pair count. Recheck required after repair: cycle every selectable theme, start a level-20 board for each, confirm removed legacy values no longer appear, and complete the remaining Memory exercise.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_memory.py` PASS: collected 8, passed 8, failed 0, skipped 0, xfailed 0 in 2.83s. `uv run --locked --group dev pytest` PASS: collected 36, passed 36, failed 0, skipped 0, xfailed 0 in 10.94s. The new cases exercise every selectable theme at 20 pairs plus stale-config fallback.
+Failure: Resolved asset-selection failures: an empty or nonexistent theme caused `os.listdir`/missing `back.jpg` failures; a nonempty theme with fewer images than the selected pair count would cause `ValueError` from `random.sample` in `Mat.start_game`.
+Decision: Do not invent missing theme assets or lower configured difficulty silently. Expose only themes that support the documented maximum level, while retaining a safe fallback for existing stale local configuration.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, cycle every selectable Memory theme and start a 20-pair game in each, then complete matching/nonmatching, restart, cartoon ICO, and sound checks. Report PASS/FAIL observations before review.
+
+Phase / task: Phase 2 - Checkpoint 6 manual recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 6 entries.
+Command and working directory: user reran `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed Memory now works after the theme/level repair.
+Manual checks: PASS - Memory checkpoint exercise, including the formerly crashing themes, now passes.
+Automated checks: Reused unchanged continuation results: 8 focused Memory GUI tests and 36 full-suite tests passed. No tested inputs changed after that run.
+Failure: No remaining checkpoint 6 failure.
+Decision: Keep the complete-theme filter, stale-config fallback, and corrected settings option while preserving the existing game rules and assets.
+Next exact action: Commit checkpoint 6. After the reviewed changes are committed, execute checkpoint 7 (15 puzzle) only.
+
+Phase / task: Phase 2 - Checkpoint 7: 15 puzzle compatibility and automated behavior checks
+Status: passed
+Files changed: `source/MDclassic_games/game_15puzzle/screen.py`, `source/MDclassic_games/game_15puzzle/sample.py`, `tests/mdclassic_games/integration/test_15puzzle.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The real 15 puzzle screen initially used removed KivyMD 2 APIs: `ThemeManager.primary_light`, H5 typography, and text/icon properties on `MDChip`. Replaced the color with `primaryColor`, mapped the moves label to Headline/small, and migrated both interactive Theme and Level controls to `MDChipText` composition. The chip originally cycled every asset directory, including incomplete legacy directories such as `elefante`, causing missing-image errors. It now selects only themes containing every 3x3, 4x4, and 5x5 tile and persists the first valid theme when an existing config is stale. Added six real-screen regressions covering valid themes and stale configuration, solvable shuffled tile sets at all three board sizes, legal and illegal moves, solved-state recognition, and settings propagation to the existing screen and isolated config.
+Manual checks: PASS - user completed the checkpoint after exercising the theme controls and reporting the missing-image errors. The complete-theme filter prevents those failures; empty legacy directories were subsequently removed. This completion request accepts the required tile/drawer navigation, legal move, restart/shuffle, size/theme, and reference-image exercise. Visual layout and representative sound were exercised on the user's desktop.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_15puzzle.py -q` PASS: collected 6, passed 6, failed 0, skipped 0, xfailed 0 in 2.25s. `uv run --locked --group dev pytest tests/mdclassic_games/unit -q` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration -q` PASS: collected 32, passed 32, failed 0, skipped 0, xfailed 0 in 12.99s. `uv run --locked --group dev pytest -q` PASS: collected 42, passed 42, failed 0, skipped 0, xfailed 0 in 13.11s. `git diff --check` PASS after removing the only trailing-whitespace violation.
+Failure: Resolved KivyMD 2 compatibility failure before user-visible construction: removed `primary_light` would raise `AttributeError`, and legacy `MDChip` text/icon declarations are unsupported. Resolved the reported missing-image failure: empty legacy theme directories such as `elefante`, `muneca`, `pez`, `via_lactea`, `mortal_kombat`, `luna`, `paisaje`, `moto`, `cyberpunk`, `mono`, `desayuno`, `numeros`, and `dibujo` were included in the in-game cycle despite lacking required tiles. The first settings regression assertion was corrected to mirror the Settings panel's order by setting the temporary config before dispatching `config_change`; no production behavior changed.
+Decision: Preserve the existing game rules, shuffle algorithm, complete theme assets, callbacks, and configuration section/key names. Exclude incomplete legacy asset directories rather than inventing replacement images. Use the same KivyMD 2 chip composition already validated in Memory rather than replacing interactive controls.
+Next exact action: Commit checkpoint 7. After the reviewed changes are committed, execute checkpoint 8 (2048) only.
+
+Phase / task: Phase 2 - Checkpoint 8: 2048 compatibility and automated behavior checks
+Status: passed
+Files changed: `source/MDclassic_games/game_2048/screen.py`, `source/MDclassic_games/game_2048/board.py`, `tests/mdclassic_games/integration/test_2048.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest; GUI cases launch the app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The 2048 screen initially used removed KivyMD 2 APIs: `ThemeManager.primary_light`, legacy `MDChip` text/icon properties, and H4 typography. Replaced the color with `primaryColor`, migrated the target-score control to `MDChipText`, and mapped score typography to Headline/small. The required `[2, 2, 2, 2]` left move initially collapsed to `[8, 0, 0, 0]` because merges were marked only after their animation callbacks. `Board.move_tile` now reserves both tiles as merged when scheduling a merge, so another tile cannot merge into the pending result. Seven real-screen regressions cover screen/control construction, start/restart, the target-score chip, a dispatched left direction control, all four directions, one merge per tile, score, no-op moves without spawning, and undo of board and score with deterministic spawning.
+Manual checks: PASS - user confirmed the full interactive desktop exercise: 2048 opened correctly, direction buttons, merge/score display, undo, target-score control, restart, drawer return/re-entry, and representative sound all worked.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_2048.py -q` PASS: collected 7, passed 7, failed 0, skipped 0, xfailed 0 in 3.67s. `uv run --locked --group dev pytest tests/mdclassic_games/unit -q` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration -q` PASS: collected 39, passed 39, failed 0, skipped 0, xfailed 0 in 17.95s. `uv run --locked --group dev pytest -q` PASS: collected 49, passed 49, failed 0, skipped 0, xfailed 0 in 17.85s. `uv pip check` and `git diff --check` PASS.
+Failure: Resolved KivyMD 2 construction incompatibilities from the removed theme color, legacy chip properties, and H4 role. The first production behavior failure was the required four-tile merge sequence producing `[8, 0, 0, 0]` instead of `[4, 4, 0, 0]`; deferred animation callbacks left its first merged result eligible for another merge. Non-blocking `xclip`/`xsel` clipboard diagnostics remain in GUI subprocess output.
+Decision: Preserve the existing board, animation, tile spawning, score, undo, and control behavior. Reserve only pending merge participants until `end_of_move` clears merge state; do not replace the interactive chip or introduce a parallel rule engine.
+Next exact action: Review and commit checkpoint 8. After the reviewed changes are committed, execute checkpoint 9 (Buscaminas) only.
+
+Phase / task: Phase 2 - Checkpoint 9: Buscaminas compatibility and automated behavior checks
+Status: in progress
+Files changed: `source/MDclassic_games/buscaminas/screen.py`, `tests/mdclassic_games/integration/test_buscaminas.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest and verification commands; GUI cases launch the real combined app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: The Buscaminas screen constructs with the KivyMD 2 app bar and starts a level-1 9x9 board with 10 mines. Its level and flag toolbar callbacks originally omitted the real action button required by `Field.set_level` and `Field.entry_mode`, so KivyMD 2 `on_release` dispatch raised before either control changed state. Both callbacks now pass `self`. Added five real-screen regressions covering board construction and toolbar level/flag controls, fixed corner/edge mine counts, connected safe-cell flood reveal, flag/reveal interaction and counter updates, and mine-hit plus cleared-board outcomes. Tests use fixed layouts, mute production sound, and execute real widgets and production methods.
+Manual checks: NOT RUN - an interactive desktop is required. From `source/MDclassic_games`, run `uv run --locked python main.py`; open Buscaminas through its tile, start a new board, reveal a safe cell, toggle flag mode and flag a cell, reach a mine and cleared-board outcome if practical, return through the drawer and reopen it, and check representative sound. Report visible layout, controls, outcome behavior, re-entry, and audio observations. Do not treat the automated runs as evidence for these checks.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_buscaminas.py -q` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 2.18s. `uv run --locked --group dev pytest tests/mdclassic_games/unit -q` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration -q` PASS: collected 44, passed 44, failed 0, skipped 0, xfailed 0 in 20.30s. `uv run --locked --group dev pytest -q` PASS: collected 54, passed 54, failed 0, skipped 0, xfailed 0 in 20.17s. `uv pip check` and `git diff --check` PASS.
+Failure: Resolved `TypeError: Field.set_level() missing 1 required positional argument: 'button'` when dispatching the real level toolbar button. This was a KivyMD 2 callback mismatch in `buscaminas/screen.py`; the adjacent flag-mode callback had the same omitted argument and was repaired together. The first focused-test attempt had a generated-test conditional-expression syntax error, corrected before it could exercise production code. Non-blocking `xclip`/`xsel` clipboard diagnostics remain in GUI subprocess output.
+Decision: Preserve Buscaminas board rules, random mine placement, controls, counters, sounds, and win condition. Pass the actual KivyMD action button to the established handlers rather than weakening handler signatures, so both controls retain their icon updates.
+Next exact action: Manually execute the Buscaminas desktop checklist above and record PASS/FAIL observations. If it passes, review checkpoint 9 changes and request a commit before beginning checkpoint 10 (Snake); otherwise repair only the first observed Buscaminas failure.
+
+Phase / task: Phase 2 - Checkpoint 9 continuation: desktop right-click multitouch repair
+Status: in progress
+Files changed: `source/MDclassic_games/main.py`, `tests/mdclassic_games/integration/test_buscaminas.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md` in addition to the preceding checkpoint 9 files
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest and verification commands; GUI cases launch the real combined app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: User reported that right-clicking placed persistent red dots across Buscaminas and other screens, including after starting another game. Kivy's mouse provider documents right/middle-click as default multitouch emulation and draws these red synthetic-touch markers. Before KivyMD or `Window` imports, `main.py` now configures Linux Kivy input as `mouse,disable_multitouch`. This preserves normal mouse events, including Buscaminas's right-click flag behavior, while disabling only simulated multitouch markers. A sixth real-screen regression imports the app before `Window` and asserts that provider configuration.
+Manual checks: FAIL before repair - user reported persistent red dots after right-click in Buscaminas and other screens. Recheck required after a fresh launch: right-click in the menu and another game must leave no dots; in Buscaminas, right-click must still flag a covered cell. Complete the preceding new-board, safe reveal, mine/cleared outcome if reachable, drawer re-entry, and sound checklist in the same session. Do not count automated results as evidence for this visual/input check.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_buscaminas.py -q` PASS: collected 6, passed 6, failed 0, skipped 0, xfailed 0 in 2.50s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_shell.py -q` PASS: collected 7, passed 7, failed 0, skipped 0, xfailed 0 in 4.19s. `uv run --locked --group dev pytest tests/mdclassic_games/unit -q` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration -q` PASS: collected 45, passed 45, failed 0, skipped 0, xfailed 0 in 19.80s. `uv run --locked --group dev pytest -q` PASS: collected 55, passed 55, failed 0, skipped 0, xfailed 0 in 19.81s. `uv pip check` and `git diff --check` PASS.
+Failure: Resolved Kivy mouse multitouch emulation, documented by Kivy at `kivy/input/providers/mouse.py`: the default provider uses right/middle click for synthetic multitouch and draws each generated touch as a red ellipse. This was an application-wide desktop input configuration issue, not a Buscaminas tile or flag rendering defect.
+Decision: Set only the Linux `mouse` provider's documented `disable_multitouch` token before window creation. Do not remove Buscaminas right-click handling, hide canvas elements, or disable physical touchscreen providers.
+Next exact action: Manually launch from `source/MDclassic_games` with `uv run --locked python main.py`, verify no red dots persist from right-clicks in the menu and another game, verify Buscaminas right-click flags still work, and complete its remaining checklist. If it passes, review checkpoint 9 changes and request a commit before beginning checkpoint 10 (Snake); otherwise record and repair the first remaining failure.
+
+Phase / task: Phase 2 - Checkpoint 9 manual right-click recheck
+Status: passed
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Same as the preceding checkpoint 9 continuation.
+Command and working directory: user relaunched `uv run --locked python main.py` from `source/MDclassic_games`.
+Expected / observed result: PASS - user confirmed the desktop right-click repair works. Kivy's synthetic red markers no longer persist across Buscaminas or other screens, and Buscaminas right-click flagging remains available.
+Manual checks: PASS - the reported application-wide right-click/flag regression is resolved. PASS - checkpoint completion was confirmed for the remaining new-board, safe-reveal, mine/cleared-outcome, drawer return/re-entry, and representative-sound exercise.
+Automated checks: Reused unchanged continuation results: 6 focused Buscaminas GUI tests, 7 shell GUI tests, 10 unit tests, 45 GUI integration tests, and 55 full-suite tests passed. No tested inputs changed after those runs.
+Failure: Resolved desktop right-click multitouch markers, as recorded in the preceding continuation. No new failure reported.
+Decision: Retain the documented Kivy mouse-provider configuration and real-widget regression. Do not infer the remaining Buscaminas manual checklist from this focused recheck.
+Next exact action: Execute checkpoint 10 (Snake) only: reproduce and repair its first KivyMD 2 compatibility failure, add deterministic real-widget regressions for required movement and outcome behavior, run affected checks, then request the required desktop exercise. Do not begin checkpoint 11.
+
+Phase / task: Phase 2 - Checkpoint 10: Snake compatibility and automated behavior checks
+Status: passed
+Files changed: `source/MDclassic_games/snake/screen.py`, `tests/mdclassic_games/integration/test_snake.py`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4
+Command and working directory: repository root for pytest and verification commands; GUI cases launch the real combined app from `source/MDclassic_games` in isolated subprocesses with temporary configuration.
+Expected / observed result: Snake initially failed to construct because KivyMD 2 removes `MDProgressBar`. Its KV also used removed `ThemeManager.primary_light` and H5 typography, and its pause toolbar callback omitted the action button required by `GameBoard.pause_button`. Replaced the progress bar with the KivyMD 2 `MDLinearProgressIndicator`, used `primaryColor`, mapped the labels to Headline/small, and passed the real pause button. Added five real-screen regressions covering screen construction with the indicator; start and pause/resume toolbar controls; movement and rejected immediate reversal; eating/growth/score and food respawn; body and wall collision game-over; and restart plus speed/mode/start-level settings updates.
+Manual checks: PASS - user confirmed the required Snake desktop exercise: start, turn, eat/score, collision/game-over, restart, speed/size/mode settings, drawer return/re-entry, and representative sound.
+Automated checks: `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_snake.py -q` PASS: collected 5, passed 5, failed 0, skipped 0, xfailed 0 in 2.17s. `uv run --locked --group dev pytest tests/mdclassic_games/unit -q` PASS: collected 10, passed 10, failed 0, skipped 0, xfailed 0 in 0.02s. `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration -q` PASS: collected 50, passed 50, failed 0, skipped 0, xfailed 0 in 22.79s. `uv run --locked --group dev pytest -q` PASS: collected 60, passed 60, failed 0, skipped 0, xfailed 0 in 22.81s. `uv pip check` and `git diff --check` PASS.
+Failure: Resolved `kivy.factory.FactoryException: Unknown class <MDProgressBar>` while constructing `ScreenSnake`. The initial collision regression set a wall location before adding its widget to the board, so its production position binding lacked a parent; correcting test setup before it reached production behavior fixed the test-only failure. Non-blocking `xclip`/`xsel` clipboard diagnostics remain in GUI subprocess output.
+Decision: Preserve Snake's game rules, continuous update scheduling, food metadata, screen layout, settings keys, and toolbar semantics. Use KivyMD 2's supported determinate linear indicator and retain the existing pause method signature so it can continue updating the actual control icon.
+Next exact action: Review and commit checkpoint 10. After the reviewed changes are committed, execute checkpoint 11 (cross-app regressions and CI) only.
+
+Phase / task: Phase 2 - Checkpoint 11: Cross-app regressions and CI (2026-10-09)
+Status: in progress - implementation and local automated checks passed; review/commit and remote CI acceptance pending
+Files changed: `source/MDclassic_games/main.py`, `tests/mdclassic_games/integration/test_cross_app.py`, `tests/mdclassic_games/integration/test_shell.py`, `tests/mdclassic_games/unit/test_resources.py`, `.github/workflows/mdclassic-games-tests.yml`, `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`
+Environment: Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4. Existing desktop SDL2/OpenGL context; GUI CI-like run selects software GL and SDL dummy audio. Full suite uses the existing desktop environment and the application's ALSA default. Xvfb/xvfb-run and `gh` are unavailable on this host.
+Command and working directory: repository root for sync, pytest, consistency and diff checks. GUI subprocesses use `source/MDclassic_games` with per-test temporary Kivy home and actual config filename. Preflight working tree was clean; checkpoint 10 is committed as `b2a7dcf`.
+Expected / observed result: Added ten cross-app GUI cases covering first entry through tiles and drawer into all seven games; loading messages; menu return and drawer re-entry with screen identity/count assertions; all five real JSON settings panels, real SettingItem value events before/after lazy screen creation, temporary config reload, and fresh-process game construction from persisted values; real GIF and every cartoons ICO decode; and stubbed sound requests plus the real mute control. Strengthened About to exercise its CLOSE button and assert version text. Audio lifecycle coverage now verifies every loaded sound is non-None, stubs audible playback after real loading, and schedules verification explicitly after the preload callback instead of using timed sleeps. Unit tests audit settings JSON, required menu/font/word/image/audio resources, statically requested sound names, and existing packaging extensions/exclusions.
+Manual checks: NOT RUN - checkpoint 11 automation does not establish appearance or audible output. The newly reproduced Pong return-to-menu repair needs an interactive recheck: enter Pong from the menu, let its transition finish, return through the drawer, then re-enter Pong and another game. The comprehensive manual acceptance checklist remains checkpoint 12 work.
+Automated checks:
+- `uv sync --locked --group dev` PASS; `uv pip check` PASS; `git diff --check` PASS.
+- `DISPLAY= WAYLAND_DISPLAY= uv run --locked --group dev pytest tests/mdclassic_games/unit --junitxml=/tmp/opencode/mdclassic-games-checkpoint11-unit.xml` PASS: collected 17, passed 17, failed 0, skipped 0, xfailed 0 in 0.05s; no GUI imports required.
+- `KIVY_WINDOW=sdl2 KIVY_GL_BACKEND=sdl2 LIBGL_ALWAYS_SOFTWARE=1 SDL_AUDIODRIVER=dummy uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration --junitxml=/tmp/opencode/mdclassic-games-checkpoint11-gui.xml` PASS: collected 60, passed 60, failed 0, skipped 0, xfailed 0 in 25.86s. This uses the desktop display, not Xvfb, and proves neither Ubuntu installation nor audible output.
+- `uv run --locked --group dev pytest --junitxml=/tmp/opencode/mdclassic-games-checkpoint11-full.xml` PASS: collected 77, passed 77, failed 0, skipped 0, xfailed 0 in 26.33s on the final test inputs. The earlier run passed in 25.70s; reran after limiting the static sound audit to runtime folders (excluding future generated build trees) and removing an unused test import. All seven game behavior modules pass. Subprocess isolation removes shared Kivy/Builder/Clock state between scenarios; settings persistence explicitly crosses a fresh process. Tracked `main.ini` digest guard passes. Final status review confirms no tracked config, generated output, assets, or sibling games changed.
+- Initial focused shell/cross-app run: 17 collected, 14 passed, 3 failed. Both route cases exposed the Pong production defect below; the Memory settings case had a test-only decimal expectation error (`10` was compared to its final digit), corrected without a gameplay change. Focused cross-app rerun after the menu repair: 10 passed.
+- Remote CI: PENDING. Workflow has push/PR triggers, two explicit Ubuntu 24.04 jobs, Python 3.11, uv 0.12.10, locked sync, finite timeouts, unit display isolation, and failure artifacts. The SDL/software GL/dummy audio provider combination is locally verified; Ubuntu prerequisites and the exact Xvfb command are not yet verified. No remote workflow run was initiated or claimed.
+Failure: Reproduced `kivy.uix.screenmanager.ScreenManagerException: No Screen with name "menu"` from `main.py:242` on the real drawer menu-return event after Pong entry. `ScreenManager.switch_to(ScreenPong())` schedules removal of the previous menu screen when the transition completes (or is stopped by the next transition). Replaced it with `add_widget(ScreenPong())`, matching the other six branches, and retained the final `self.sm.current = new_screen`. Both real route regressions now pass and preserve menu/screen identity. Classification: application navigation defect discovered during cross-app coverage. Initial traceback is captured in the focused pytest tool output; final machine-readable reports are the `/tmp/opencode/mdclassic-games-checkpoint11-{unit,gui,full}.xml` files above. No remaining local automated failure.
+Decision: Keep the dependency baseline, game rules and Android spec unchanged. Audit the existing package rules now; add ICO inclusion and its assertion during Phase 3. Do not count dummy audio as audible validation, local software GL as Xvfb validation, or the new workflow file as passing remote CI.
+Next exact action: Review checkpoint 11 and interactively recheck Pong menu return/re-entry using `uv run --locked python main.py` from `source/MDclassic_games`. Commit only when requested. When these changes are published, verify both CI jobs and append the workflow run URL, results and any prerequisite fixes. After the reviewed changes are committed, checkpoint 12 may perform desktop acceptance while remote CI remains explicitly pending if unavailable; Phase 2 and Android entry remain gated by actual acceptance evidence.
+
+Phase / task: Phase 2 - Checkpoint 11 approval and handoff (2026-10-09)
+Status: passed - checkpoint completion approved by the user; remote CI acceptance remains pending
+Files changed: checkpoint 11 files listed above; master plan and Phase 2 progress tracker updated to checkpoints 1-11 complete, checkpoint 12 next.
+Environment: unchanged from the checkpoint 11 execution record above.
+Command and working directory: repository root; reviewed `git status --short --untracked-files=all`, `git diff`, and `git log --oneline -10` before committing the approved checkpoint changes.
+Expected / observed result: User explicitly requested marking this gate complete, updating the plan, and committing. Accept checkpoint 11's implementation/local-check handoff under its documented remote-CI-pending allowance. This approval is not evidence of a remote workflow run or a new manual runtime observation.
+Manual checks: NOT RUN in this handoff; Pong menu return/re-entry and the comprehensive desktop exercise remain checkpoint 12 checks.
+Automated checks: Reuse the unchanged checkpoint 11 results: 17 unit, 60 GUI, and 77 full-suite tests passed, with no skips or xfails. Only documentation changed after the final recorded test run. Remote CI remains PENDING; Ubuntu/Xvfb runner verification remains unrun.
+Failure: No remaining local automated failure. Remote execution is unavailable until the changes are published and the workflow runs.
+Decision: Mark checkpoint 11 complete as requested, retain the explicit pending CI evidence, and keep Phase 2 acceptance partial. No Android entry is authorized by this handoff.
+Next exact action: Execute checkpoint 12 only: launch `uv run --locked python main.py` from `source/MDclassic_games`, perform and record the full desktop acceptance checklist including Pong return/re-entry, sounds, layout, and settings persistence. Reuse the preceding full-suite result if tested inputs and environment are unchanged. When the changes are published, record both GitHub Actions job results and the run URL before closing the Phase 2 CI gate.
+
+Phase / task: Phase 2 - Checkpoint 12: Desktop acceptance preflight (2026-10-09)
+Status: in progress - preflight passed; manual desktop acceptance and remote CI evidence pending
+Files changed: `docs/assistant/mdclassic_games_upgrade_plan.md`, `docs/assistant/mdclassic_games_phase2_desktop_plan.md`, `docs/assistant/mdclassic_games_validation.md`. Config backup created outside the repository at `/tmp/opencode/mdclassic-games-checkpoint12-main.ini.backup`.
+Environment: unchanged Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4. GitHub CLI and Xvfb remain unavailable.
+Command and working directory: repository root for `git status --short --untracked-files=all`, `git log -1 --oneline`, `uv lock --check`, `uv pip check`, `uv --version`, and Python/package metadata inventory. Manual launch is `uv run --locked python main.py` with working directory `source/MDclassic_games`.
+Expected / observed result: Preflight tree was clean at approved checkpoint 11 commit `7ea8772`; runtime, test, dependency, configuration and environment inputs match the preceding full-suite pass. Lock consistency and installed dependency checks pass. Original config and backup both have SHA-256 `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`; backup is byte-identical and tracked config was not edited.
+Manual checks: NOT RUN in this checkpoint. Await actual desktop observations; prior individual game passes do not establish final acceptance after the shared navigation repair. Record each row below from the user's interactive run:
+
+| Area | Status | Required observations |
+| --- | --- | --- |
+| Navigation | NOT RUN | All seven games through tiles and drawer; loading message on first entry; menu return; re-entry; specifically Pong menu return after its transition finishes |
+| Pong | NOT RUN | Start/restart, pause/resume, paddles, ball/score, skin/speed settings |
+| Ahorcado | NOT RUN | New word, correct/wrong letter, keyboard/man settings, word/image display |
+| Memory | NOT RUN | Matching/nonmatching pair, restart, size/theme controls, cartoons ICO images |
+| 15 puzzle | NOT RUN | Legal move, shuffle/restart, size/theme controls, matching reference image |
+| 2048 | NOT RUN | Direction controls, merge/score, undo, target-score chip, restart |
+| Buscaminas | NOT RUN | New board, safe reveal, flag action, outcome popup if reachable; no persistent red multitouch markers |
+| Snake | NOT RUN | Start, turn, eat/score, collision/game-over, restart, speed/size/mode settings |
+| Shell/settings | NOT RUN | Five panels, settings persistence after exit/relaunch, About/CLOSE, Help URL, Exit |
+| Audio/layout/lifecycle | NOT RUN | Audible representative start/move/win-or-loss sounds; mute where offered; portrait/landscape resizing; leave/re-enter running games without crashes or duplicate updates |
+
+Automated checks: Reuse checkpoint 11's final `uv run --locked --group dev pytest --junitxml=/tmp/opencode/mdclassic-games-checkpoint11-full.xml` pass: collected 77, passed 77, errors 0, failed 0, skipped 0, xfailed 0, 26.33s. Its JUnit file remains available and confirms 77 tests, zero failures/errors/skips. The separate 17-unit and 60-GUI results remain valid for their recorded provider environments. No redundant pytest run performed for this documentation-only checkpoint entry. Remote CI remains PENDING; no workflow result or Ubuntu/Xvfb verification claimed.
+Failure: No local preflight/application failure observed. Completion is waiting on interactive observations and remote CI evidence, not an automated test failure.
+Decision: Use the runbook's permitted test-result reuse and preserve the user's original settings. Keep checkpoint 12 and Phase 2 incomplete until required observations are recorded; repair any reported fault narrowly, with affected tests and a full-suite rerun if tested inputs change.
+Next exact action: User launches from `source/MDclassic_games` with `uv run --locked python main.py`, completes the table above, exits and relaunches to verify settings persistence, then reports PASS/FAIL observations and any first traceback. After testing, restore only test-generated config edits from the recorded backup, preserving intentional user changes. Obtain both GitHub Actions job results and a run URL when published; then review checkpoint 12 before any requested commit or Phase 3 handoff.
+
+Phase / task: Phase 2 - Checkpoint 12 continuation: manual report, purple theme restoration and warning investigation (2026-10-10)
+Status: in progress - user functional desktop checks passed; repairs and automated checks passed; focused visual recheck, remote CI and review/commit pending
+Files changed: `source/MDclassic_games/main.py`, `source/MDclassic_games/game_15puzzle/sample.py`, `tests/mdclassic_games/integration/test_cross_app.py`, `tests/mdclassic_games/integration/test_shell.py`, and the three execution documents. `main.ini` has user-selected values from manual testing; preserved and excluded from the checkpoint deliverable.
+Environment: same Linux x86_64, CPython 3.11.14, uv 0.12.10, pytest 9.1.1, Kivy 2.3.1, KivyMD 2.0.0, Pillow 12.3.0, materialyoucolor 3.0.4 baseline. Desktop SDL2 Window and Mesa Intel OpenGL; no dependency change.
+Command and working directory: pytest from repository root; real-app GUI subprocesses launch from `source/MDclassic_games` with temporary Kivy/config state. Runtime reference inspection used the installed pinned KivyMD `appbar.kv`, `chip.kv`, `button.kv`, and Kivy `image.py` and `input/providers/mtdev.py`. Host diagnostics used `ls -l /dev/input/event11` and `id`, plus read-only inspection of the user's Kivy input configuration.
+Expected / observed result: User reported "all works fine" for the requested checkpoint 12 desktop checklist, then supplied an original screenshot showing purple app bars and requested the same styling for buttons. KivyMD 2's default app-bar canvas and chip backgrounds use surface colors rather than the classic primary purple. Added shared KV rules in `main.py`: app bars, chips and Material buttons use custom DeepPurple `#673AB7`; app-bar titles/actions and chip/button labels/icons use white for contrast. This applies to the main menu and all seven real game screens without changing their callbacks. `CardSample` now uses `fit_mode: 'contain'` instead of deprecated `allow_stretch: True`; Kivy 2.3.1 documents this as the aspect-preserving resize/upscale behavior, matching the old setting with default `keep_ratio=True`.
+Manual checks: PASS before these repairs - user confirmed the requested navigation, seven game exercises, five settings/persistence, shell, audio and layout/lifecycle checklist works. Appearance regression reported: original purple bars/buttons were missing. NOT RUN after repair - focused appearance and puzzle-reference-image recheck still needed. Prior functional observations remain recorded; do not treat automated colors as the user's visual approval.
+Automated checks:
+- `uv run --locked --group dev pytest -m gui tests/mdclassic_games/integration/test_cross_app.py tests/mdclassic_games/integration/test_15puzzle.py tests/mdclassic_games/integration/test_shell.py -q` PASS: collected 26, passed 26, failed 0, skipped 0, xfailed 0 in 13.93s.
+- `uv run --locked --group dev pytest --junitxml=/tmp/opencode/mdclassic-games-checkpoint12-full.xml` PASS: collected 80, passed 80 (17 unit and 63 GUI), failed 0, skipped 0, xfailed 0 in 28.58s. Reran because shared KV/runtime/test inputs changed; this supersedes the checkpoint 11 full-suite result for the current code. Config digest guard passed without altering the user's manual-test settings.
+- Three new real-widget regressions inspect the actual purple app-bar canvas and title/action colors on all eight screens; purple chips and About CLOSE styling/interaction; and aspect-preserving puzzle-reference upscale with no `allow_stretch`/`keep_ratio` deprecation messages in captured output. The shared subprocess helper returns its captured result for the warning assertion.
+- Initial color-test assertions failed because canvas bindings had not been flushed and the dialog label was mid-theme-color-animation. Tests now flush `Builder.sync()` and disable theme-switch color animation only in the focused chip/dialog test to assert final colors deterministically; no runtime animation is disabled. Final regressions pass. `git diff --check` PASS.
+Failure: No remaining local automated failure. Reported MTD warning is an environment/input-provider issue: Kivy's mtdev provider catches `OSError` errno 13 at device open, logs this exact warning, and returns from that device's reader. The user's Kivy `[input]` configuration enables `probesysfs`; `/dev/input/event11` has mode `crw-rw----`, owner `root`, group `input`, while `id` shows the user's groups do not include `input`. Kivy therefore cannot read this raw touch device. The user-reported working desktop mouse controls remain independent. The device's identity was not inspected because permission for that extra read was declined; do not claim a particular touchscreen/touchpad model. No device permissions, user groups, or Kivy input-probing settings were changed.
+Decision: Restore the demonstrated classic purple controls with supported pinned APIs and eliminate the application-level image deprecations. Retain the MTD issue as a non-blocking raw-input permission warning for the tested desktop mouse setup; raw touch through that node is unavailable. Preserve the user's current settings. Remote CI acceptance remains PENDING.
+Next exact action: Relaunch from `source/MDclassic_games` with `uv run --locked python main.py` and visually confirm purple bars/titles/icons on all eight screens, purple interactive chips and About CLOSE, and unchanged 15 puzzle reference-image fitting without the two deprecation warnings. After confirmation, review the checkpoint 12 changes and commit only when requested, excluding `main.ini`. Record remote CI evidence before marking Phase 2 complete or entering Android work.
+
+Phase / task: Phase 2 - Checkpoint 12 visual approval and requested commit (2026-10-10)
+Status: in progress - local desktop/automated acceptance passed and approved; remote CI gate remains pending
+Files changed: approved checkpoint 12 runtime/test/documentation files listed above. User-selected `source/MDclassic_games/main.ini` values remain local and are excluded from staging.
+Environment: unchanged from the preceding checkpoint 12 continuation.
+Command and working directory: repository root; reviewed `git status --short --untracked-files=all`, `git diff`, and `git log --oneline -10`; branch is `MDclassic_games`, remote is `https://github.com/osso73/classic_games.git`.
+Expected / observed result: User answered "ok, all good" to the focused visual/image-warning recheck and explicitly requested a commit plus CI-checking instructions. Desktop appearance and gameplay acceptance are approved. Only execution documentation changed after the recorded 80-test pass; runtime, tests, dependencies and test environment are unchanged.
+Manual checks: PASS - user confirms purple bars/light titles and icons, purple chip/button controls, and reference-image fitting/deprecation-warning recheck. Reuse the preceding user-confirmed functional desktop checklist. The MTD raw-input permission warning remains the separately documented non-blocking environment issue for desktop mouse use.
+Automated checks: Reuse checkpoint 12's final full-suite result: 80 passed (17 unit, 63 GUI), failed 0, skipped 0, xfailed 0 in 28.58s; focused affected checks 26 passed. Remote CI remains PENDING; no remote run result or Ubuntu/Xvfb verification is claimed.
+Failure: No remaining local acceptance failure. Phase 2 is waiting on both remote workflow jobs passing.
+Decision: Commit the approved local deliverables while preserving the user's local settings. Do not push without an explicit request. Keep checkpoint 12 and Phase 2 acceptance partial until remote evidence is recorded.
+Next exact action: User runs `git push origin MDclassic_games` from repository root, opens <https://github.com/osso73/classic_games/actions>, selects **MDclassic games tests** for the new commit on branch `MDclassic_games`, and checks that both `unit` and `gui` are green. If a job fails, inspect its first failing step and failure-log artifacts. Supply the run URL and results so they can be recorded before Phase 3 starts.
+
+Phase / task: Phase 2 - Checkpoint 12 CI report and Node.js action-runtime warning cleanup (2026-10-10)
+Status: in progress - original workflow jobs passed per user evidence; updated action versions await review/commit and remote execution
+Files changed: `.github/workflows/mdclassic-games-tests.yml` and the three execution documents.
+Environment: user screenshot shows GitHub Actions push workflow with `unit` green (1m 34s) and `gui` green (2m 1s). Workflow declares Ubuntu 24.04, Python 3.11 and uv 0.12.10. Exact remote Python patch, run URL and tested commit were not supplied. Local application/test/dependency environment is unchanged.
+Command and working directory: repository root for `git status --short --untracked-files=all`, `git log -1 --oneline`, and diff checks; documentation/source checks fetched each selected upstream action manifest.
+Expected / observed result: Both jobs passed, but GitHub annotated each with "Node.js 20 is deprecated" and noted the old action versions were forced to run on Node.js 24. This is a GitHub helper-action runtime warning, not a Python/Kivy warning or failed test. Updated both jobs to `actions/checkout@v6`, `actions/setup-python@v6`, `astral-sh/setup-uv@v7`, and `actions/upload-artifact@v6`, each verified to declare `runs.using: node24`. Existing action inputs, Python/uv selections, locked sync, test commands, runner/provider settings, timeouts and artifact paths are unchanged.
+Manual checks: Reuse user-approved desktop acceptance from the preceding record; no application behavior changed.
+Automated checks: Original remote `unit` and `gui` PASS per user screenshot; screenshot has two runtime-deprecation warnings. Remote test counts are not visible, so do not fabricate them. Reuse the unchanged local 80-test pass (17 unit, 63 GUI). No redundant pytest run for this workflow-only change: pytest cannot validate GitHub action execution. Upstream Node.js 24 declarations verified at <https://raw.githubusercontent.com/actions/checkout/v6/action.yml>, <https://raw.githubusercontent.com/actions/setup-python/v6/action.yml>, <https://raw.githubusercontent.com/astral-sh/setup-uv/v7/action.yml>, and <https://raw.githubusercontent.com/actions/upload-artifact/v6/action.yml>. Updated workflow's remote execution remains PENDING.
+Failure: No test failure reported. The warnings identify deprecated Node.js 20 action declarations; selected Node.js 24 actions address those declarations. Warning disappearance is not yet observed in a new run.
+Decision: Update the actions themselves rather than suppressing annotations with runtime override flags. Keep the successful original CI report separate from verification of the new action versions. Desktop acceptance is committed at `3efd3cf`; final Phase 2 handoff still needs the current workflow's run URL/commit and success evidence.
+Next exact action: Review and commit the workflow cleanup only on user request, publish it, and confirm both jobs pass without Node.js 20 annotations. Supply the Actions run URL and tested commit. Record those results, then close Phase 2 and start Phase 3 checkpoint 1 toolchain selection.
+
+Phase / task: Phase 2 - Checkpoint 12 CI rerun and uv cache-save collision cleanup (2026-10-10)
+Status: in progress - user reports both CI jobs passed again; per-job cache suffix awaits review/commit and remote execution
+Files changed: `.github/workflows/mdclassic-games-tests.yml` and the three execution documents.
+Environment: Node.js 24 workflow update is committed as `bfaacd1`; preflight working tree was clean. Latest user screenshot shows one `gui` warning from setup-uv cache saving, with no Node.js 20 annotations shown. Exact run URL and tested commit remain unsupplied.
+Command and working directory: repository root for status/log/diff checks. No application, test, dependency or provider inputs changed.
+Expected / observed result: User reports tests passed again. Annotation: "Failed to save: Unable to reserve cache with key setup-uv-... another job may be creating this cache." Both concurrent jobs declare the same runner, Python/uv version and lockfile, with no cache suffix, so they can attempt to save the same immutable GitHub cache key. Added the supported setup-uv v7 input `cache-suffix: ${{ github.job }}` to both jobs; it resolves to `unit` and `gui`, separating cache namespaces while preserving caching in each job. The input was verified in the upstream v7 manifest referenced in the preceding entry.
+Manual checks: Reuse recorded desktop acceptance; workflow-only change.
+Automated checks: Remote jobs PASS again per user report; cache-save warning does not invalidate test execution. Reuse unchanged local 80-test pass. `git diff --check` PASS; workflow diff limited to two cache-suffix lines. Cache-save behavior requires a new remote run and is not validated by desktop pytest.
+Failure: Non-blocking cache reservation race in the GUI job's post-step; no test failure reported. The new suffix should prevent unit/gui saves in the same run competing for an identical key; disappearance is not yet observed. Overlapping runs of the same job can still share that job's cache key.
+Decision: Separate caches by job rather than disable caching or suppress warnings. Keep CI test success distinct from cache-save success. No commit or push performed without a user request.
+Next exact action: Review and commit the cache-suffix cleanup when requested, publish it, and inspect the next workflow's job results and annotations. Supply the run URL and tested commit so final CI evidence can be recorded and Phase 2 closed.
+
+Phase / task: Phase 2 - Final CI evidence and desktop handoff (2026-10-10)
+Status: passed - all Phase 2 desktop, automated and remote CI acceptance gates satisfied
+Files changed: final evidence entries and status/handoff summaries in the master plan, Phase 2 runbook, Phase 3 entry tracker and this validation record. Runtime, tests, dependencies and workflow remain unchanged.
+Environment: accepted desktop baseline remains CPython 3.11.14, uv 0.12.10, Kivy 2.3.1, KivyMD 2.0.0, Pillow 12.3.0 and materialyoucolor 3.0.4. Remote workflow declares Ubuntu 24.04, Python 3.11 and uv 0.12.10, with the documented SDL2/software GL/Xvfb/dummy audio settings. Remote Python patch and per-test log counts are not available from the public summary and are not claimed.
+Command and working directory: repository root for `git status --short --untracked-files=all`, `git log --oneline -4`, `git rev-parse HEAD`, and `git diff 3efd3cf HEAD -- source/MDclassic_games tests/mdclassic_games pyproject.toml uv.lock .python-version`. GitHub CLI remains unavailable; the public run summary was fetched read-only from the user-supplied URL.
+Expected / observed result: User confirmed "everything good now" and supplied <https://github.com/osso73/classic_games/actions/runs/38006783012>. Public summary independently confirms **Success** for push run **#3**, titled "Update CI actions with cache suffix to avoid cache collisions", branch `MDclassic_games`, exact commit `3d55d2b3ca91e52126f23eaf0c7f90394404948e`, matching local HEAD. Total duration 1m 49s; `unit` 56s; `gui` 1m 44s. Cache fix is committed as `3d55d2b`; Node.js 24 actions as `bfaacd1`; desktop acceptance and styling/image fixes as `3efd3cf`. Preflight tree was clean, and the application/test/dependency diff from the recorded 80-test state is empty.
+Manual checks: PASS - retain the user's recorded full desktop checklist and post-repair visual/image-warning confirmation. User's latest report confirms the workflow warning cleanup is good. No additional manual game exercise was needed for workflow/documentation-only changes. The documented MTD raw-input permission issue remains non-blocking for the accepted mouse setup.
+Automated checks: PASS - reuse the unchanged local final suite: 80 passed (17 unit, 63 GUI), failed 0, skipped 0, xfailed 0 in 28.58s, report `/tmp/opencode/mdclassic-games-checkpoint12-full.xml`. Remote CI PASS: `unit` and `gui` in run 38006783012; individual job links are <https://github.com/osso73/classic_games/actions/runs/38006783012/job/114077283268> and <https://github.com/osso73/classic_games/actions/runs/38006783012/job/114077283441>. Full job logs require sign-in, so no unobserved remote test counts are substituted for the local counts. No redundant pytest run for final evidence-only edits.
+Failure: No remaining Phase 2 acceptance failure. Public summary shows successful execution of the current workflow, and the user reports the latest run is good after warning fixes.
+Decision: Close checkpoint 12 and Phase 2. Android toolchain selection is now eligible; Android build and device support remain unvalidated. Preserve the deferred ICO inclusion/assertion for Phase 3 spec/resource work. No commit or push of these final evidence notes without an explicit request.
+Next exact action: Review final evidence notes, then execute Phase 3 checkpoint 1 only: verify the accepted entry state and select a coherent Buildozer/p4a/Python 3.11/JDK/SDK/NDK/native-dependency matrix. Follow the one-checkpoint review workflow; do not install/build or change the Android spec before the selection evidence is established.
+
+### Phase 3 checkpoint 1 - Entry and native recipe audit
+
+Phase / task: Phase 3 - Checkpoint 1: verify entry and inspect candidate toolchain (2026-10-10)
+
+Status: blocked - Phase 2 entry PASS; current supporting-native pins fail recipe patch feasibility; matrix incomplete and selection awaiting review.
+
+Files changed: checkpoint evidence in this record and status/next-action summaries in `mdclassic_games_phase3_android_plan.md` and `mdclassic_games_upgrade_plan.md`. Pre-existing edits in those files and `mdclassic_games_phase2_desktop_plan.md` were preserved.
+
+Environment: Manjaro Linux rolling (`/etc/os-release`), Linux x86_64; host CPython 3.11.14 at the root `.venv/bin/python3`; uv 0.12.10; Kivy 2.3.1; PyPI KivyMD 2.0.0; Pillow 12.3.0; materialyoucolor 3.0.4; materialshapes 0.3; pycairo 1.29.1; asynckivy 0.6.4; asyncgui 0.6.3. Workspace is under `~/Nextcloud/Programacion/GitHub/classic_games` on `/dev/nvme0n1p5`; `df -h .` reports 24 GiB available, 97% used. This is a synchronized-path checkout; no filesystem build fault was observed because no build was attempted. No proxy environment variables are present; GitHub API/raw access and source clones succeeded. Google SDK/NDK download access was NOT RUN. `JAVA_HOME` is unset; `java -version` and `javac -version` select OpenJDK 26.0.2.1, not the documented JDK 17 candidate. Manjaro-specific prerequisite installation remains unverified; the pinned Buildozer docs permit other Linux distributions but provide Ubuntu/macOS installation instructions.
+
+Command and working directory: repository root for `git status --short`, `uv --version`, `uv lock --check`, `uname -sm`, `df -h .`, `git rev-parse HEAD`, `uv pip check`, metadata inventory via `uv run --locked python -c ...`, `java -version`, `javac -version`, and `git diff 3efd3cf HEAD -- source/MDclassic_games tests/mdclassic_games pyproject.toml uv.lock .python-version`. Read current metadata, lock, Python selector, spec, resource tests, Phase 2 tracker and acceptance record. Source-only checkouts outside the repository:
+
+```bash
+git clone --depth 1 --branch v2026.05.09 https://github.com/kivy/python-for-android.git /tmp/opencode/mdclassic-p4a-2026.05.09
+git clone --depth 1 --branch 1.6.0 https://github.com/kivy/buildozer.git /tmp/opencode/mdclassic-buildozer-1.6.0
+uv run --locked python /tmp/opencode/mdclassic-android-source-audit.py
+```
+
+The audit script downloads version-specific source files into `/tmp/opencode/mdclassic-android-source-audit/` and runs `patch --dry-run --batch -p1 -i <absolute-recipe-patch>` with each package scratch directory as working directory. No source patch was applied and no package was installed or compiled. The external script and checked source files are evidence aids; the exact URLs and patch outcomes below are the durable record.
+
+Expected / observed result: HEAD is `3d55d2b3ca91e52126f23eaf0c7f90394404948e`, matching the recorded passing final CI run 38006783012. Only the four pre-existing execution documents were modified on entry. Application/test/dependency/spec state matches the accepted state; the diff from desktop acceptance commit `3efd3cf` for runtime/test/dependency inputs is empty. `uv lock --check` and `uv pip check` PASS (21 installed packages compatible). The Phase 2 user checklist includes seven games, controls, settings persistence, audible audio and layout/lifecycle; its post-repair visual confirmation and local 80-test result remain applicable.
+
+#### Candidate matrix (not a passed selection)
+
+| Selection | Observed/candidate value | Evidence and remaining work |
+| --- | --- | --- |
+| Host | Manjaro rolling x86_64; CPython 3.11.14; uv 0.12.10 | Buildozer metadata supports Python >=3.8 and p4a >=3.7; actual prerequisite verification belongs to host setup |
+| Buildozer | Released 1.6.0; source commit `b4ae4225cd1fe19f16a5133fb6afa5a2cfbb6382` | [Release](https://github.com/kivy/buildozer/releases/tag/1.6.0), [setup.py](https://github.com/kivy/buildozer/blob/b4ae4225cd1fe19f16a5133fb6afa5a2cfbb6382/setup.py), [Android implementation](https://github.com/kivy/buildozer/blob/b4ae4225cd1fe19f16a5133fb6afa5a2cfbb6382/buildozer/targets/android.py#L676-L763): supports `p4a.url`, `p4a.branch`, `p4a.commit`; clones the branch/tag then resets to the full commit |
+| Host Python build tools | Cython 0.29.34 candidate; remaining exact host-tool pins unresolved | [Pinned installation docs](https://github.com/kivy/buildozer/blob/b4ae4225cd1fe19f16a5133fb6afa5a2cfbb6382/docs/source/installation.rst) specify 0.29.34; Buildozer requires Cython <3.0. [p4a setup.py](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/setup.py#L22-L26) also needs meson/ninja/build/toml/setuptools/wheel and other host packages; exact group pins not selected before native blocker |
+| p4a | v2026.05.09; full commit `58d21141f17c889bf8585f5665921d72028f8831`; repository `https://github.com/kivy/python-for-android.git` | [Release](https://github.com/kivy/python-for-android/releases/tag/v2026.05.09); annotated tag object `8aba7685beea080d0e34375e6c0e2067a2dcad0a` resolves to the recorded commit (use commit, not tag object, in future spec) |
+| Python recipes | `python3==3.11.14`, `hostpython3==3.11.14` candidates; neither built | Both recipe defaults are 3.14.2; `hostpython3.download` requires matching recipe versions. Python3 has version-conditional patches and `--with-build-python` for 3.11+. Hostpython ensurepip patch dry-run against 3.11.14 PASS; remaining Python patch/source feasibility still needs checking. Do not infer 3.11 build success from the version override alone |
+| JDK | JDK 17 major candidate; actual vendor/patch/`JAVA_HOME` selection unresolved | Pinned installation docs request OpenJDK 17; current Java 26.0.2.1 is not selected for this build |
+| SDK tools | Exact command-line tools/platform-tools/build-tools selection unresolved | Buildozer automatically chooses highest available build-tools unless update is disabled; reproducible SDK provisioning must be designed explicitly before passing selection |
+| APIs / NDK | Target API unresolved; minimum/NDK API 24 and NDK 28c candidates | [p4a recommendations](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recommendations.py): NDK recommendation 28c, NDK API 24. Source still contains older API/NDK warning constants, while installation docs discuss API 36/NDK 29 for develop. Resolve a coherent choice from pinned Gradle/bootstrap/CI evidence after native decision |
+| Runtime | Preserve Kivy 2.3.1 / KivyMD 2.0.0; native audit below | Current Pillow and pycairo pins fail patch feasibility; materialyoucolor 3.0.4 requires an evidenced version override above recipe default 2.0.10 |
+| Bootstrap / ABI | SDL2; `arm64-v8a` candidate | Kivy recipe supports SDL2; recipe SDL2 2.30.11, SDL2_ttf 2.22.0, SDL2_mixer 2.6.3. No actual device/emulator supplied; arm64 is the runbook default, not verified device availability |
+
+#### Native dependency audit and first failures
+
+Recipe links in this table use immutable p4a commit `58d21141f17c889bf8585f5665921d72028f8831`.
+
+| Package / path | Classification and evidence | Outcome |
+| --- | --- | --- |
+| Kivy 2.3.1 | [Native recipe](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/kivy/__init__.py) defaults to 2.3.1, supports SDL2 and explicitly depends on Android/pyjnius/setuptools; Cython constraints are recorded separately for generated hostpython | Candidate recipe route exists; build NOT RUN |
+| KivyMD 2.0.0, asynckivy 0.6.4, asyncgui 0.6.3 | Pure-Python distributions. Installed metadata requires Kivy >=2.3.0, Pillow, materialyoucolor >=3.0.3, materialshapes >=0.3, asynckivy >=0.6,<0.7; asynckivy requires asyncgui >=0.6,<0.7 | Explicit transitives needed to preserve pins; pure Python does not remove downstream native dependencies |
+| materialshapes 0.3 -> pycairo | materialshapes metadata requires Kivy, Pillow, pycairo; Python wrapper needs the native Cairo binding | Cannot omit pycairo to bypass recipe failure |
+| Pillow 12.3.0 | [Pillow recipe](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/Pillow/__init__.py) defaults to 11.3.0; depends on png/jpeg/freetype (with harfbuzz) and applies [setup.py.patch](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/Pillow/setup.py.patch). Inspected [12.3.0 setup.py](https://github.com/python-pillow/Pillow/blob/12.3.0/setup.py) | FAIL: dry-run exit 1, `Hunk #2 FAILED at 515`, `1 out of 4 hunks FAILED`. Its pkg-config block changed to a `lib_name2` loop, so the native-path patch cannot apply unchanged |
+| pycairo 1.29.1 -> libcairo | [pycairo recipe](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/pycairo/__init__.py) defaults to 1.28.0; [Meson patch](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/pycairo/meson.patch) sets explicit target Cairo include/link paths. [libcairo 1.18.4 recipe](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/libcairo/__init__.py) builds Cairo/pixman and needs png/freetype/cpufeatures | FAIL: cairo/meson.build hunk checks successfully, but meson_options.txt hunk fails at line 1 (dry-run exit 1). [1.29.1 options](https://github.com/pygobject/pycairo/blob/v1.29.1/meson_options.txt) add `no-x11` after the prior three lines, conflicting with the patch's end-of-file context |
+| materialyoucolor 3.0.4 | [C++ PyProjectRecipe](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipes/materialyoucolor/__init__.py) defaults to 2.0.10 with `c++_shared`. [v3.0.4 release](https://github.com/T-Dynamos/materialyoucolor-python/releases/tag/v3.0.4) has the exact tarball matching the recipe URL template; asset SHA-256 `30b8dde034dce180845b0eaf52f72c5b22cd5b60bd7aff96804febae4e266276` | Version-override candidate exists, but build backend/native-source compatibility audit remains incomplete. Recipe default 2.0.10 violates KivyMD's >=3.0.3 constraint |
+| Legacy networking requirements | Kivy metadata requires requests; its p4a recipe explicitly lists certifi/chardet/idna/requests/urllib3/filetype as Python dependencies | Do not remove the old networking entries solely from app-import searches; final exact transitive requirements selection remains pending |
+
+The separate hostpython check against [CPython 3.11.14 ensurepip](https://github.com/python/cpython/blob/v3.11.14/Lib/ensurepip/__init__.py) returned exit 0: `Hunk #1 succeeded at 85 (offset 16 lines)`. This is only a source-patch check, not a hostpython build.
+
+Manual checks: retain Phase 2 PASS evidence; Android runtime/device checks NOT RUN.
+
+Automated checks: entry lock/dependency consistency PASS; source patch checks: 1 PASS, 2 FAIL as above. Reuse Phase 2 checkpoint 12's unchanged full-suite result, 80 passed (17 unit, 63 GUI), failed/skipped/xfailed 0 in 28.58s, and final CI run 38006783012 at the same HEAD. No redundant pytest run for source research/documentation-only edits. APK build/inspection/clean reproduction NOT RUN.
+
+Failure classification: native recipe/source-version incompatibility demonstrated before compilation, not an application traceback or failed APK build. Full raw observations and immutable source links are recorded above; scratch script/source paths are under `/tmp/opencode/` and independent of app build caches.
+
+Decision: stop checkpoint 1 at the runbook's native-feasibility gate. Propose common desktop/Android **Pillow 11.3.0** and **pycairo 1.28.0** candidates matching the selected recipes, while retaining Python 3.11, Kivy 2.3.1, KivyMD 2.0.0 and materialyoucolor 3.0.4. Installed runtime metadata imposes no conflicting version bounds on those two supporting-package candidates, but neither has been selected into the project or desktop-validated. Review their patch/source feasibility before adopting them. If approved, checkpoint 2 must lock the common pins and run the full desktop suite plus affected manual image/ICO/GIF/font/material-widget checks. A passing test on a future adjusted baseline does not retroactively validate Android compilation. Exact host-tools/JDK/SDK/API selection and remaining native/Python source audit must be completed before the checkpoint-1 gate can pass.
+
+Next exact action: review the proposed Pillow 11.3.0 / pycairo 1.28.0 common-pin decision, then resume **checkpoint 1 only** to check those sources, finish materialyoucolor/Python/native-transitive feasibility and fill the exact tool matrix (including JDK 17 selection/provisioning and pinned SDK tools). Keep host installation, dependency edits, spec edits and builds gated by the reviewed checkpoint sequence. No commit performed.
+
+### Phase 3 checkpoint 1 - Approved supporting versions and toolchain selection
+
+Phase / task: Phase 3 - Checkpoint 1 continuation (2026-10-10)
+
+Status: in progress - source feasibility and exact candidate selection checks PASS; review/commit pending. Installation and desktop validation of adjusted versions belong to checkpoint 2; APK compilation remains untested.
+
+User decision: user approved proceeding with common Pillow 11.3.0 / pycairo 1.28.0 candidates after clarification, with Python packages confined to this project's `.venv` and JDK 17 installed in a user-owned directory, selected only for Android build commands. No system-default Java change is authorized or needed. This approval resumes checkpoint 1; it is not a commit request or evidence that an APK works.
+
+Files changed: this record, Phase 3 tracker and master summary; all pre-existing documentation edits preserved. Runtime metadata, lock, spec and user config remain at the previously tested desktop baseline during this source-selection checkpoint.
+
+Environment: same Manjaro Linux x86_64 / host CPython 3.11.14 / uv 0.12.10 / current Kivy 2.3.1, KivyMD 2.0.0, Pillow 12.3.0, materialyoucolor 3.0.4 and pycairo 1.29.1 installation. Java 26 remains the system-selected Java. Selected JDK 17 is not installed yet. Scratch evidence remains in `/tmp/opencode/`, outside the synchronized workspace and app build cache.
+
+Command and working directory: repository root for source-only checks:
+
+```bash
+uv run --locked python /tmp/opencode/mdclassic-android-source-audit.py
+uv run --locked python /tmp/opencode/mdclassic-android-runtime-audit.py
+uv pip compile /tmp/opencode/mdclassic-android-host-candidates.in --python-version 3.11 --output-file /tmp/opencode/mdclassic-android-host-candidates.txt
+uv run --locked python /tmp/opencode/mdclassic-android-sdk-audit.py
+```
+
+`uv pip compile` resolves candidate host requirements without installing them or changing project metadata. The runtime script checks version-specific PyPI metadata and inspects the exact locked materialyoucolor sdist in memory. The SDK script reads Google's repository XML and prints selected Linux archive revisions/URLs/checksums without installing tools. Also inspected pinned p4a recipes, Gradle template/wrapper, Dockerfile, CI SDK makefile and test-app setup, plus Buildozer's SDK update and p4a dependency invocation code.
+
+Expected / observed result: all seven final patch dry-runs exit 0: Pillow 11.3.0 (four hunks), pycairo 1.28.0 (two hunks), hostpython 3.11.14 ensurepip, and Python 3.11.14 site/pyconfig detection, reproducible build info, ctypes, and optional lld/cortex patch. Python reproducible-buildinfo hunk succeeds with fuzz 1 at line 1243; the other Python patches use exact/offset matches. An initial audit attempt omitted `Lib/site.py` and `Makefile.pre.in`, reporting missing scratch files; those files were fetched and the complete audit rerun successfully. This was an audit-input omission, not a recipe incompatibility. Python's 3.14-only patches are not selected for 3.11.14.
+
+Pillow 11.3.0 and pycairo 1.28.0 are non-yanked PyPI releases requiring Python >=3.9. materialyoucolor's exact source SHA-256 matches the lock (`30b8dde034dce180845b0eaf52f72c5b22cd5b60bd7aff96804febae4e266276`); its setuptools backend requires setuptools >=61, wheel and pybind11 >=2.11.0, and builds `materialyoucolor.quantize.celebi` as C++17. The selected p4a PyProjectRecipe supplies target compiler/include/link environment and `c++_shared`; its existing versioned URL supports the released 3.0.4 archive with no recipe patches. Keep the compiled route; do not enable the package's optional pure-Python bypass. This is a viable candidate build path, not a compilation result.
+
+#### Exact toolchain selection for subsequent checkpoints
+
+All values here are **selected**. Installed/built versions must be verified independently in the later checkpoints.
+
+| Component | Selected value / location | Evidence / rationale |
+| --- | --- | --- |
+| Build host | Manjaro rolling Linux x86_64; host CPython 3.11.14; uv 0.12.10 | Actual host inventory above; pinned Buildozer supports other Linux distributions and Python >=3.8; p4a metadata supports Python >=3.7 and CI includes host Python 3.11 |
+| Buildozer | 1.6.0, source commit `b4ae4225cd1fe19f16a5133fb6afa5a2cfbb6382` | Released source and supported immutable checkout options verified in preceding audit |
+| p4a | Repository `https://github.com/kivy/python-for-android.git`; tag `v2026.05.09`; commit `58d21141f17c889bf8585f5665921d72028f8831` | Future spec uses `p4a.branch = v2026.05.09` for fetching and `p4a.commit` with the full commit for immutable reset |
+| Embedded / generated host Python | `python3==3.11.14`, `hostpython3==3.11.14` | Both matching versions explicitly override 3.14.2 recipe defaults; all applicable recipe patches dry-run successfully. [Requirement parsing](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/toolchain.py#L685-L693) sets `VERSION_<recipe>` for `==` pins; [recipe property](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/recipe.py#L178-L195) uses it |
+| Java | Eclipse Temurin OpenJDK HotSpot **17.0.20.1+1**, Linux x64 | Exact vendor release archive and checksum below; JDK 17 is requested by pinned Dockerfile/install docs/CI. Planned `JAVA_HOME=/home/oriol/.local/share/classic-games-android/jdk-17.0.20.1+1` |
+| Gradle / Android Gradle plugin | Gradle **8.14.3** / AGP **8.11.0** | [Pinned wrapper](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/bootstraps/common/build/gradle/wrapper/gradle-wrapper.properties) and [Gradle template](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/pythonforandroid/bootstraps/common/build/templates/build.tmpl.gradle#L1-L35) |
+| SDK command-line tools | **19.0**, Linux archive build **13114758** | Google repository metadata; SDK root planned `/home/oriol/.local/share/classic-games-android/sdk`; install under `cmdline-tools/19.0`, provide `tools` symlink to that directory because Buildozer 1.6.0 expects `sdk/tools/bin/sdkmanager` |
+| SDK platform / build-tools / platform-tools | Platform **android-36 revision 2**; build-tools **36.0.0**; platform-tools **37.0.1** | Exact official archive names/checksums below. Isolated SDK root will contain only selected build-tools. Future spec uses `android.sdk_path` and `android.skip_update = True` to prevent automatic version changes |
+| Target / minimum / NDK API | **36 / 24 / 24** | [Pinned CI SDK provisioning](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/ci/makefiles/android.mk#L1-L9) selects API 36; [test-app setup](https://github.com/kivy/python-for-android/blob/58d21141f17c889bf8585f5665921d72028f8831/testapps/on_device_unit_tests/setup.py) selects API 36 / NDK API 24; Buildozer minimum and p4a recommended NDK API are 24 |
+| NDK | **r28c**, package revision **28.2.13676358** | Both p4a recommendations and pinned CI makefile choose 28c; planned location `/home/oriol/.local/share/classic-games-android/android-ndk-r28c`. Older NDK warning constants in recommendations do not override this explicit selection |
+| Runtime native/framework | Kivy **2.3.1**, KivyMD **2.0.0**, Pillow **11.3.0**, pycairo **1.28.0**, materialyoucolor **3.0.4** | Approved shared supporting-version adjustment; existing recipes and source feasibility checked; actual desktop installation changes deferred to checkpoint 2 |
+| Bootstrap / ABI | **sdl2 / arm64-v8a** | Recipe supports both; ABI is the runbook's default target selection. Actual compatible Phase 4 device remains unidentified |
+
+The source documentation has stale defaults in some places (including Buildozer API 33, p4a recommendation API 33 and CI makefile build-tools 29.0.3). Explicitly select API 36 from the pinned test-app/CI inputs and build-tools 36.0.0 for that platform rather than inheriting those defaults. A request for the official AGP release-notes web page timed out; selection evidence here is the inspected immutable Gradle and CI source, not an unobserved web page.
+
+**Selected host Python group:** `buildozer==1.6.0`, `cython==0.29.34`, `appdirs==1.4.4`, `colorama==0.4.6`, `jinja2==3.1.6`, `sh==2.2.2`, `meson==1.4.0`, `ninja==1.11.1.4`, `build==1.2.2.post1`, `toml==0.10.2`, `packaging==26.3`, `setuptools==79.0.1`, `wheel==0.43.0`, `pip==25.1.1`. Cython follows the pinned Buildozer installation docs; meson follows p4a MesonRecipe 1.4.0; wheel follows p4a `~=0.43.0`; setuptools satisfies Pillow's >=77 hostpython prerequisite and materialyoucolor's >=61 backend constraint. Remaining versions are exact available Python-3.11-compatible candidates satisfying p4a's setup metadata, verified by resolution (not a claim they are the newest). Resolution PASS: 18 packages, additionally pexpect 4.9.0, ptyprocess 0.7.0, MarkupSafe 3.0.4, pyproject-hooks 1.3.3. Generate the authoritative project lock in checkpoint 2; never hand-copy this scratch resolution into `uv.lock`.
+
+Include pip deliberately: Buildozer invokes its host interpreter with `-m pip` to satisfy p4a host dependencies. Keep execution inside the uv environment with `VIRTUAL_ENV` set; its code otherwise adds `--user`. Already satisfied pinned dependencies should not upgrade in that invocation, but verify the log and resulting environment. Generated hostpython and isolated native-backend dependencies are separate recipe-managed environments, not covered by root `uv.lock`; record their actual versions in build logs.
+
+**Runtime/pure-Python requirement selection:** explicitly retain/pin asynckivy 0.6.4, asyncgui 0.6.3, materialshapes 0.3, Kivy-Garden 0.1.5, docutils 0.23, Pygments 2.21.0, filetype 1.2.0, requests 2.34.2, urllib3 2.7.0, idna 3.19, certifi 2026.7.22 and charset-normalizer 3.5.1 from the desktop lock. Also select chardet 5.2.0 and six 1.17.0 (non-yanked, compatible metadata checked), required by the p4a Kivy/pyjnius dependency declarations even though not in the desktop lock. Retain setuptools 79.0.1 as a p4a runtime dependency. These networking packages have no recipes at the selected revision and use the pure-Python route. Charset-normalizer has a universal Python wheel in the lock; do not use its manylinux extension wheel for Android. Do not include pytest, host build tools, Windows-only dependencies or test-only lock entries in Android runtime requirements.
+
+**Recipe-derived native versions:** SDL2 2.30.11, SDL2_image 2.8.2, SDL2_mixer 2.6.3, SDL2_ttf 2.22.0, pyjnius 1.7.0, libcairo 1.18.4 (including pixman), png 1.6.37, jpeg/libjpeg-turbo 2.0.1, freetype 2.14.1, harfbuzz 2.6.4. Use the recipes at the immutable p4a revision; record actual selected versions during compilation. Include `harfbuzz` explicitly: Pillow's recipe looks up its build paths, but freetype only builds HarfBuzz support when that recipe is selected. Remove the historical SDL2_ttf 2.0.15 override in checkpoint 3. Python's sqlite3/openssl/libffi dependencies remain recipe-managed. Cairo has a supported Meson recipe and links cpufeatures from the selected NDK; its cross-compilation and actual bundled libraries still require build/inspection evidence. SDL2 image/mixer own their external codec sources; ICO/GIF/OGG runtime decoding remains Phase 4 validation.
+
+#### User-local download/provisioning selection
+
+All SDK archive URLs use prefix `https://dl.google.com/android/repository/`. The following exact archives were found in [Google repository metadata](https://dl.google.com/android/repository/repository2-3.xml) during this checkpoint; future provisioning must verify versions/checksums and avoid `sdkmanager --update` or floating platform-tools downloads.
+
+| Component | Exact archive | Vendor checksum |
+| --- | --- | --- |
+| Command-line tools 19.0 | `commandlinetools-linux-13114758_latest.zip` (the numeric build is pinned despite the filename suffix) | SHA-1 `5fdcc763663eefb86a5b8879697aa6088b041e70` |
+| Platform-tools 37.0.1 | `platform-tools_r37.0.1-linux.zip` | SHA-1 `477254aa5f903c15cf51001717bdf347fb6b53e0` |
+| Build-tools 36.0.0 | `build-tools_r36_linux.zip` | SHA-1 `b0b6376977657e8ad9b969bacf4093601da2c6fb` |
+| Android API 36 revision 2 | `platform-36_r02.zip` | SHA-1 `2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576` |
+| NDK r28c | `android-ndk-r28c-linux.zip` | SHA-1 `a7b54a5de87fecd125a17d54f73c446199e72a64` |
+
+JDK archive: <https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.20.1%2B1/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1.tar.gz>, SHA-256 `3808d1d15e3ec6bd5b84057fb5d84c33d8a1536a258146bcea2e603fc726e08e`; exact [vendor release](https://github.com/adoptium/temurin17-binaries/releases/tag/jdk-17.0.20.1%2B1). Adoptium discovery returned this concrete release; subsequent instructions must use its versioned URL, not the discovery endpoint. Metadata reports archive size 193252603 bytes. Provision without sudo under the recorded user-local path; set `JAVA_HOME` and prepend its `bin` only in build commands/processes. Installed Java/Javac patch must match this selection in checkpoint 2.
+
+Do not add shell-profile exports, change Java alternatives, or install Python packages with system pip. SDK licenses must still be reviewed/accepted during setup as required. Archive selection does not mean licenses, installed executable paths or host prerequisites have been checked. The current 24 GiB free-space observation remains recorded for capacity checks before the first and clean builds.
+
+Manual checks: no new interactive desktop exercise needed for source/docs-only selection. After checkpoint 2 actually changes the supporting versions, recheck Memory cartoons ICOs, representative GIFs, complete 15 puzzle themes/reference fitting, fonts, menu images, purple controls/chips and About rendering/interaction; automated provider/resource checks plus the full suite are required as well.
+
+Automated checks: seven final patch dry-runs PASS; candidate host resolution PASS (18 packages); exact native-release metadata and materialyoucolor sdist hash/backend inspection PASS; Google SDK metadata access PASS. Reuse the unchanged current-baseline Phase 2 80-test full-suite and final CI evidence; do not count it as validation of the future adjusted pins. Installation/version commands, new-baseline desktop tests, SDK license/executable checks, APK builds and device checks NOT RUN.
+
+Failure: no unresolved source/native-version selection conflict after the approved adjustment. First attempts with missing scratch Python files were corrected as described above; AGP web-page timeout did not affect pinned-source inspection. No build success is claimed.
+
+Decision: approve the source-based candidate toolchain for a build attempt after host setup. Checkpoint 1 technical selection checks pass; keep its tracker In progress until review/commit. Apply project-local Python adjustments and provision user-local JDK/SDK in checkpoint 2 only after the reviewed checkpoint is committed. Keep the reviewed one-checkpoint-at-a-time workflow.
+
+Next exact action: review this selection and the execution-document diffs; commit only on explicit request. Once checkpoint 1 is reviewed and committed, execute checkpoint 2: generate the Android host group/lock, apply approved common supporting pins in `.venv`, provision the exact user-local JDK/SDK/NDK, verify host commands/prerequisites, run the full desktop suite and obtain affected manual resource/widget observations. Then stop for checkpoint-2 review before changing the spec.
+
+### Phase 3 checkpoint 2 - Project-local host setup and desktop revalidation
+
+Phase / task: Phase 3 - Checkpoint 1 requested commit, then checkpoint 2 host setup (2026-10-10)
+
+Status: blocked - checkpoint 1 reviewed/committed; checkpoint 2 project setup and automated desktop checks PASS, but OS zip, SDK licenses and affected manual visual recheck remain pending.
+
+Commit: user explicitly requested commit and the next step. Reviewed `git status --short`, complete documentation diff, `git log --oneline -10` and `git diff --check`; committed the four reviewed execution documents as **`8cb288f`**, `Select reproducible Android toolchain and supporting versions`. No push requested/performed. Checkpoint 1 is now complete. Checkpoint 2 changes are separate, uncommitted work awaiting its own review.
+
+Files changed: `pyproject.toml`, generated `uv.lock`, `docs/getting-started.md`, new standard-library provisioning script `docs/assistant/mdclassic_games_install_android_tools.py`, and this record/master/Phase 3 tracker. User tools and archive cache installed outside the repository at `/home/oriol/.local/share/classic-games-android`. No application/KV/spec/assets/requirements/sibling-game edits. `main.ini` remains unchanged.
+
+Environment: Manjaro Linux 7.2.3-2-MANJARO x86_64; host CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0; Pillow **11.3.0**; pycairo **1.28.0**; materialyoucolor 3.0.4. `pycairo==1.28.0` built successfully on this host during uv sync using Cairo 1.18.4. Host package inventory: base-devel 1-3, autoconf 2.73-1, automake 1.18.1-1, libtool 2.6.2-5, pkgconf 3.0.7-1, cmake 4.4.3-2, gettext 1.0-2, unzip 6.0-23, openssl 3.6.4-1, libffi 3.8.0-1, zlib 1:1.3.2-3, cairo 1.18.4-1, lld 22.1.8-1. `pkg-config --modversion cairo libffi openssl zlib` returns 1.18.4 / 3.8.0 / 3.6.4 / 1.3.2. **zip is missing** from PATH and pacman inventory. No privileged package installation was attempted.
+
+Command and working directory: repository root for:
+
+```bash
+uv lock
+uv sync --locked --group android
+uv pip check
+uv lock --check
+uv run --locked --group android python --version
+uv run --locked --group android buildozer --version
+uv run --locked --group android python -m pip --version
+uv run --locked --group android python docs/assistant/mdclassic_games_install_android_tools.py
+uv run --locked --group dev --group android pytest --junitxml=/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml
+```
+
+Also inspected installed package metadata and executable paths under uv; audited OS tools with `command -v`, `pacman -Q`, `pacman -Qo /usr/bin/lld` and pkg-config; verified user config digest and backup; checked normal system Java and remaining disk space. Provisioning stdout/stderr saved with `pipefail` and `tee` at `/tmp/opencode/mdclassic-phase3-checkpoint2-tools.log`. Layout correction/idempotent reprovisioning log: `/tmp/opencode/mdclassic-phase3-checkpoint2-tools-layout.log`.
+
+Expected / observed result: uv generated a 44-package universal lock, changing only the approved runtime versions (Pillow 12.3.0 -> 11.3.0 and pycairo 1.29.1 -> 1.28.0) and adding the selected host dependencies/transitives. Declared pycairo as an exact direct runtime pin so the common desktop/Android version is retained rather than floating through materialshapes. Sync installed all selected host dependencies in the root `.venv`. `uv pip check` PASS: 38 installed Linux packages compatible. Python/Buildozer/pip version checks PASS: 3.11.14 / 1.6.0 / 25.1.1. Metadata confirms Cython 0.29.34, setuptools 79.0.1, meson 1.4.0, ninja 1.11.1.4 and wheel 0.43.0. `VIRTUAL_ENV` points at the root `.venv`; installed Buildozer source confirms its subprocess pip call omits `--user` in this environment. No system Python package installation was used.
+
+#### Installed user-local tools
+
+All six downloaded archive checksums match the exact selection in checkpoint 1. The new tracked provisioning script can recreate them after an OS reinstall; a second run reused all matching installation records without downloads. Scripts do not change shell profiles or Java alternatives and do not accept licenses. SDK/NDK/JDK/archive cache directories are outside version control and app source staging.
+
+| Tool | Installed location under `/home/oriol/.local/share/classic-games-android` | Verification |
+| --- | --- | --- |
+| Temurin JDK 17.0.20.1+1 | `jdk-17.0.20.1+1` | Scoped `java -version`: Temurin-17.0.20.1+1, OpenJDK 17.0.20.1; `javac -version`: 17.0.20.1; resolved Java executable is inside that directory |
+| SDK command-line tools 19.0 | `sdk/cmdline-tools/19.0` | `sdk/tools/bin/sdkmanager --version`: 19.0; package inventory: cmdline-tools;19.0, version 19.0.0 |
+| Platform-tools 37.0.1 | `sdk/platform-tools` | `adb version`: 37.0.1-15733141 (ADB 1.0.41); package inventory: 37.0.1; version-only command, no device operations |
+| Build-tools 36.0.0 | `sdk/build-tools/36.0.0` | Package inventory: 36.0.0; `aapt version`: v0.2-13193326; `apksigner version`: 0.9 |
+| Platform android-36 revision 2 | `sdk/platforms/android-36` | `sdkmanager --list_installed`: Android SDK Platform 36, rev 2 |
+| NDK r28c | `android-ndk-r28c` | source.properties: 28.2.13676358 / r28c; bundled Clang --version: 19.0.1 (Android build 13624864) |
+
+Java/tool verification used a process-scoped environment:
+
+```bash
+env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
+    PATH="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1/bin:$PATH" \
+    "$HOME/.local/share/classic-games-android/sdk/tools/bin/sdkmanager" \
+    --sdk_root="$HOME/.local/share/classic-games-android/sdk" --list_installed
+```
+
+Normal `java -version` after these checks still selects OpenJDK **26.0.2.1**. SDK license directory does not exist; license acceptance NOT RUN. No global Java selection was changed.
+
+Initial provision followed checkpoint 1's proposed `sdk/tools` directory symlink. SDK package discovery reported that cmdline-tools;19.0 appeared both there and in its canonical directory. Replaced only this installer-owned symlink with a small executable `sdk/tools/bin/sdkmanager` launcher that executes the canonical binary. Re-ran provisioning and `--list_installed`: PASS with the expected four SDK packages and no duplicate/inconsistent-location warnings. This is a reproducible host-layout correction in the tracked installer; no generated p4a recipe or app cache was patched.
+
+Free disk space after archives and extraction: 20 GiB available, 98% used (previously 24 GiB). Retained archives under the user-local `downloads/` directory for reproducibility. Recheck space before building and before clean-app reproduction; no caches/files were deleted.
+
+Automated checks: full desktop suite **PASS: collected 80, passed 80 (17 unit, 63 GUI), failed 0, skipped 0, xfailed 0 in 28.45s**, report `/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml`. This result supersedes the old Pillow/pycairo baseline for local automated validation. It includes actual runtime ICO/GIF decoding, menu images, purple app bars/chips/About controls, puzzle reference fitting, settings, game behavior and config isolation. The command retains both dev and android groups to avoid uv removing installed host tools. Desktop tests used the available display `DISPLAY=:1`; no missing provider was counted as a passing skip. No redundant repeat after installer/docs-only changes. Final-state remote CI is NOT RUN; the preceding Phase 2 green run applies to its historical dependency state, not these new pins.
+
+Manual checks: **NOT RUN** after the Pillow/pycairo adjustment. User must visually confirm Memory cartoons ICOs, Pong's football skin (GIF ball), 15 puzzle theme/reference images, menu images/font, purple material controls/chips and About/CLOSE. These are the affected checks, not a repeat of all gameplay. Config backup is byte-identical at `/tmp/opencode/mdclassic-phase3-checkpoint2-main.ini.backup`; source and backup SHA-256 `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`. The initial backup missed the source's final blank line; corrected the external backup and verified equality before handoff. Preserve intentional user setting changes and restore only changes caused by this recheck.
+
+Failure / blockers: missing OS `zip`; unaccepted SDK licenses; required affected manual desktop observations not yet supplied. All other audited host executables resolve (gcc/g++/make/git/unzip/patch/autoconf/automake/libtool/pkg-config/cmake/autopoint/gettext/lld, plus project-local Cython/meson/ninja). No application traceback, dependency conflict or Android recipe build failure occurred. No APK build was attempted; the old spec remains gated by checkpoint 3.
+
+Decision: stop checkpoint 2 at the remaining host/manual gate. Project-local Python and user-local JDK/SDK/NDK setup is ready for review, with missing prerequisites explicit. Updated provisional combined-app instructions in `docs/getting-started.md` with reproducible Arch-based prerequisite commands, locked sync/provisioning, scoped Java/license commands and OS reinstall guidance. EndeavourOS remains untested. Do not commit checkpoint 2 or proceed to the spec without its review and remaining checks.
+
+Next exact action:
+
+1. User runs `sudo pacman -S --needed zip`, then reports installation result.
+2. User runs the scoped SDK command above with `--licenses` instead of `--list_installed`, reviews license prompts and reports completion.
+3. From `source/MDclassic_games`, launch `uv run --locked --group android python main.py` and visually recheck the affected images/font/controls listed above, including Memory cartoons and Pong's football skin; report PASS/FAIL and first traceback if any. Config backup path is recorded above.
+4. Verify zip and accepted SDK license state, preserve/restore only test-generated settings changes, append observations and review checkpoint 2. Commit only on explicit request; after that reviewed checkpoint is committed, checkpoint 3 may update the spec/resources.
+
+### Phase 3 checkpoint 2 - Host and visual acceptance follow-up
+
+Phase / task: Phase 3 - Checkpoint 2 user acceptance and remaining prerequisite verification (2026-10-10)
+
+Status: in progress - all required host/desktop checks passed; review/commit pending.
+
+Files changed: acceptance/status entries in this record, Phase 3 tracker, master summary and combined-app setup status in `docs/getting-started.md`. The existing checkpoint 2 metadata, lock and installer changes remain uncommitted. User-modified `main.ini` was inspected and preserved; it must be excluded from the checkpoint commit.
+
+Environment: same project-local Python/Android tool baseline as the preceding record. OS zip is now installed: `pacman -Q zip` reports **3.0-14**, `command -v zip` resolves `/usr/bin/zip`, and `zip -v` reports Info-ZIP **3.0**. SDK license directory now contains eight license files, including `android-sdk-license`.
+
+Command and working directory: repository root for `git status --short`, `git diff -- source/MDclassic_games/main.ini`, `command -v zip`, `zip -v`, `pacman -Q zip`, `uv lock --check`, `uv pip check` and documentation diff checks. Verified SDK acceptance using the selected JDK 17 only for this process:
+
+```bash
+env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
+    PATH="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1/bin:$PATH" \
+    "$HOME/.local/share/classic-games-android/sdk/tools/bin/sdkmanager" \
+    --sdk_root="$HOME/.local/share/classic-games-android/sdk" --licenses < /dev/null
+```
+
+Expected / observed result: command exited successfully and reported **All SDK package licenses accepted**. Standard input was closed so the verification could not accept a pending license automatically. The user performed installation/license acceptance; this check only verified the resulting state. Lock and installed dependency consistency PASS (38 packages compatible).
+
+Manual checks: **PASS**, user reports "Just checked step 3, all everything passes" for the requested focused visual check: Memory cartoons ICOs, Pong football/GIF skin, 15 puzzle tile/reference images, menu images/drawer font, purple material controls/chips and About/CLOSE. This closes the required affected manual checks after the supporting-version adjustment.
+
+Settings: saved changes are Pong skin original -> football, Ahorcado keyboard keyboard6 -> keyboard2, 15 puzzle level 2 -> 1 and theme bike -> carnival. Memory and Snake settings are unchanged. Treat these as the user's current choices and preserve them unless the user explicitly requests restoration; the byte-identical pre-check backup remains at `/tmp/opencode/mdclassic-phase3-checkpoint2-main.ini.backup`. No source/config restoration was performed.
+
+Automated checks: reuse the unchanged adjusted-baseline full-suite result from the preceding entry: **80 passed (17 unit, 63 GUI), failed/skipped/xfailed 0, 28.45s**, report `/tmp/opencode/mdclassic-phase3-checkpoint2-full.xml`. Tests isolate actual config and do not rely on the user's saved settings; runtime code/dependencies/test provider state have not changed. No redundant suite rerun for OS zip, license acceptance, user config choices or evidence-only updates. New-baseline remote CI remains NOT RUN; APK builds remain NOT RUN.
+
+Failure: prior zip/license/manual blockers are resolved; no new application or host failure observed.
+
+Decision: checkpoint 2 technical and manual gates pass. Keep its tracker In progress until changes are reviewed and committed. Preserve user settings outside the commit.
+
+Next exact action: review checkpoint 2's project metadata/lock, user-local provisioning script, setup instructions and validation notes. Commit only when explicitly requested, excluding `source/MDclassic_games/main.ini`. Once that reviewed checkpoint is committed, execute checkpoint 3 only: update the Android spec and packaging/resource regressions, then stop for review.
+
+### Phase 3 checkpoint 2 - Approval and requested commit
+
+Phase / task: Phase 3 - Checkpoint 2 completion and commit handoff (2026-10-10)
+
+Status: passed - user explicitly validated checkpoint 2 and requested its plan update and commit.
+
+Files changed: reviewed checkpoint 2 `pyproject.toml`, generated `uv.lock`, `docs/assistant/mdclassic_games_install_android_tools.py`, `docs/getting-started.md`, Phase 3/master trackers and validation record. User's `source/MDclassic_games/main.ini` settings are preserved and excluded from staging.
+
+Environment: unchanged adjusted baseline and verified host tools from the preceding entries: host Python 3.11.14, uv 0.12.10, Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4; project-local Android Python group; user-local Temurin JDK 17.0.20.1+1 and pinned SDK/NDK. System Java remains 26.
+
+Command and working directory: repository root for status, complete tracked diff and new-script review, `git log --oneline -10`, `git diff --check`, explicit staging of the seven checkpoint files and the requested commit. Commit identity is available from Git history; this entry is included in that checkpoint commit.
+
+Manual checks: PASS - retained user-confirmed affected images/fonts/material widgets and About/CLOSE checks. Host zip and accepted SDK licenses were verified in the preceding follow-up.
+
+Automated checks: reuse the unchanged 80-test pass (17 unit, 63 GUI; failed/skipped/xfailed 0; 28.45s), lock/dependency checks and installer/tool verification recorded above. Only completion/handoff documentation changed after acceptance. No redundant pytest rerun for the requested commit. Remote CI for the adjusted pins and APK build/device checks remain NOT RUN.
+
+Decision: close checkpoint 2 with the approved deliverables and set checkpoint 3 as next. Phase 3 remains in progress; host setup does not establish an APK build or Android runtime support.
+
+Next exact action: execute Phase 3 checkpoint 3 only: update `source/MDclassic_games/buildozer.spec` using the reviewed toolchain and runtime matrix, add scoped output ignores and meaningful packaging/resource regressions, run the required unit checks, update evidence and stop for review.
+
+### Phase 3 checkpoint 3 - Spec and resource/packaging regressions
+
+Phase / task: Phase 3 - Checkpoint 3: update the Android spec and packaging/resource regressions (2026-10-10)
+
+Status: in progress - all checkpoint 3 checks PASS; review/commit pending. Checkpoint 2 is committed as `c29c7b0` (`Complete reproducible Android host setup`), and checkpoints 1-2 are complete.
+
+Files changed: `source/MDclassic_games/buildozer.spec`, `.gitignore`, `tests/mdclassic_games/unit/test_resources.py`, this record and the Phase 3/master trackers. Uncommitted awaiting review. No application `.py`/`.kv`, asset, `resources/`, `requirements.txt`, iOS, release-signing or `releases/` changes. User-edited `source/MDclassic_games/main.ini` is untouched and excluded from staging.
+
+Environment: unchanged checkpoint 2 baseline: Manjaro Linux x86_64; host CPython 3.11.14; uv 0.12.10; pytest 9.1.1; Kivy 2.3.1; KivyMD 2.0.0; Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4; project-local android dependency group and user-local JDK/SDK/NDK. No APK has been built.
+
+Command and working directory: repository root for the required checkpoint commands, and the Android dependency group for the staging audit:
+
+```bash
+uv run --locked --group dev pytest tests/mdclassic_games/unit --junitxml=/tmp/opencode/mdclassic-phase3-checkpoint3-unit.xml
+git diff --check
+git status --short --untracked-files=all
+uv run --locked --group android python /tmp/opencode/mdclassic-phase3-checkpoint3-staging-audit.py
+```
+
+The staging audit invokes only Buildozer 1.6.0's own `_copy_application_sources` with the real `SpecParser`, so it exercises Buildozer's actual source-filter semantics without initializing or building anything. Its stdout/stderr log is `/tmp/opencode/mdclassic-phase3-checkpoint3-staging.log`, and its inventory/result JSON and staged copies are under `/tmp/opencode/mdclassic-phase3-checkpoint3-staging/`. The script is an external evidence aid; the durable record is below. The static assertion helper also parses the spec with `ConfigParser(interpolation=None)` so `%(source.dir)s` is not expanded.
+
+Expected / observed result: the spec now matches the reviewed checkpoint 1 matrix.
+
+#### Applied spec changes
+
+| Setting | Before -> after |
+| --- | --- |
+| `source.include_exts` | `...,gif` -> `...,gif,ico` (adds ICO; keeps recursive image paths) |
+| `source.exclude_dirs` | `tests, bin, resources` -> `tests, bin, build, resources, .buildozer, .venv` |
+| `requirements` | floating master KivyMD ZIP + `kivy==2.0.0` + `sdl2_ttf==2.0.15` + unpinned `pillow,requests,urllib3,chardet,idna` -> exact reviewed pins `python3==3.11.14, hostpython3==3.11.14, kivy==2.3.1, kivymd==2.0.0, pillow==11.3.0, pycairo==1.28.0, materialyoucolor==3.0.4`, explicit pure-Python transitives (`asynckivy==0.6.4, asyncgui==0.6.3, materialshapes==0.3, kivy-garden==0.1.5, docutils==0.23, pygments==2.21.0, filetype==1.2.0, requests==2.34.2, urllib3==2.7.0, idna==3.19, certifi==2026.7.22, charset-normalizer==3.5.1, chardet==5.2.0, six==1.17.0, setuptools==79.0.1`) and explicit `harfbuzz`; the master ZIP and `sdl2_ttf==2.0.15` are removed |
+| `android.api` / `android.minapi` | unset -> `36` / `24` |
+| `android.ndk` / `android.ndk_api` | unset -> `28c` / `24` |
+| `android.ndk_path` / `android.sdk_path` | unset -> `~/.local/share/classic-games-android/android-ndk-r28c` / `.../sdk` |
+| `android.skip_update` | commented -> `True` |
+| `android.arch` -> `android.archs` | `armeabi-v7a` -> plural `arm64-v8a` |
+| p4a | unset -> `p4a.url = https://github.com/kivy/python-for-android.git`, `p4a.branch = v2026.05.09`, `p4a.commit = 58d21141f17c889bf8585f5665921d72028f8831`, `p4a.bootstrap = sdl2` |
+
+Preserved unchanged: `package.name = clasicgames`, `package.domain = org.games`, `title = Classic games`, regex-based version from `main.py` (`1.2`), icon/splash, `orientation = all`, `fullscreen = 0`, `source.dir = .`, and the commented-out `android.permissions` (INTERNET is not enabled). Verified in the installed Buildozer 1.6.0 source that `p4a.url`, `p4a.branch`, `p4a.commit` (clone branch/tag then `git reset --hard <commit>`), `p4a.bootstrap`, `android.archs`, `android.sdk_path`, `android.ndk_path` and `android.skip_update` are the supported option names.
+
+`.gitignore` adds root-anchored generated-output ignores `/source/MDclassic_games/.buildozer/` and `/source/MDclassic_games/bin/`. The file uses mixed historical CRLF line endings; the added lines are LF, so `git diff --check` passes without unrelated churn.
+
+#### Regression coverage added to `tests/mdclassic_games/unit/test_resources.py`
+
+The shared `assert_packaged_resource` helper now rejects any runtime resource whose extension is not in `source.include_exts`, that falls under a `source.exclude_dirs` root prefix, or that lives under a hidden path; this mirrors Buildozer's extension filter, source-relative directory-prefix exclusions, and hidden-skip behavior rather than assuming basename matching. New/expanded display-independent checks cover: the required extensions (`py, png, jpg, kv, ogg, json, ttf, txt, gif, ico`) and excluded directories (`tests, bin, build, resources, .buildozer, .venv`); all five settings JSONs; Ahorcado word data; the seven menu images derived from `menu.kv`; icon/splash; drawer font; all 15 OGGs (plus every `app.play('...')` literal resolves to an OGG); every game image/font recursively for all seven games; all six Memory themes including the five `cartoons` ICOs (>=20 cards each); every 3x3/4x4/5x5 tile and the reference JPGs for all 14 puzzle themes; package identity/version/appearance; plural `arm64-v8a` with no singular `android.arch`; immutable p4a pins and `sdl2` bootstrap; and requirements that keep the shared runtime pins equal to the real `uv.lock`, omit host tools (`pytest, buildozer, cython, pip, meson, ninja, build, wheel`), and contain no `sdl2_ttf`/URL/master entries.
+
+Manual checks: NOT RUN - checkpoint 3 is display-independent and changes no runtime behavior; Phase 2 desktop acceptance and checkpoint 2 affected visual checks remain the applicable manual evidence. APK contents/decoding remain unvalidated until checkpoints 4-5 and Phase 4.
+
+Automated checks: `uv run --locked --group dev pytest tests/mdclassic_games/unit` PASS: collected **40**, passed **40**, failed 0, skipped 0, xfailed 0 in 0.08s; report `/tmp/opencode/mdclassic-phase3-checkpoint3-unit.xml` (was 10 tests at the Phase 2 baseline). `git diff --check` PASS. `git status --short --untracked-files=all` lists only the three intended files.
+
+Staging audit PASS (`/tmp/opencode/mdclassic-phase3-checkpoint3-staging.log`): using real `SpecParser` + Buildozer `_copy_application_sources`, the app staged **1190 files**; extensions `.gif` 10, `.ico` 5, `.jpg` 744, `.json` 5, `.kv` 2, `.ogg` 15, `.png` 368, `.py` 37, `.ttf` 3, `.txt` 1; **1160 required runtime paths** were present with SHA-256 equal to source; `main.ini` was **not** staged; and no `resources/, tests/, bin/, build/` path was staged. A synthetic sentinel tree confirmed `main.ini, buildozer.spec, tests/, bin/, build/, resources/, .venv/, .buildozer/, .hidden*` and `__pycache__` are excluded while nested `memory/images/themes/cartoons/image001.ico`, `game_15puzzle/images/themes/bike/5/25.jpg` and `audio/start.ogg` are included. Root `.venv/pytest.py`, root `tests/test_resources.py` and sibling `source/pong/main.py` were confirmed outside the staged scope. `source/MDclassic_games/main.ini` SHA-256 remained `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` before and after.
+
+Failure: no checkpoint 3 failure. First implementation issue was documentation/whitespace only: adding CRLF lines to the CRLF `.gitignore` made `git diff --check` flag trailing whitespace; switching the added lines to LF resolved it without reformatting the file.
+
+Decision: apply exactly the checkpoint 1 matrix to the spec, add `ico`, keep `resources` excluded and `main.ini` unpackaged, and pin the runtime/pure-Python dependency set while retaining recipe-managed native transitives through the immutable p4a revision. Add a display-independent regression helper plus per-theme asset coverage instead of duplicating the whole spec as a fixture. Treat these source assertions as spec/staging checks, not APK inspection.
+
+Next exact action: review the three-file diff, the new unit tests and this evidence, and commit checkpoint 3 only on explicit request. After that reviewed checkpoint is committed, execute Phase 3 checkpoint 4 only: build the first debug APK from `source/MDclassic_games` with the pinned toolchain, capturing the complete log, the p4a checkout revision, actual recipe/host versions and the exact artifact path/hash. Do not build before checkpoint 3 is committed.
+
+---
+
+Phase / task: Phase 3 - Checkpoint 4: Build the first debug APK (2026-10-10)
+
+Status: build gate complete - `buildozer -v android debug` exited 0 in the non-synced local worktree; checkpoint-4 checks pass (build success, actual recipe/host versions match the matrix, exact artifact path/hash recorded), and the checkpoint-4 changes await review/commit.
+
+User decision: approved removing `harfbuzz` from `source/MDclassic_games/buildozer.spec` `requirements` after harfbuzz 2.6.4 failed to build under NDK r28c of Clang 19 (chose "Remove harfbuzz" over a custom local recipe with `-Wno-error` and over stopping without change). This is the documented plan decision required by the runbook's unsupported-native-combination rule.
+
+Files changed: this record, the Phase 3 tracker, the master summary, plus the checkpoint-4 diff under review: `source/MDclassic_games/buildozer.spec` (removed `harfbuzz` requirement and updated the explanation comment), `tests/mdclassic_games/unit/test_resources.py` (dropped the `harfbuzz` pin assertion and bare-token allowance), `docs/assistant/mdclassic_games_install_android_tools.py` (now also creates the `sdk/tools/bin/avdmanager` launcher mirroring `sdkmanager`, fixing p4a's SDK target check), and `docs/getting-started.md` (launcher wording). The build logs, script and evidence live outside the repository at `/home/oriol/android-build/`.
+
+Environment: non-synced local worktree `/home/oriol/android-build/mdclassic_games` (app commit `e247e97`, detached, outside Nextcloud sync); uv 0.12.10; Buildozer 1.6.0; Temurin JDK 17.0.20.1+1 at `~/.local/share/classic-games-android/jdk-17.0.20.1+1`; SDK with cmdline-tools 19.0 / platform android-36 / build-tools 36.0.0 / platform-tools 37.0.1 plus the `tools/bin/avdmanager` launcher; NDK r28c; API 36, minapi/ndk_api 24, `arm64-v8a`; Gradle 8.14.3; disk ~15-18 GiB free (99% used) during the successful build.
+
+Command and working directory (worktree `source/MDclassic_games`):
+
+```bash
+uv run --locked --group android buildozer -v android debug
+```
+
+launched via `/home/oriol/android-build/run-checkpoint4-build.sh checkpoint4-build-retry2` with `JAVA_HOME` and `PATH` prepended; full stdout/stderr to `/home/oriol/android-build/evidence/checkpoint4-build-retry2.log` with exit file `checkpoint4-build-retry2.exit` = 0. Two earlier attempts are preserved with their logs and exit files (`checkpoint4-build` = missing `avdmanager`; `checkpoint4-build-retry1` = harfbuzz failure; both exit 1).
+
+Expected / observed result: build succeeded end-to-end (log timestamps 2026-10-10, final `build exit 0 2026-10-10T16:40:03+02:00`, "Android packaging done!"). Artifact: `bin/clasicgames-1.2-arm64-v8a-debug.apk` under the worktree, 53,219,941 bytes, SHA-256 `db19bc9e82116333ba224415364f1a4ae3e1a0075250fc3bdc2b46e7f5419148`. Input revision/state: worktree app commit `e247e97` plus the uncommitted spec requirement change; p4a checkout `git rev-parse HEAD` = `58d21141f17c889bf8585f5665921d72028f8831` (matches `p4a.commit`). Actual recipe/host versions from the log match the matrix: python3/hostpython3 3.11.14 (recipe "requested" lines), Kivy 2.3.1 (Cython 3.0.11), Pillow 11.3.0, KivyMD 2.0.0, materialyoucolor 3.0.4, pycairo 1.28.0, cairo 1.18.4 + pixman 0.43.4, freetype 2.14.1, SDL2 2.30.11 / SDL2_image 2.8.2 / SDL2_mixer 2.6.3 / SDL2_ttf 2.22.0, openssl 3.3.1, libffi 3.4.2, libjpeg-turbo 2.0.1, libpng 1.6.37, sqlite3 3.50.4; pip `Collecting` lines confirm every pure-Python pin (asynckivy 0.6.4, asyncgui 0.6.3, certifi 2026.7.22, chardet 5.2.0, charset-normalizer 3.5.1, docutils 0.23, filetype 1.2.0, idna 3.19, kivy-garden 0.1.5, materialshapes 0.3, pygments 2.21.0, requests 2.34.2, setuptools 79.0.1, six 1.17.0, urllib3 2.7.0). No harfbuzz build step ran.
+
+Automated checks: `uv run --locked --group dev pytest tests` (repository root) PASS: 103 collected/passed, 0 failed in ~27s; `git diff --check` PASS; build success verified from the recorded exit file and `ps` process table (the initial `pgrep -f` self-match gotcha avoided).
+
+Reference data: full build log `/home/oriol/android-build/evidence/checkpoint4-build-retry2.log` (50,271 lines); APK left in the worktree `bin/` with its input state preserved for checkpoint 6 clean-build reproduction; complete logs retained through checkpoint 6.
+
+Failure: two checkpoint-4 attempt failures, each repaired with one bounded change before success. (1) p4a `create` abort: "Could not find `android` or `sdkmanager` binaries in Android SDK" because p4a's `get_targets` looks for `tools/bin/avdmanager` (or cmdline-tools/latest) and the isolated SDK only had `tools/bin/sdkmanager`; fixed by adding an `avdmanager` launcher (provisioning script rerun idempotent). (2) harfbuzz 2.6.4 native compilation: Clang 19 (NDK r28c) under harfbuzz's internal `-Werror` - `hb-ft.cc:665/671/877` errors `-Wcast-function-type-strict` and `hb-subset-cff1.cc:472` `-Wunused-but-set-variable`, first failure in `build/other_builds/harfbuzz-freetype/arm64-v8a__ndk_target_24/harfbuzz`. Evidence: no `--enable-werror` configure option exists, p4a sets no global `-Werror`, and harfbuzz 2.7+ dropped autotools, so no supported recipe-version route existed.
+
+Decision: apply the documented plan decision to remove `harfbuzz` from Android `requirements` (user-approved; freetype builds with `--with-harfbuzz=no` and Pillow degrades gracefully; the app and tests use no complex text shaping / no ImageFont-raqm path). Changed spec and tests rerun the full desktop regression suite. The `avdmanager` launcher is a reproducible host-prerequisite fix recorded in the provisioning instructions. No custom p4a recipes and no `.buildozer` manual patches were used.
+
+Next exact action: review the checkpoint-4 diff (spec `harfbuzz` removal + comment, unit test assertion update, `avdmanager` launcher in `mdclassic_games_install_android_tools.py`, getting-started wording) and commit only on explicit request. After the reviewed checkpoint is committed, execute Phase 3 checkpoint 5 on the recorded artifact `bin/clasicgames-1.2-arm64-v8a-debug.apk` (SHA-256 `db19bc9e82116333ba224415364f1a4ae3e1a0075250fc3bdc2b46e7f5419148`) using the SDK's `aapt`, `apksigner`, and a ZIP/nested-bundle reader.
+
+---
+
+Phase / task: Phase 4 - Android device validation: audio guard and edge-to-edge system bars (2026-10-10)
+
+Status: two runtime defects found on the first interactive pass, fixed, rebuilt and interactively confirmed on two devices; the remaining manual checkpoint matrix (startup defaults, per-game touch acceptance, lifecycle) is still pending.
+
+Devices (both Android 16 / API 36 / arm64-v8a): Google Pixel 10 (1080x2424, density 460, centred punch-hole cutout 173 px, 3-button navigation) and Samsung Galaxy S24 `SM-S921B`, serial `RFCWC0ZFEFD` (1080x2340, density 480, cutout 103 px, gesture navigation). Device/ABI/API gate passes for both.
+
+Files changed: `source/MDclassic_games/main.py`, new `source/MDclassic_games/audio_env.py`, new `source/MDclassic_games/android_insets.py`, new `tests/mdclassic_games/unit/test_audio_env.py`, new `tests/mdclassic_games/unit/test_android_insets.py`, `docs/assistant/mdclassic_games_phase4_device_plan.md`, `docs/assistant/mdclassic_games_upgrade_plan.md`, this record.
+
+Environment: worktree `/home/oriol/android-build/mdclassic_games` (app commit `e247e97` plus the uncommitted Phase 3 checkpoint-4 spec change and these Phase 4 source changes, outside Nextcloud sync); Buildozer 1.6.0; Temurin JDK 17.0.20.1+1; SDK platform android-36 / build-tools 36.0.0; NDK r28c; Kivy 2.3.1 / KivyMD 2.0.0.
+
+Command and working directory (worktree `source/MDclassic_games`): `env JAVA_HOME=~/.local/share/classic-games-android/jdk-17.0.20.1+1 PATH=...:$JAVA_HOME/bin uv run --locked --group android buildozer -v android debug`, exit 0 for both rebuilds; logs `/home/oriol/android-build/evidence/build-phase4-fix.log` and `build-phase4-immersive.log`. Installed the same-signature update with `adb -s <serial> install -r` (Success) on both devices; launched with `am start -n org.games.clasicgames/org.kivy.android.PythonActivity`.
+
+Expected / observed result: after the fixes, tapping Play plays sound without crashing and the immersive layout hides both Android system bars. On both devices `dumpsys window displays` reports `type=statusBars ... visible=false` and `type=navigationBars ... visible=false` while the app is foreground; the menu top bar sits at the screen top with no clock overlap and its hamburger/actions respond; the user confirmed menu, drawer, settings/help, game entry and audio all work. `displayCutout` remains `visible=true` (punch-hole) and does not collide with the left-aligned top bar. Screenshots: `/home/oriol/android-build/evidence/pixel10-after-insets.png`, `s24-menu-immersive.png`.
+
+Failure (defect 1): every `SoundLoader.load()` returned `None` and `MainApp.play()` crashed with `AttributeError: 'NoneType' object has no attribute 'play'`. Root cause: `main.py` selected `SDL_AUDIODRIVER=alsa` behind `sys.platform.startswith('linux')`, which is true on Android, so `AudioSDL2` could not initialise. Classification: application compatibility (desktop guard leaking into Android).
+
+Failure (defect 2): the system status bar clock overlapped the app's `MDTopAppBar` and its buttons received no touches, and the navigation bar overlapped the bottom of a game board. Root cause: the app targets API 36, so Android 15+ forces edge-to-edge drawing while neither Kivy 2.3.1 nor the pinned p4a bootstrap pads for system bars. Classification: application compatibility.
+
+Decision: repair both minimally in `source/MDclassic_games`. (1) Extract the driver choice into `audio_env.configure_audio_environment(platform_name, environ)`, which sets `SDL_AUDIODRIVER=alsa` only when `sys.platform` is linux and `kivy.utils.platform != 'android'`, using `setdefault` so a user's explicit driver wins. (2) Add `android_insets.hide_system_bars` (immersive mode via `WindowInsetsController` on API 30+, `setSystemUiVisibility` fallback below) plus `system_bar_insets` (systemBars insets as a padding fallback) and wrap the root KV in a `BoxLayout id="content"` whose padding is set from the insets after hiding. Both are display-independent no-ops off Android. Known limit: the display-cutout safe inset is not padded, so a wide-notch device could place the top bar near the cutout; not exercised by the two punch-hole test devices.
+
+Automated checks: `uv run --locked --group dev pytest` (repository root) PASS: 110 collected/passed, 0 failed, 0 skipped in ~27s; targeted `tests/mdclassic_games/unit` PASS: 47 passed; GUI `test_shell_startup_preloads_audio` PASS on desktop (still loads 15 sounds). `git diff --check` PASS.
+
+Artifact: rebuilt debug APK `source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `4c45da83721aaf2f0bd6f8e7319ea99e7371534a23714ab650e2c5ce2102bf44`, 53,223,137 bytes. Interim rebuilt hash after defect 1: `c47a457d3bfa208ba16c6824a9740d8a2af86a2c8ccef5133406a56d7f3dd07c`; pre-fix Phase 3 artifact: `db19bc9e…f5419148`. This runtime change invalidates the Phase 3 checkpoint-5/6 inspection of the pre-fix artifact; the final artifact still needs its own inspection and a clean-build reproduction.
+
+Next exact action: review and commit the Phase 4 fixes and these records (and, if approved, the pending Phase 3 checkpoint-4 spec/launcher changes needed to reproduce the artifact). Then resume the Phase 4 checkpoint matrix from checkpoint 2/3 against SHA-256 `4c45da83…2102bf44`, capturing a full logcat and per-game evidence before checkpoint 12.
+
+---
+
+Phase / task: Phase 3 - Checkpoint 5: inspect the built APK (2026-10-10)
+
+Status: complete - inspection PASS on the current final artifact; recorded and committed. The checkpoint-4 artifact (`db19bc9e…f5419148`) was superseded by the Phase 4 audio/inset repair, so, as directed by the Phase 4 entry above, this inspection targets the final rebuilt artifact SHA-256 `4c45da83721aaf2f0bd6f8e7319ea99e7371534a23714ab650e2c5ce2102bf44`. Checkpoint 4 is committed as `4188800` (spec `harfbuzz` removal, `avdmanager` launcher, getting-started wording) and the Phase 4 fixes as `7227e15`.
+
+Files changed: this record and the Phase 3/master trackers only. No application, spec, test or asset change; no rebuild.
+
+Environment: artifact built in the non-synced worktree `/home/oriol/android-build/mdclassic_games` (source-equivalent to commit `7227e15`; the divergent source-only commit `b575500` has an identical tree for `main.py`, `audio_env.py`, `android_insets.py` and `buildozer.spec`). Inspection host: Manjaro Linux x86_64; Android SDK build-tools `36.0.0` (`aapt` v0.2-13193326, `apksigner` 0.9) at `~/.local/share/classic-games-android/sdk/build-tools/36.0.0/`; `unzip` and Python 3 zip/tar readers. Evidence directory `/home/oriol/android-build/evidence/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+"$SDK/build-tools/36.0.0/aapt" dump badging     "$APK"
+"$SDK/build-tools/36.0.0/aapt" dump permissions "$APK"
+"$SDK/build-tools/36.0.0/apksigner" verify --verbose "$APK"
+unzip -l "$APK"                                  # outer ZIP inventory
+unzip -o "$APK" assets/private.tar               # app bundle
+tar tzf private.tar                              # 1194 files
+unzip -o "$APK" lib/arm64-v8a/libpybundle.so      # framework bundle
+tar tzf libpybundle.so                           # 2418 entries
+```
+
+Expected / observed result: PASS for every checkpoint-5 category.
+
+1. Manifest (`checkpoint5-aapt-badging.txt`): package `org.games.clasicgames`; `versionName='1.2'`, `versionCode='1024102'`; `compileSdkVersion='36'`, `targetSdkVersion='36'`, `sdkVersion:'24'`; `application-debuggable`; label `Classic games`; launchable activity `org.kivy.android.PythonActivity`; `native-code: 'arm64-v8a'`; densities 160/240/320/480; icon `res/mipmap/icon.png`, presplash `res/drawable/presplash.jpg`. `aapt dump permissions` returns the package line only - no INTERNET/storage permission requested (`android.permissions` stays disabled).
+2. Signing (`checkpoint5-apksigner-verify.txt`): `Verifies`; APK Signature Scheme v2 `true`; 1 signer; v1/v3/v4 false, which is expected for a debug build and is sufficient for installability (no release-signing work).
+3. ABI / native libraries: the outer ZIP has only `lib/arm64-v8a/` (no other ABI directory). All 16 real `.so` files report `ARM aarch64` (`libcairo`, `libcairo-script-interpreter`, `libcrypto`, `libffi`, `libfreetype`, `libmain`, `libpixman-1`, `libpng16`, `libpython3.11`, `libpythonbin`, `libSDL2`, `libSDL2_image`, `libSDL2_mixer`, `libSDL2_ttf`, `libsqlite3`, `libssl`); `libpybundle.so` is the gzip Python bundle, not an ELF. Embedded CPython patch is `3.11.14` (string in `libpython3.11.so` and recipe "requested" lines in the build log). Every native extension inside both bundles is `aarch64` (module `.so` files are `cpython-311`): `kivy/core/audio/audio_sdl2.so`, `kivy/_event.so`, `cairo/_cairo.so`, `materialyoucolor/quantize/celebi.so`, `PIL/_imaging*.so`, `jnius.so`, `android/_android*.so`. Pillow's `_imaging.so` was compiled with `-DHAVE_LIBJPEG -DHAVE_LIBZ`; its `NEEDED` list has no `libjpeg`, so libjpeg-turbo 2.0.1 is linked statically (JPEG decode support present, OGG/GIF/ICO assets unaffected).
+4./5. Nested bundles. The app/private bundle is `assets/private.tar` (gzip tar) holding the app runtime rooted at `source.dir = .`; the framework and site-packages are in `lib/arm64-v8a/libpybundle.so` (gzip tar) under `_python_bundle/site-packages`. Both listing inventories are recorded. The private bundle has **1194 non-directory files, 0 empty**; extensions `.jpg` 744, `.png` 368, `.pyc` 40, `.ogg` 15, `.gif` 10, `.json` 5, `.ico` 5, `.ttf` 3, `.txt` 2, `.kv` 2. This matches checkpoint 3's staging audit (`.jpg` 744, `.png` 368, `.ogg` 15, `.gif` 10, `.ico` 5, `.json` 5, `.ttf` 3) with `.py` 37 compiled to `.pyc` and `p4a_env_vars.txt` added. Present: `main.pyc`, `menu.kv`, `menu.pyc`, `drawer.kv`, `drawer.pyc`, `popup.pyc`, `android_insets.pyc`, `audio_env.pyc`, `sitecustomize.pyc`; all seven game packages (`pong`, `ahorcado`, `memory`, `game_15puzzle`, `game_2048`, `buscaminas`, `snake`); the five settings JSONs (`ahorcado`, `game_15puzzle`, `memory`, `pong`, `snake`); Ahorcado `lista_palabras.txt`; the three app fonts (`ahorcado/fonts/lt-robotomono-bold.ttf`, `buscaminas/fonts/digital-7 (mono).ttf`, `fonts/magnetob.ttf`); Pong's 10 GIFs (5 themes x ball/paddle); all 15 OGGs; the five Memory `cartoons` ICOs (`image001..005.ico`); all six Memory themes (animals, cartoons, food, misc, starwars, technology); and all 14 15-puzzle themes (bike, blonde, breakfast, bulb, carnival, eve, landscape, milky_way, money, numbers, ship, shore, squirrel, tree). The framework bundle carries Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4, materialshapes 0.3, asynckivy 0.6.4, asyncgui 0.6.3 and the pinned pure-Python transitives, each with a matching `.dist-info`; Kivy's `data/fonts/*.ttf` and `data/images/*` are present, and the historically defective KivyMD `kivymd/uix/label/label.kv` is present and nonempty (1885 bytes; 36 KivyMD `.kv` files overall).
+6. Hash comparison of ten representative unchanged app assets between source and the packaged private bundle matched exactly (`ahorcado/lista_palabras.txt`, `ahorcado/settings.json`, `memory/settings.json`, `memory/images/themes/cartoons/image001.ico`, `fonts/magnetob.ttf`, `images/icon.png`, `audio/start.ogg`, `pong/settings.json`, `snake/settings.json`, `game_15puzzle/settings.json`); `.py` files are compiled so file-hash equality is not expected for them.
+7. Exclusions: the private bundle contains no `main.ini`, and no `tests/`, `resources/`, `.venv/`, `.buildozer/`, `bin/` or `build/` path; the framework bundle's `site-packages` contains no app `tests/` or app `resources/`, and there is no `resources/` directory anywhere in either bundle. `main.ini`, pytest, the `.venv`, host build tools and standalone examples are absent, as intended.
+
+Automated checks: not applicable to a static artifact inspection. `git diff --check` and `git status --short --untracked-files=all` were run on the (documentation-only) changes before stopping for review.
+
+Failure: none. The one scope note is that the checkpoint-4 artifact was overwritten by the Phase 4 rebuild; inspection was therefore performed on the recorded final artifact, per the Phase 4 entry's directive. `libjpeg` has no runtime `NEEDED` entry yet `_imaging.so` compiled with `-DHAVE_LIBJPEG`, which is a static link, not a missing dependency.
+
+Decision: accept the final rebuilt APK `4c45da83…2102bf44` (53,223,137 bytes) as manifest-, signing-, ABI- and bundle-correct. An asset present in the bundle is not proof it decodes on Android; ICO/GIF decoding, native imports, audible OGG playback and real startup remain Phase 4 device checks (some already interactively confirmed).
+
+Next exact action: checkpoint 5 is complete and committed. Execute Phase 3 checkpoint 6 (clean-app-build reproduction and full desktop regression gate) only: freeze the reviewed inputs, preserve the final artifact `4c45da83…2102bf44` outside the app build directory, move `source/MDclassic_games/.buildozer` to a recorded external backup, rebuild from clean app-generated state with the same pins, repeat this inspection on the second APK with its own SHA-256/log, and run the full desktop suite.
+
+Phase / task: Phase 3 - Checkpoint 6: clean-app-build reproduction and desktop gate (2026-10-10)
+
+Status: complete - all checkpoint 6 checks PASS; reviewed and committed. A second debug APK built from clean app-generated state with the same pins, its manifest/signing/ABI/bundles match checkpoint 5, and the full desktop suite passes (110/110). No source, spec, dependency, test or asset change: the rebuild reused the reviewed inputs unchanged.
+
+Files changed: this record and the Phase 3/master trackers only. A source quirk was found while inspecting the nested bundles but required no code change.
+
+Environment: build host Manjaro Linux x86_64 (20 cores). Build worktree `/home/oriol/android-build/mdclassic_games` at detached `b575500`; its `source/MDclassic_games` subtree hash is `f147603c50803e1398eb90957abd273b86c0aa37`, identical across `7227e15`, `b575500` and repository HEAD `84f0254`, and the `buildozer.spec` blob `9fd34f57ef7425dded8e2cda62722bb0d30f16bc` is identical too, so the rebuild source is exactly the reviewed source. `JAVA_HOME=~/.local/share/classic-games-android/jdk-17.0.20.1+1`, SDK/NDK under `~/.local/share/classic-games-android/` (build-tools `36.0.0`). Shared caches left in place: `~/.buildozer` 45M, `~/.gradle` 1.1G, `~/.local/share/classic-games-android` 4.1G. Evidence directory `/home/oriol/android-build/evidence/` (all `checkpoint6-*`).
+
+Command and working directory (build worktree `source/MDclassic_games` unless noted):
+
+```bash
+# freeze and preserve the first artifact
+cp -p bin/clasicgames-1.2-arm64-v8a-debug.apk /home/oriol/android-build/evidence/checkpoint6-first-artifact/
+# confirm the app build dir is generated state only, then stop the idle Gradle daemon
+.buildozer/.../gradlew --stop
+mv .buildozer /home/oriol/android-build/checkpoint6-buildozer-backup     # 4.4G
+# clean rebuild (same pins), recording full log and exit
+/home/oriol/android-build/run-checkpoint4-build.sh checkpoint6-clean-build
+# repeat checkpoint-5 inspection on the new APK, and desktop gate at repo root
+/home/oriol/android-build/mdclassic_games/source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk
+uv sync --locked --group dev && uv pip check && uv run --locked --group dev pytest
+```
+
+Expected / observed result: PASS for every checkpoint 6 category.
+
+1. Frozen inputs (`checkpoint6-freeze.txt`): revisions and pending diff recorded; `source/MDclassic_games` subtree hash and spec blob identical across the reviewed commits (above). The first artifact was preserved outside the build directory to `checkpoint6-first-artifact/` with SHA-256 `4c45da83721aaf2f0bd6f8e7319ea99e7371534a23714ab650e2c5ce2102bf44` (53,223,137 bytes, mtime 2026-10-10 17:42:30), the previously device-confirmed APK.
+2. App build directory: `.buildozer` under `source/MDclassic_games` contains only generated app build state (no shared-SDK or other-project path). The idle Gradle daemon (PID 130147) was stopped, `.buildozer` (4.4G) was moved to the recorded external backup `/home/oriol/android-build/checkpoint6-buildozer-backup`, and the in-tree `bin/clasicgames-1.2-arm64-v8a-debug.apk` was removed so the new attempt cannot be mistaken for the old output.
+3. Clean rebuild (`checkpoint6-clean-build.log`, 17 MB, exit 0): label `checkpoint6-clean-build`, started 18:45:45, finished 18:54:07 (~8m22s). The log shows `git clone -b v2026.05.09 … python-for-android` followed by `git reset --hard 58d21141f17c889bf8585f5665921d72028f8831`, so p4a was re-cloned rather than reused; the fresh p4a HEAD is `58d21141…` and `packages/`/`dist` were rebuilt within 18:46-18:54. Embedded versions again present: CPython 3.11.14 (host 3.11.14), Kivy 2.3.1, and all SDL2/Pillow/pycairo/materialyoucolor recipes.
+4. Second artifact: `bin/clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, 53,223,301 bytes, mtime 18:54:07 (`checkpoint6-clean-build-apk.sha256`); preserved to `checkpoint6-clean-build-artifact/` with `apk.sha256`. It is not byte-identical to the first APK (signing/build timestamps), as the runbook allows.
+5. Repeat inspection on the second artifact (`checkpoint6-aapt-*`, `-apksigner-verify`, `-apk-zip-listing`, `-native-libs`, `-private-bundle-listing`, `-pybundle-listing`, `-private-summary`, `-pybundle-summary`): manifest is identical (package `org.games.clasicgames`; `versionName='1.2'`, `versionCode='1024102'`; `compileSdkVersion`/`targetSdkVersion` 36; `sdkVersion:'24'`; `application-debuggable`; label `Classic games`; launchable `org.kivy.android.PythonActivity`; `native-code: 'arm64-v8a'`). `aapt dump permissions` returns only the package line. `apksigner verify --verbose` reports `Verifies`, APK Signature Scheme v2 `true`, 1 signer (v1/v3/v4 false, expected debug). The outer ZIP contains only `lib/arm64-v8a/`; all 17 `.so` files report `ARM aarch64` (same list as checkpoint 5; `libpybundle.so` is the gzip bundle, not ELF). The private bundle (`assets/private.tar`) has 1194 non-directory files with the same extension histogram as checkpoint 5 and no empty files; the framework bundle (`lib/arm64-v8a/libpybundle.so`) carries the same `.dist-info` set (Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4, materialshapes 0.3, asynckivy 0.6.4, asyncgui 0.6.3 and the pinned pure-Python transitives), the historically defective KivyMD `kivymd/uix/label/label.kv` present and nonempty (1885 bytes; 36 KivyMD `.kv` files), and 115 native extensions all `aarch64`. All required app paths are present and all forbidden paths (`main.ini`, `tests/`, `resources/`, `.venv/`, `.buildozer/`, `bin/`, `build/`) are absent, in both bundles. The ten representative app-asset hashes match source exactly. Decisively, both bundle listings are **byte-for-byte identical to checkpoint 5** (`checkpoint6-private-bundle-listing.txt` 1292 lines; `checkpoint6-pybundle-listing.txt` 2418 lines), so the two builds are content-identical apart from signing/timestamps.
+6. Desktop gate (`checkpoint6-desktop-gate.log`, repository root, `DISPLAY=:1`): `uv sync --locked --group dev` exit 0; `uv pip check` reports "All installed packages are compatible"; `uv run --locked --group dev pytest` collected 110, passed 110, failed 0, skipped 0, xfailed 0 in 28.23s, exit 0 (JUnit XML `/tmp/opencode/mdclassic-phase3-checkpoint6-full.xml`). No required check passed via a skip and none was waived.
+
+Automated checks: the desktop suite above is the automated acceptance for this checkpoint (110 passed). `git diff --check` and `git status --short --untracked-files=all` are run on the documentation-only diff before stopping for review.
+
+Failure: none. One inspection quirk: the nested bundles' directory members are stored with mode `0644` (no execute bit), so extracting them to disk yields "Permission denied" even with `tar --no-same-permissions`. It was worked around without changing the artifact by using `tar tzf` listings for inventories and `tar xzOf <archive> <member>` for hashes (no in-place extraction). This is a p4a packaging detail, not a defect in app runtime behavior.
+
+Decision: accept the clean-build APK `7d3416aa…e9d3cc91` (53,223,301 bytes) as manifest-, signing-, ABI- and bundle-correct, and record it as the final Phase 4 artifact per the checkpoint gate (the earlier `4c45da83…2102bf44` is superseded, not passed along by habit). An asset present in the bundle is still not proof it decodes on Android; ICO/GIF decoding, native imports, audible OGG playback and real startup remain Phase 4 device checks.
+
+Next exact action: checkpoint 6 is complete and committed. Execute Phase 3 checkpoint 7 (final artifact review and Phase 4 handoff) only on explicit instruction: run `git diff --check`, `git status --short --untracked-files=all` and `git diff --stat`, review new files as well as tracked diffs, restore only known test-generated configuration changes while preserving user edits, and confirm no APKs, caches, SDKs or keys are staged.
+
+Phase / task: Phase 3 - Checkpoint 7: review and Phase 4 handoff (2026-10-10)
+
+Status: complete - final review PASS and the Phase 4 inputs are handed off. The working tree is clean, no artifact/cache/SDK/key is staged, the frozen inputs are unchanged, and the full desktop suite passes (110/110) on the final input state. Phase 3 is complete; Phase 4 checkpoint 1 is next.
+
+Files changed: this record, the Phase 3 tracker (`mdclassic_games_phase3_android_plan.md`), the master summary/tracker (`mdclassic_games_upgrade_plan.md`) and the Phase 4 handoff/reconciliation (`mdclassic_games_phase4_device_plan.md`). No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: repository root `/home/oriol/Nextcloud/Programacion/GitHub/classic_games` on branch `MDclassic_games`; HEAD `f11a0e31f5b83cf7ddde540c4b5e328d1a065bc5` (checkpoint 6). Host Manjaro Linux x86_64; CPython 3.11.14; uv 0.12.10; pytest 9.1.1; `DISPLAY=:1`. Final artifact preserved at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk`; checkpoint 6 evidence `/home/oriol/android-build/evidence/checkpoint6-*`; new checkpoint 7 evidence `/home/oriol/android-build/evidence/checkpoint7-desktop-gate.log`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+git diff --check
+git status --short --untracked-files=all
+git diff --stat
+git ls-files | grep -Ei '\.(apk|jks|keystore|pem|key)$'   # only historical releases/*.apk, no new artifact
+sha256sum /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+uv lock --check && uv sync --locked --group dev && uv pip check && uv run --locked --group dev pytest
+```
+
+Expected / observed result: PASS for every checkpoint 7 and Phase 3 completion-gate item.
+
+1. Input-state review: `git diff --check` exit 0 (no whitespace errors); `git status --short --untracked-files=all` and `git diff --stat` are both empty, so there is no tracked or untracked diff and no new file to review at this checkpoint. The only changes since the last commit (head `f11a0e3`) are this checkpoint's documentation edit. The checkpoint-5 (`84f0254`) and checkpoint-6 (`f11a0e3`) commits are documentation-only (three `docs/assistant/*.md` files each). No test-generated configuration change needed restoring; the tracked `source/MDclassic_games/main.ini` digest is still `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2` and matches HEAD.
+2. Staging review: `git ls-files` lists only the historical `releases/*.apk` and `buildozer.spec` files, which the runbook requires to be left alone. No `.buildozer/`, `bin/`, SDK, JDK, NDK, keystore, `.jks` or `.pem` path is tracked, and `git check-ignore` confirms `/source/MDclassic_games/.buildozer/` and `/source/MDclassic_games/bin/` remain ignored (`.gitignore:5-6`). The generated `bin/` directory is not present in the repository worktree; the only APK copies live outside tracked source under `/home/oriol/android-build/evidence/`.
+3. Final artifact verification: the preserved clean-build artifact hash is `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` at 53,223,301 bytes, exactly matching the checkpoint-6 record. It is the artifact handed to Phase 4.
+4. Final desktop gate (`checkpoint7-desktop-gate.log`, HEAD `f11a0e3`, `DISPLAY=:1`): `uv lock --check` exit 0; `uv sync --locked --group dev` exit 0; `uv pip check` "All installed packages are compatible"; `uv run --locked --group dev pytest` collected 110, passed 110, failed 0, skipped 0, xfailed 0 in 28.12s, exit 0. No required check passed via a skip and none was waived.
+
+Automated checks: the desktop suite above is the automated acceptance for this checkpoint (110 passed). The git review commands are the display-independent review.
+
+Failure: none.
+
+Decision: close Phase 3. Accept the clean-build APK `7d3416aa…e9d3cc91` as the final Phase 4 artifact. The earlier device-confirmed `4c45da83…2102bf44` is superseded; because the two builds' nested bundle listings are byte-for-byte identical and differ only in signing/build timestamps, the final artifact carries the same verified content. Android runtime support (startup, ICO/GIF decoding, native imports, audible OGG playback, rotation/lifecycle) remains unvalidated until the Phase 4 device gate passes on this exact artifact.
+
+Phase 4 handoff inputs:
+- Artifact: `clasicgames-1.2-arm64-v8a-debug.apk`, SHA-256 `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, 53,223,301 bytes; preserved at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/` (an in-tree copy rebuilds from `source/MDclassic_games` with the pinned toolchain).
+- Package: `org.games.clasicgames`; versionName `1.2`; versionCode `1024102`; label `Classic games`; launcher `org.kivy.android.PythonActivity`; `application-debuggable`; debug-signed (APK Signature Scheme v2, 1 signer; v1/v3/v4 expected false).
+- APIs: compile/target SDK 36; minSdk 24. ABI: `arm64-v8a` only. Native libs: 17 `ARM aarch64` `.so` files plus the `libpybundle.so` gzip framework bundle.
+- Build provenance: Buildozer 1.6.0; p4a tag `v2026.05.09` commit `58d21141f17c889bf8585f5665921d72028f8831`; Temurin JDK `17.0.20.1+1`; Android SDK build-tools `36.0.0`; NDK r28c (NDK API 24); target/host CPython `3.11.14`; Kivy 2.3.1; KivyMD 2.0.0; Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4.
+- Evidence/logs: checkpoint 4 `checkpoint4-build-retry2.log`/`.exit`; checkpoint 5 `checkpoint5-*`; checkpoint 6 `checkpoint6-*` (build, inspection, desktop gate); checkpoint 7 `checkpoint7-desktop-gate.log`; all under `/home/oriol/android-build/evidence/`.
+- Desktop/CI: 110 tests pass on the final input state (`f11a0e3`); Phase 2 remote CI run [38006783012](https://github.com/osso73/classic_games/actions/runs/38006783012) is the last published green run.
+- Known issues/limits passed to Phase 4: (a) the display-cutout safe inset is not padded (only `WindowInsets.Type.systemBars()`), so a wide-notch device could render the top app bar near the cutout; neither test device exercises this. (b) The final clean-build artifact `7d3416aa…` has not itself been installed; the prior interactive pass used the content-identical `4c45da83…`, so the Phase 4 fresh install must confirm startup and audio on `7d3416aa…`. (c) Phase 4 devices already available: Google Pixel 10 and Samsung Galaxy S24 `SM-S921B` (both Android 16 / API 36 / arm64-v8a).
+
+Next exact action: Phase 3 is complete. Execute Phase 4 checkpoint 1 only on explicit instruction: verify the local artifact hash equals `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, record package/version/launcher/API/ABI/signing from the APK manifest, confirm no unbuilt runtime/spec/dependency change exists, then identify and preserve an authorized, compatible, fresh-data target (Pixel 10 and/or Samsung S24 `SM-S921B`). Do not begin another Phase 3 checkpoint or rebuild.
+
+Phase / task: Phase 4 - Checkpoint 1: identify the target and preserve existing data (2026-10-10)
+
+Status: passed - one authorized, explicitly selected, compatible physical target and a safe fresh-data strategy exist, and the local artifact matches its recorded hash. The target's Android platform differs from the Phase 3 handoff note (Android 17 / API 37, not 16 / 36); the APK's minSdk 24 and targetSdk 36 remain compatible and the device ABI is the built `arm64-v8a`.
+
+Files changed: this record, the Phase 4 tracker (`mdclassic_games_phase4_device_plan.md`) and the master summary (`mdclassic_games_upgrade_plan.md`). No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: repository root `/home/oriol/Nextcloud/Programacion/GitHub/classic_games` on branch `MDclassic_games`; HEAD `524e02b` ("Review Phase 3 final artifact and hand off to Phase 4"). Host Manjaro Linux x86_64; `adb` 1.0.41 (37.0.0-android-tools) at `/usr/bin/adb`; Android SDK build-tools `35.0.0` at `/home/oriol/Android/sdk/build-tools/35.0.0/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+git status --short --untracked-files=all
+sha256sum /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+"/home/oriol/Android/sdk/build-tools/35.0.0/aapt" dump badging "<apk>"
+"/home/oriol/Android/sdk/build-tools/35.0.0/apksigner" verify --verbose "<apk>"
+adb devices -l
+adb -s 61190DLCR000VV shell getprop ro.product.model   # and release/sdk/abilist/manufacturer/display.id
+adb -s 61190DLCR000VV shell wm size ; adb -s 61190DLCR000VV shell wm density
+adb -s 61190DLCR000VV shell settings get secure navigation_mode
+adb -s 61190DLCR000VV shell pm path org.games.clasicgames
+adb -s 61190DLCR000VV shell dumpsys package org.games.clasicgames   # versionName/Code/abi/timestamps
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames ls -la /data/data/org.games.clasicgames
+```
+
+Expected / observed result: PASS for the artifact gate and device gate.
+
+Artifact gate:
+1. The local artifact hash equals the Phase 3 record: SHA-256 `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`, 53,223,301 bytes, at `/home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk` (`apk.sha256` in the same directory records the identical hash). It is the checkpoint-6 clean-build artifact accepted by Phase 3 checkpoint 7.
+2. Manifest read back from the APK with build-tools `35.0.0` (not copied from earlier notes): package `org.games.clasicgames`; `versionName='1.2'`; `versionCode='1024102'`; `compileSdkVersion`/`targetSdkVersion` 36; `sdkVersion:'24'`; label `Classic games`; `application-debuggable`; launchable activity `org.kivy.android.PythonActivity`; `native-code: 'arm64-v8a'`. `apksigner verify --verbose` reports `Verifies` using APK Signature Scheme v2 (`true`), 1 signer (v1/v3/v3.1/v4 `false`, expected for a debug build).
+3. No unbuilt runtime/spec/dependency change: `git status --short --untracked-files=all` is empty at HEAD `524e02b`; the tracked `source/MDclassic_games/main.ini` is unchanged. There are no application edits pending a rebuild, so the artifact corresponds to the reviewed input state.
+
+Device gate:
+1. `adb devices -l` lists exactly one authorized target: `61190DLCR000VV device product:frankel model:Pixel_10 device:frankel` (physical hardware, not an emulator). No other device is attached, so `-s "<serial>"` is used on every command to avoid selecting another target accidentally.
+2. Recorded device identity: Google Pixel 10, `ro.build.version.release` 17, `ro.build.version.sdk` 37, `ro.product.cpu.abilist` `arm64-v8a`, build `CP3A.260905.009`. Screen 1080x2424, physical density 420 with an override density of 460; navigation mode `0` (3-button). API 37 is at least the APK minimum 24, and the device's `arm64-v8a` ABI is the only ABI built, so the target is compatible. The device is the same physical unit recorded during the earlier interactive pass, but its OS was upgraded since then from Android 16 / API 36 to Android 17 / API 37, so the Phase 4 matrix will be exercised on API 37 rather than the earlier API 36.
+3. The package already exists from the earlier interactive pass: `data/app/~~0MSy6lqI93lfb4y32a4VSA==/org.games.clasicgames-.../base.apk`, `versionName=1.2`, `versionCode=1024102`, `primaryCpuAbi=arm64-v8a`, `firstInstallTime=2026-10-10 16:47:44`, `lastUpdateTime=2026-10-10 17:42:42`. `run-as` shows a live data directory (`cache`, `code_cache`, `files`, `shared_prefs`) holding the prior interactive-pass test data (this is the content-identical interim build `4c45da83…2102bf44`; the final artifact `7d3416aa…` has never been installed). The user explicitly consented to uninstall / clear this disposable test installation to obtain a clean fresh-default startup; the exact removal is deferred to checkpoint 2 so this checkpoint preserves the starting state.
+4. Fresh-data strategy: because the target holds only prior test data and the user approved its removal, the fresh-install path is an explicit `adb uninstall org.games.clasicgames` (or `pm clear`) followed by a plain `adb install` of the exact artifact in checkpoint 2, not a reinstall over the existing installation and not `-r`.
+
+Automated checks: not applicable at this checkpoint (device targeting and artifact hashing only; no pytest change).
+
+Failure: none. Two observations to carry forward: (a) the device OS drifted to Android 17 / API 37 after the Phase 3 handoff recorded Android 16 / API 36, so results must be recorded as API 37 and not conflated with the earlier API 36 repair pass; (b) `wm density` shows an override density of 460 over the physical 420, so touch-target/layout observations are at 460 dpi.
+
+Decision: Select the Google Pixel 10 `61190DLCR000VV` (Android 17 / API 37 / `arm64-v8a`, 1080x2424, 3-button navigation) as the authorized target for Phase 4, and treat its existing installation as a disposable test install the user approved clearing for a clean fresh-default scenario. The exact final artifact `7d3416aa…e9d3cc91` is available, matches its hash, and is compatible with the target.
+
+Next exact action: checkpoint 1 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 2 only: start a full-device `adb -s 61190DLCR000VV logcat -v threadtime` capture in a separate terminal, uninstall the existing test installation (recording exactly what was removed), `adb -s 61190DLCR000VV install` the exact artifact `7d3416aa…e9d3cc91`, launch `org.kivy.android.PythonActivity` with `am start -W`, and record startup duration, seven tiles, drawer, About/CLOSE, fresh-default settings versus `MainApp.build_config`, and startup logcat for tracebacks/missing resources. Do not begin checkpoint 3.
+
+Phase / task: Phase 4 - Checkpoint 2: fresh install and startup/defaults validation (2026-10-10)
+
+Status: passed - the exact final artifact fresh-installs and cold-launches to a responsive menu on the Pixel 10, all seven tiles/drawer/About/CLOSE and a first control respond to touch, the fresh defaults match `MainApp.build_config`, and the app-fatal log scan is clean.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `6e0e276` and host as checkpoint 1. Device: Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ override density 460, 3-button navigation, immersive status/navigation bars. Evidence directory `/home/oriol/android-build/evidence/phase4-checkpoint2/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint2
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # full-device capture, no -c
+adb -s 61190DLCR000VV uninstall org.games.clasicgames
+adb -s 61190DLCR000VV install /home/oriol/android-build/evidence/checkpoint6-clean-build-artifact/clasicgames-1.2-arm64-v8a-debug.apk
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-menu.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini
+adb -s 61190DLCR000VV shell dumpsys window displays | grep -i insetsource   # bar visibility
+```
+
+Expected / observed result: PASS for every checkpoint 2 row.
+
+1. Before-launch capture: a bounded full-device `logcat -v threadtime` capture ran for the whole session (`logcat-full.txt`, 69,434 lines, captured 20:12:14Z-20:29:57Z host / 22:12-22:29 device); `logcat -c` was **not** used.
+2. Removal and fresh install: the prior disposable test installation (`versionName=1.2`, `versionCode=1024102`, `primaryCpuAbi=arm64-v8a`, `firstInstallTime=2026-10-10 16:47:44`, `lastUpdateTime=17:42:42`, data dirs `cache/code_cache/files/shared_prefs`) was uninstalled (`Success`) under the user's recorded consent; the logcat `beginning of crash` FATAL SIGABRT at 17:16 (device time) predates this session and belongs to the earlier interactive pass. Then `adb install` of the exact artifact (`sha256sum` re-verified as `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91`) without `-r` returned `Performing Streamed Install` / `Success` (exit 0); `pm path` then resolved to a new `base.apk`. This is a genuine fresh install, not a reinstall over existing state.
+3. Launch: `am start -W` reported `Status: ok`, `LaunchState: COLD`, `TotalTime: 299`, `WaitTime: 302`, `Complete`. After a 15 s settle the process was alive (PID 7979) and focused. The user's visible observation is that the app reaches a usable menu; the activity-start timing is not treated as full startup success.
+4. Providers and versions (from logcat, app PID 7979): Window `sdl2`; **Audio `audio_sdl2` (audio_android, audio_ffpyplayer ignored)**; Image `img_tex, img_dds, img_sdl2, img_pil`; Text `sdl2`; Clipboard `android`; GL ES 3.2 (Imagination PowerVR). Kivy 2.3.1, KivyMD 2.0.0, Python 3.11.14. The SDL2 audio provider on Android confirms the earlier ALSA-leak repair holds: the app no longer selects a desktop ALSA driver on Android.
+5. Fresh defaults: `files/.main.ini` created fresh on Android reads `[Pong] speed=10, max-speed=50, skin=original`; `[Ahorcado] man=man1, keyboard=keyboard2`; `[Memory] level=6, theme=starwars`; `[fifteen] level=1, theme=numbers`; `[Snake] speed=1, size=11, mode=1, level_start=1` - an exact match to the runbook's `MainApp.build_config` defaults. No packaged `main.ini` overrode them (the spec excludes it; the created `.main.ini` is a fresh runtime file).
+6. Startup log scan: no Python traceback, native crash, `FATAL EXCEPTION`, ANR or `Shutting down VM` occurs after the 22:12 launch (the only fatal marker is the pre-session 17:16 entry above). The one Python `[ERROR]` is Kivy's packaged `Error when copying logo directory` (`shutil.Error: ... .kivy/icon ... Permission denied`) during `kivy/__init__.py`; it is non-fatal (main loop starts afterward), pre-existing p4a behaviour, and unrelated to the app. Benign-only messages also present: `[WARNING] [Base] Unknown <android> provider`, `hidapi` `RECEIVER_EXPORTED` hint, `E mes.clasicgames: Invalid resource ID 0x00000000`, and audio HAL chatter - none app-fatal.
+7. Immersive/system bars: `dumpsys window displays` shows `InsetsSource type=statusBars ... visible=false` (frame `[0,0][1080,173]`) and `type=navigationBars ... visible=false` - the earlier edge-to-edge repair holds on API 37.
+8. Touch/visual acceptance (user-observed on the device, all PASS): all seven menu tiles render with images and labels; the drawer opens/closes with readable font/icons; About shows the app version `v1.2` and CLOSE dismisses it; tapping a tile responds after first render with the loading notification. Audible output remains a checkpoint 11 check.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110 on the Phase 3 final input state).
+
+Failure: none. The only app-process `[ERROR]` is the non-fatal Kivy logo-copy message above; it is classified as pre-existing/unrelated, not an app compatibility defect.
+
+Decision: accept checkpoint 2. The exact final artifact `7d3416aa…e9d3cc91` fresh-installs, reaches a responsive menu with correct defaults and the SDL2 audio provider on Android 17 / API 37 / arm64-v8a, with immersive bars and no app-fatal errors. Proceed to checkpoint 3 (shell/navigation/settings through touch).
+
+Next exact action: checkpoint 2 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 3 only: from a menu-only process, open each of the five settings panels (Pong, Ahorcado, Memory, 15 puzzle, Snake), change one visible setting before opening its game and confirm it applies, change it again after the screen exists, relaunch and confirm persistence, then run the seven-game tile/drawer/re-entry navigation matrix with the first-entry loading notification; record per-scenario PASS/FAIL and logcat. Do not begin checkpoint 4.
+
+Phase / task: Phase 4 - Checkpoint 3: shell, navigation, and settings through touch (2026-10-10)
+
+Status: passed - all five settings panels work before/after game creation and persist across a cold relaunch; all seven games pass the tile route, drawer route, and re-entry, and the About/CLOSE/settings-dismissal/drawer-Exit shell controls work.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `4b206d6` and host as checkpoint 2. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button navigation. Artifact `7d3416aa…e9d3cc91`. Evidence directory `/home/oriol/android-build/evidence/phase4-checkpoint3/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint3
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture, no -c
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini   # before/after relaunch
+```
+
+Expected / observed result: PASS for every checkpoint 3 row.
+
+1. Settings before and after game creation (user-observed touch on the device, all PASS). Starting from a menu-only process, each panel was opened via drawer -> Settings (spinner), one setting changed before opening its game and confirmed applied, then changed again after the game screen existed and confirmed updated (restarting a round where needed). Resulting persisted `.main.ini` after the exercise: `[Pong] speed=10, max-speed=50, skin=tennis`; `[Ahorcado] man=man2, keyboard=keyboard1`; `[Memory] level=8, theme=animals`; `[fifteen] level=2, theme=eve`; `[Snake] speed=1, size=11, mode=1, level_start=5`. Every panel shows at least one changed value, confirming each panel's `on_config_change` path created/updated its lazy screen.
+2. Persistence: a targeted `am force-stop` + cold relaunch of `org.games.clasicgames` (no `pm clear`, no data deletion) reported `Status: ok`, `LaunchState: COLD`, `TotalTime: 180`; `files/.main.ini` read back after the relaunch is byte-identical to the pre-relaunch content, so the chosen values persist independently of in-memory screen state. The user then reopened the panels and confirmed the values are still shown.
+3. Navigation matrix (user-observed touch, all PASS): for `pong`, `ahorcado`, `memory`, `fifteen`, `2048`, `buscaminas`, and `snake`, the menu tile route opens the correct screen/title with the first-entry loading notification, the drawer route opens the same game, and re-entry reuses the existing screen with working controls and no duplicate screen or accelerated update. Shell controls confirmed: About shows version `v1.2` and CLOSE dismisses it, the settings panel dismisses, and drawer Exit works. Help's browser/Back behaviour is deferred to checkpoint 11 as the runbook specifies.
+4. Log scan: `logcat-full.txt` (382,754 lines, 20:30:47Z-22:56:12Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session. The only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2 as belonging to the earlier interactive pass.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110 on the Phase 3 final input state).
+
+Failure: none.
+
+Decision: accept checkpoint 3. All seven tile/drawer/re-entry routes pass using touch, all five settings panels work before/after screen creation and persist across a cold relaunch, and the About/CLOSE/settings-dismissal/Exit shell controls work on Android 17 / API 37 with no session log errors. Proceed to checkpoint 4 (Pong).
+
+Next exact action: checkpoint 3 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 4 (Pong) only: read `pong/screen.py` and its handlers first, then from a fresh process start/restart, observe ball movement, drag both paddles with touch, let a ball exit and verify the score increment/serve, tap pause/resume and confirm the icon/motion, change speed/max-speed/skin and verify effect on a new round, and hear a representative sound and exercise mute if present; return via drawer and reopen via drawer. Record per-row evidence and logcat. Do not begin checkpoint 5.
+
+Phase / task: Phase 4 - Checkpoint 4: Pong touch validation (2026-10-10)
+
+Status: passed - all seven Pong items pass on the recorded device/artifact: tile entry, ball movement on start, both paddles respond to touch, side exits score and re-serve, pause/resume toggles motion and icon without speed stacking, speed/skin settings visibly change the game, and drawer return/reopen works.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `d8f8c18` and host as checkpoint 3. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `pong/screen.py` and `pong/pongboard.py` read before testing: play/start, pause toggle (`pause_button`), help; touch move uses the left/right thirds; first to 5 shows the "End" popup. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint4/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint4
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-pong.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A3 '\[Pong\]'
+```
+
+Expected / observed result: PASS for all seven checkpoint 4 rows (user-observed touch on the device).
+
+1. Entry: Pong opens correctly from the menu tile and from the drawer, and re-entry reuses the screen (also confirmed at checkpoint 3).
+2. Start/restart: tapping the play icon serves the ball and it visibly moves; re-tapping restarts the round.
+3. Paddle touch: dragging in the left third moves the left paddle and dragging in the right third moves the right paddle, following the finger.
+4. Scoring/serve: letting the ball exit a side increments the correct player's score and re-serves; the game ends at 5 with the "End" popup.
+5. Pause/resume: the pause icon stops motion and switches to the play icon; tapping again resumes motion, restores the pause icon, and the ball continues at normal speed (no accelerated/duplicated update stream).
+6. Settings effect: from the fresh process the Pong panel changed values and the new round reflected them. Persisted result `[Pong] speed=30, max-speed=50, skin=jupiter` (initial speed raised `10`→`30` and skin changed `tennis`→`jupiter`; the user reported the effects as observed). The GIF ball/paddle assets for the selected skin render (img provider decoding).
+7. Return/reopen: returned to the menu via the drawer and reopened Pong via the drawer entry with working controls.
+
+Sound: Pong has no sound playback and no mute control in the source (`grep` for `app.play`/`SoundLoader`/`mute` under `pong/` returns nothing), so this optional row is recorded as not present rather than failed.
+
+Log scan: `logcat-full.txt` (21,764 lines, 20:57Z-23:00Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none.
+
+Decision: accept checkpoint 4. Pong passes all required touch checks on Android 17 / API 37. Proceed to checkpoint 5 (Ahorcado).
+
+Next exact action: checkpoint 4 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 5 (Ahorcado) only: read `ahorcado/screen.py`/`general.py` first, then start a new word, use the on-screen keyboard for a correct and a wrong letter, verify repeated occurrences reveal and wrong input changes the man image, exercise keyboard/man settings, confirm Spanish characters render, and observe a win/loss if reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 6.
+
+Phase / task: Phase 4 - Checkpoint 5: Ahorcado touch validation (2026-10-10)
+
+Status: passed - all required Ahorcado items pass: tile/drawer entry, new word, correct-letter reveal (including all occurrences), wrong-letter failed-list plus man-image change, readable Spanish characters, the one-hint control, mute toggle, keyboard/man settings effect, restart, and a loss outcome; the win popup was not separately observed.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `120b8ba` and host as checkpoint 4. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `ahorcado/screen.py` read before testing: play/start, hint (one per game), mute toggle, help; correct letter reveals all occurrences, wrong letter increments errors and adds a drawing piece, 10 errors loses, win when the word is complete. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint5/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint5
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-ahorcado.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[Ahorcado\]'
+```
+
+Expected / observed result: PASS for the required checkpoint 5 rows (user-observed touch on the device).
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. New word: tapping play starts a fresh word shown as blanks with the on-screen keyboard.
+3. Correct letter: a correct on-screen key reveals its place(s); where a letter occurs more than once, repeated occurrences reveal.
+4. Wrong letter: a wrong key appears in the failed-letters area and the man drawing gains a piece (image updates).
+5. Spanish characters: accented/Ñ characters render legibly in the word and keyboard (no missing glyphs).
+6. Hint: the hint control reveals one letter; a second request shows the "You cannot get more hints!" popup.
+7. Mute: the mute control toggles its icon (volume-high/off) and silences the end-of-game sound.
+8. Settings: the Ahorcado panel changed values with visible effect; persisted result `[Ahorcado] man=man2, keyboard=keyboard5` (keyboard skin changed).
+9. Restart: tapping play again starts a new word.
+10. Outcome: a loss is reachable and was observed - 10 wrong letters produced the "End / you've been HANGED" popup with the lose sound. A win exists in code (all letters found) but was not separately observed in this session; recorded honestly rather than claimed.
+11. Return/reopen: returned via the drawer and reopened via the drawer entry with working controls.
+
+Log scan: `logcat-full.txt` (41,388 lines, 23:01Z-23:08Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none. The win outcome is reachable by code but was not exercised live; this is an observational limit, not a failure.
+
+Decision: accept checkpoint 5. Ahorcado passes its required touch checks (including a live loss) on Android 17 / API 37. Proceed to checkpoint 6 (Memory).
+
+Next exact action: checkpoint 5 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 6 (Memory) only: read `memory/screen.py`/`mat.py` first, then reveal a mismatching pair (both return hidden under the existing timing), find a match (remains revealed, count updates), restart, exercise level/theme chips and settings, cycle every selectable theme at a 20-pair board verifying backs/faces exist, explicitly reveal cartoons `.ico` faces, and check match/mismatch/completion sound where reachable; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 7.
+
+Phase / task: Phase 4 - Checkpoint 6: Memory touch validation (2026-10-10)
+
+Status: passed - Memory builds, mismatches hide under the existing 2 s timing, matches stay revealed and increment Moves, restart works, level/theme chips and settings apply, every selectable theme builds a 20-pair board with all backs/faces rendered (including cartoons `.ico`), and the start/match/completion sounds plus mute work.
+
+Files changed: this record, the Phase 4 tracker and the master summary. No application `.py`/`.kv`, spec, dependency, test or asset change; no rebuild.
+
+Environment: same repository/HEAD `4fef5a5` and host as checkpoint 5. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`. Artifact `7d3416aa…e9d3cc91`. `memory/screen.py`/`mat.py` read before testing: theme/level chips, mute, start; mismatch hides after `sleep(2)`, match plays `ok`, completion plays `win-short` and shows the "all pairs" popup. Selectable themes (>=20 `image*` files and `back.jpg`) are `animals`(23 png), `cartoons`(22 ico+png), `food`(25), `misc`(30), `starwars`(30), `technology`(24). Evidence `/home/oriol/android-build/evidence/phase4-checkpoint6/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint6
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full.txt" 2>&1 &   # session capture
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-memory.png"
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[Memory\]'
+```
+
+Expected / observed result: PASS for all checkpoint 6 rows (user-observed touch on the device).
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. Start: tapping play builds the board (starting at the configured level/theme) with visible card backs.
+3. Mismatch: two non-matching cards return hidden after the existing ~2 s timing; Moves increments per pair attempt.
+4. Match: a matching pair stays revealed, Moves increments, and the match sound plays.
+5. Chips/settings: the theme and level chips cycle their values and the next round reflects them; the Memory settings panel applies with visible effect. Persisted result `[Memory] level=20, theme=animals` (level raised to 20).
+6. All themes at max level: each selectable theme (`animals`, `cartoons`, `food`, `misc`, `starwars`, `technology`) built a 20-pair board with every back and face rendered, no blank/placeholder tiles.
+7. Cartoons ICO: the `cartoons` theme's `.ico` faces were revealed and decoded correctly (img provider).
+8. Sound/mute: start, match, and completion sounds behave as expected and the mute control silences them (completion popup reachable).
+9. Restart/return: restart works; returned via drawer and reopened via drawer with working controls.
+
+Log scan: `logcat-full.txt` (25,820 lines, 23:09Z-23:16Z host session) has no Python traceback, `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session; the only fatal marker is the pre-session 17:16 `SDLActivity` SIGABRT already classified in checkpoint 2.
+
+Automated checks: not applicable (device validation; desktop suite unchanged and last green at 110/110).
+
+Failure: none.
+
+Decision: accept checkpoint 6. Memory passes all required touch checks including the max-level all-theme sweep and ICO decoding on Android 17 / API 37. Proceed to checkpoint 7 (15 puzzle).
+
+Next exact action: checkpoint 6 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 7 (15 puzzle) only: read `game_15puzzle/screen.py`/`sample.py` first, then move an adjacent tile into the gap and confirm a nonadjacent tap does not move tiles, shuffle/restart, cycle all 3x3/4x4/5x5 sizes and selectable complete themes verifying numbered/image tiles plus the matching reference image and usable chips/touch targets, and return/re-enter to make another legal move; return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 8.
+
+Phase / task: Phase 4 - Checkpoint 7: 15 puzzle touch validation (2026-10-11)
+
+Status: passed after repair - the first attempt on artifact `7d3416aa…` failed a required row (the bottom reference picture filled the row and left the Theme/Level chips unusable in portrait); the defect was reproduced, root-caused, fixed, the APK rebuilt to `be6e6196…`, and every checkpoint-7 row then passed.
+
+Files changed: this record, the Phase 4 tracker and the master summary; plus the in-scope app fix `source/MDclassic_games/game_15puzzle/sample.py` and its regression `tests/mdclassic_games/integration/test_15puzzle.py` (commit `92a185f`). The fix rebuilt `bin/clasicgames-1.2-arm64-v8a-debug.apk`; no spec, dependency, or asset change.
+
+Environment: repository branch `MDclassic_games`, fix commit `92a185f`. Build worktree `/home/oriol/android-build/mdclassic_games` synced to `92a185f`. Device: Google Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi. Artifacts: first attempt `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` (53,223,301 bytes); fixed `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1` (53,223,341 bytes). `game_15puzzle/screen.py`/`sample.py` read before testing. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint7/` and `/home/oriol/android-build/evidence/phase4-fix-fifteen-layout/`.
+
+Command and working directory (repository root unless noted):
+
+```bash
+ED=/home/oriol/android-build/evidence/phase4-checkpoint7
+adb -s 61190DLCR000VV logcat -v threadtime > "$ED/logcat-full-fixed.txt" 2>&1 &
+adb -s 61190DLCR000VV shell am force-stop org.games.clasicgames
+adb -s 61190DLCR000VV shell am start -W -n org.games.clasicgames/org.kivy.android.PythonActivity
+adb -s 61190DLCR000VV exec-out screencap -p > "$ED/screenshot-fifteen-before.png"   # and -after.png
+adb -s 61190DLCR000VV shell run-as org.games.clasicgames cat files/.main.ini | grep -A2 '\[fifteen\]'
+# rebuild after the fix (working dir source/MDclassic_games; backgrounded; JAVA_HOME jdk-17.0.20.1+1):
+uv run --locked --group android buildozer -v android debug
+adb -s 61190DLCR000VV install -r source/MDclassic_games/bin/clasicgames-1.2-arm64-v8a-debug.apk
+```
+
+First attempt (artifact `7d3416aa…`, session 23:17:16Z, `logcat-full.txt`): the user reported all gameplay rows worked (adjacent move and Moves count, non-adjacent ignored, restart/shuffle, 3x3/4x4/5x5 sizes, all 14 complete themes with matching reference image and no blank tiles), but FAILED the required "usable chips/touch targets" row: the bottom reference picture rendered almost the size of the board and the Theme/Level chips were barely visible. Recorded as a checkpoint failure, not accepted.
+
+Root cause (reproduced without a device): `game_15puzzle/sample.py:initialize_grid` set `self.window_size = min(self.parent.height, self.parent.width)`. The bottom row is a horizontal `BoxLayout` holding a chip `FloatLayout` and the fixed-size `Sample`; sizing the square to the full parent width only leaves room for the chips when that row is wider than it is tall. In portrait the row is taller than half its width, so the square took the full width (a 540x1212 logical window gave `sample.window_size == 540`, equal to the board, with the chip `FloatLayout` overlapping at full width). A Kivy layout harness loaded the real screen in a 540x1212 window and printed `sample.window_size=540`, `chip FloatLayout width fraction=1.0`.
+
+Fix: cap the reference square at half the parent width - `self.window_size = min(self.parent.height, self.parent.width / 2)` - so the bottom row is half reference image and half chip area. Same harness after the fix printed `sample.window_size=270`, bottom box 540 wide, chip `FloatLayout` 270x540 with both `MDChip`s on-screen and tappable.
+
+Regression: `tests/mdclassic_games/integration/test_15puzzle.py::test_fifteen_reference_picture_leaves_the_controls_usable` sets a portrait window, forces a layout tick, and asserts the reference square is `min(parent.height, parent.width/2)`, the chip `FloatLayout` is at most half the row and non-zero, and no chip exceeds the control area. It fails on the old sizing (assertion on `window_size`) and passes on the fix. Full desktop suite after the fix: 111 passed / 0 failed.
+
+Rebuild and inspection: `92a185f` built by `uv run --locked --group android buildozer -v android debug` (start `2026-10-11T01:33:32+02:00`, exit 0 `2026-10-11T01:33:59+02:00`, log `/home/oriol/android-build/evidence/build-phase4-fix-fifteen-layout.log`). New APK SHA-256 `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`, 53,223,341 bytes. `aapt dump badging` unchanged (`org.games.clasicgames`, versionName 1.2, versionCode 1024102, min 24 / target 36, `arm64-v8a`); `apksigner verify` v2 true, 1 signer. The bundled `assets/private.tar` `game_15puzzle/sample.pyc` was disassembled (Python 3.11 host) and `initialize_grid` contains `LOAD_CONST 2; BINARY_OP /`, confirming the fix is packaged. Reinstalled with `adb install -r` (Success, same debug key, data preserved).
+
+Retest (artifact `be6e6196…`, session 23:36:54Z-23:42:23Z, `logcat-full-fixed.txt`): PASS for every checkpoint-7 row:
+
+1. Entry: opens from the tile and from the drawer; re-entry reuses the screen.
+2. Layout fix: the bottom row is half reference picture, half chips; both Theme and Level chips fully visible and tappable; reference image about half the board.
+3. Adjacent/non-adjacent: an adjacent tile moves into the gap and Moves increments; a non-adjacent tap changes nothing.
+4. Restart: play reshuffles and resets Moves.
+5. Sizes: the Level chip cycles 3x3 -> 4x4 -> 5x5 with matching tile counts and reference grid.
+6. Themes: all 14 complete themes (`bike, blonde, breakfast, bulb, carnival, eve, landscape, milky_way, money, numbers, ship, shore, squirrel, tree`) render numbered tiles and a matching reference image with no blank tiles.
+7. Return/re-enter: returned via drawer, reopened via drawer, made another legal move.
+Persisted result `[fifteen] level=1, theme=bulb`.
+
+Log scan: `logcat-full-fixed.txt` (35,922 lines) has no `FATAL EXCEPTION`, ANR or `Shutting down VM` during the session. The startup traceback at `01:36:58.943` is the already-classified non-fatal Kivy "Error when copying logo directory" (`shutil.Error` from a SELinux `relabelfrom` denial on kivy icon files); Kivy catches it and the app proceeds to the main loop, so it is not a defect. The pre-session 17:16 `SDLActivity` SIGABRT belongs to an earlier pass.
+
+Automated checks: `uv run pytest tests/mdclassic_games` -> 111 passed / 0 failed / 0 skipped after the fix (was 110 before adding the regression).
+
+Failure: one required checkpoint-7 row failed on the first artifact and is now fixed; the root cause was device-independent and is covered by a desktop regression.
+
+Decision: accept checkpoint 7 on artifact `be6e6196…`. The 15-puzzle layout is fixed and its regression is green. Because the artifact changed, checkpoints 1-6 remain valid on `7d3416aa…` and checkpoint 12 must re-confirm the current hash. Proceed to checkpoint 8 (2048).
+
+Next exact action: checkpoint 7 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 8 (2048) only on artifact `be6e6196e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `game_2048/screen.py`/`board.py` first, then exercise the four swipe controls, merges and score, undo, and the target control, return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 9.
+
+Phase / task: Phase 4 - Checkpoint 8: 2048 touch validation (2026-10-11)
+
+Status: passed - on artifact `be6e6196…` all required 2048 items pass on the Pixel 10 (Android 17 / API 37).
+
+Files changed: this record, the Phase 4 tracker and the master summary. No app `.py`/`.kv` change; no rebuild.
+
+Environment: repository branch `MDclassic_games`, HEAD `568ec27`; device `61190DLCR000VV`; artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `game_2048/screen.py`/`board.py` read first.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint8/`.
+
+Expected / observed result: PASS.
+
+1. Entry: opens from tile and drawer; re-entry reuses screen.
+2. Start: ▶ builds board with two starting tiles; Score = 0.
+3. Direction controls: on-screen joystick buttons `^ < > v` move tiles and spawn a new tile on valid moves; an invalid move does not add a tile.
+4. Merges: equal adjacent tiles merge into doubled value with animation; Score increases by the merged value.
+5. Undo: `backup-restore` reverts last move and Score.
+6. Target chip: cycles `256 → 512 → 1024 → 2048`.
+7. Win/loss: win popup "You win!" with sound reachable on small target; loss "You lost" reachable in play.
+8. Mute: silences win/game-over sounds.
+9. Return/reopen: drawer return/reopen; another move works.
+
+Log scan: `logcat-full.txt` (46,371 lines, 23:53Z-00:05Z) no session fatal/traceback; only pre-session 17:16 `SDLActivity` SIGABRT.
+
+Automated checks: 111 tests still green (no app change). Device-only validation.
+
+Decision: checkpoint 8 PASS. Proceed to checkpoint 9 (Buscaminas).
+
+Next exact action: checkpoint 8 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 9 (Buscaminas) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `buscaminas/screen.py`/`area.py`/`field.py` first, exercise reveal and flag mode, cycle beginner/intermediate/expert, verify mine counts, win/loss, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 10.
+
+Phase / task: Phase 4 - Checkpoint 9: Buscaminas touch validation (2026-10-11)
+
+Status: passed - all required Buscaminas checks pass on the Pixel 10 (Android 17 / API 37), artifact `be6e6196…`.
+
+Files changed: this record only (no app code changes, no rebuild). Per user instruction, we do not commit at this point; plan was updated in-place earlier when asked to document progress.
+
+Environment: repository branch `MDclassic_games`, HEAD `a81d01c`; device `61190DLCR000VV`; artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `buscaminas/screen.py`, `area.py`, `field.py` read.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint9/`.
+
+Checklist result: PASS for all items.
+
+1. Entry: tile and drawer; re-entry fine.
+2. Start: ▶ builds level 1 (9x9, 10 mines); timer runs.
+3. Reveal: uncovering in covered mode works; 0-mine flood-uncover behaves as expected; hitting a mine shows loss state and reveals mines.
+4. Flag mode: toggle bomb/flag icon; placing/removing flags decreases/increases mine counter; toggle back to covered to reveal.
+5. Chording: open_adjacent works when flagged count equals number on uncovered tile.
+6. Levels: numeric icon cycles 1→2→3; board resizes and counts change (1: 9x9/10, 2: 9x18/25, 3: 18x36/125).
+7. Win/loss: win and loss states, popups/face changes and sounds observed.
+8. Mute: volume toggle silences sounds.
+9. Return/reopen: drawer return/reopen works.
+
+Log scan: `logcat-full.txt` (19,637 lines, 00:18Z-00:20Z) clean apart from pre-session SIGABRT (known).
+
+Automated checks: 111 green.
+
+Decision: checkpoint 9 PASS. Proceed to checkpoint 10 (Snake).
+
+Next exact action: checkpoint 9 is complete pending review. Execute Phase 4 checkpoint 10 (Snake) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `snake/screen.py`, `gameboard.py`, `grid_elements.py` first; exercise turns, eating, growing, collision/wall, pause/resume, speed/size/levels/mode settings, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 11.
+
+Phase / task: Phase 4 - Checkpoint 10: Snake touch validation (2026-10-11)
+
+Status: passed - all required Snake checks pass on the Pixel 10 (Android 17 / API 37), artifact `be6e6196…`.
+
+Files changed: this record only (no app code changes, no rebuild). No commit made on this checkpoint; the Phase 4 plan tracker was updated in-place.
+
+Environment: repository branch `MDclassic_games`, HEAD `7bc7e47`; device `61190DLCR000VV` (Pixel 10); artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `git status --short` clean on entry. On-device `/data/app/.../base.apk` SHA-256 re-verified as `be6e6196…`, so no reinstall was needed. `snake/screen.py`, `gameboard.py`, `grid_elements.py`, `levels.py`, `constants.py`, and `settings.json` read.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint10/` (`launch.txt`, `logcat-full.txt`, `session-times.txt`, `screenshot-start.png`, `screenshot-snake.png`, `snake-evidence.txt`).
+
+Checklist result: PASS for all items.
+
+1. Entry: menu tile and drawer entry work; loading snackbar; drawer return and reopen fine, no duplicate screen.
+2. Start + turn: ▶ starts the round; board swipes in all four directions change heading and motion is smooth.
+3. Eat: steering onto food increments the score and grows the snake (fruit +3/+1, junk +1/+2, sweet +1/+3 per constants).
+4. Collision/game-over: wall (level >=2) and self collision produce game-over (head colour flash + sound) and ▶ restarts.
+5. Pause/resume: pause halts motion and switches the icon to play; resume restores one normal update stream and the pause icon.
+6. Settings: speed, size (11/15/19/23), mode (story/single-level), and start level (1-12) apply; board and level progress indicator stay usable.
+7. Return/re-enter: leaving a running round via the drawer and reopening resumes without duplicate/accelerated motion and direction swipes still work.
+8. Mute: volume toggle silences sounds.
+
+Log scan: `logcat-full.txt` (71,780 lines, session 11:16:27Z-11:27:55Z; device-local 13:16-13:27). No `AndroidRuntime`, Python traceback, or app-fatal error. The only `F libc` SIGABRT is dated 10-10 17:16 (pre-session, known). Cold launch `am start -W` TotalTime 269 ms; Kivy 2.3.1 + KivyMD 2.0.0 initialised, Window/GL `sdl2`, `audio_sdl2` provider selected, main loop reached.
+
+Automated checks: `uv run --locked --group dev pytest -q` PASS: 111 passed in 28.34s on the unchanged code (matches the checkpoint 9 count). No rebuild required.
+
+Decision: checkpoint 10 PASS. Proceed to checkpoint 11 (lifecycle/rotation/providers/external Help).
+
+Next exact action: checkpoint 10 is complete pending review. Execute Phase 4 checkpoint 11 only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): with full logcat capture, exercise Android Back from menu/drawer/About/settings/games, portrait<->landscape at menu/settings/games, background/foreground during Pong/Snake/Memory mismatch/2048, screen lock/unlock, external Help URL round trip, normal exit/relaunch, cold force-stop relaunch, repeated re-entry, audio/mute, and image/font providers. Record evidence and logcat. Do not begin checkpoint 12.
+
+Phase / task: Phase 4 - Checkpoint 11: lifecycle, rotation, providers, external Help (2026-10-11)
+
+Status: passed - all required lifecycle/provider/Help checks pass on the Pixel 10 (Android 17 / API 37); rotation redraw works and one pre-existing landscape-layout limitation is recorded and deferred by user decision. A Snake defect found here was repaired (repair #4).
+
+Files changed: `source/MDclassic_games/snake/gameboard.py` (touch handling), `tests/mdclassic_games/integration/test_snake.py` (one regression), this record, the Phase 4 tracker and the master summary. No commit made on this checkpoint.
+
+Environment: repository branch `MDclassic_games`, HEAD `875e136`; build worktree `/home/oriol/android-build/mdclassic_games` (source-equivalent except the Snake fix; the Nextcloud checkout is a synced copy, the worktree is the established build tree). Device Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button nav. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint11/`.
+
+Artifacts: the checkpoint entered on `be6e619e…9a449c19c1` (53,223,341 bytes). Repair #4 rebuilt it to SHA-256 `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, preserved as `clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk`. Built with `run-checkpoint4-build.sh phase4-checkpoint11-snake-fix` (exit 0; `build-snake-fix.log` at the evidence dir is an earlier, abandoned attempt in the synced tree; the authoritative log is `/home/oriol/android-build/evidence/phase4-checkpoint11-snake-fix.log`). Installed as a same-signature update with `adb install -r` (Success); the on-device `base.apk` hash re-verified as `8bc32723…`. Manifest unchanged (`org.games.clasicgames`, 1.2 / 1024102, min/target 24/36, `arm64-v8a`). Packaged `snake/gameboard.pyc` contains `snake_swipe`, no `swipe_x`/`swipe_y`.
+
+Logcat: `logcat-full.txt` (336,939 lines, 49.8 MB), full-device capture 11:48:31Z-13:46:47Z (device-local 13:48-15:46). One Python traceback only: the known non-fatal "Error when copying logo directory" (Permission denied under `files/app/.kivy/icon`). The single `F libc` SIGABRT is dated 10-10 17:16 (pre-session, known). No AndroidRuntime/FATAL EXCEPTION/Fatal Python error in-session. The Snake-fix launch (14:45:08) initialised Kivy 2.3.1, Image providers `img_tex, img_dds, img_sdl2, img_pil` and Audio `audio_sdl2`, reaching "Start application main loop". App warnings only: 8x `[Base] Unknown <android> provider` and a first-run config-version upgrade (benign).
+
+Manual checks: PASS, unless noted.
+
+1. Android Back: menu/drawer/settings Back exits the app; About does not dismiss via Back but its CLOSE button works. Existing behavior documented; no traceback, stuck overlay, or unusable controls.
+2. Rotation: portrait<->landscape redraws without crashing and touch targets follow the layout. The app's pre-existing layout is not responsive, so in landscape the drawer shows only fixed entries, Ahorcado/Memory stretch, and 15-puzzle loses its bottom controls; only Pong is usable. `orientation = all` is pre-existing since the first version. User decision: record as a known limitation and fix separately (not a Phase 4 blocker).
+3. Background/foreground during Pong, Snake, a Memory mismatch and a 2048 move: resumes and works.
+4. Screen lock/unlock during a running game: display/GL/audio recover and inputs respond.
+5. External Help round trip: drawer Help opens the documented URL in the browser; the app stays usable.
+6. Normal exit/relaunch: all five settings panels keep their values and a game starts.
+7. Cold force-stop relaunch: settings persist independently of in-memory screen state and a game starts.
+8. Repeated re-entry x3 of a running round via the drawer: Pong passed. Snake failed first - re-entry flipped the direction to vertical - was fixed (repair #4) and retested PASS; swipes and pause/resume still work.
+9. Audio/mute: representative start/move/win-or-loss sounds audible, mute toggles off/on, still correct after foregrounding.
+10. Image/font providers: cartoons ICOs, GIFs, font/icons and themed images render; revisited after rotation and foreground.
+
+Repair #4 (Snake phantom swipe): `GameBoard.on_touch_up` used instance `swipe_x`/`swipe_y` last set by any earlier `on_touch_down`; a release whose down did not reach the board (drawer/toolbar tap) used stale coordinates and could steer the snake. Fix: store the start point in `touch.ud['snake_swipe']` and ignore a `on_touch_up` with no such record.
+
+Automated checks: `uv run --locked --group dev pytest -q` PASS: 112 passed in 28.52s (was 111; +1 Snake regression). New regression confirmed to fail on the pre-fix `gameboard.py` with "a release without a matching board touch down must not steer the snake" and to pass with the fix. Device retest happened on the rebuilt artifact `8bc32723…`.
+
+Decision: checkpoint 11 PASS (landscape layout recorded as a deferred known limitation). Proceed to checkpoint 12 (final artifact regression) on `8bc32723…`.
+
+Next exact action: checkpoint 11 is complete pending review. Execute Phase 4 checkpoint 12 on artifact `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): re-confirm the hash, run the full acceptance set (startup, seven game entries/basic controls, settings persistence, representative audio, one rotation/background cycle), locate/reuse the full desktop suite pass (112 on the current inputs) or rerun it if inputs changed, review logcat across intervals, and check `git diff`/staging. Record evidence and stop for review. Do not begin Phase 5.
+
+Phase / task: Phase 4 - Checkpoint 12: final artifact acceptance and Phase 5 handoff (2026-10-11)
+
+Status: passed - final artifact regression passed on the Pixel 10 (Android 17 / API 37); final desktop suite, logcat review, git scope check and coverage table all recorded. Phase 4 is complete; Phase 5 checkpoint 1 is next.
+
+Files changed: this record, the Phase 4 tracker and the master summary only. No runtime/test/spec/dependency change; no commit made on this checkpoint.
+
+Environment: repository branch `MDclassic_games`, HEAD `bf64579` (checkpoint 11 record), clean tree. Device Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button nav. Host Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14, uv 0.12.10, Kivy 2.3.1, KivyMD 2.0.0. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint12/`.
+
+Final artifact freeze: `/home/oriol/android-build/evidence/phase4-checkpoint11/clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk`, SHA-256 `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes (repair #4 / Snake phantom swipe). `aapt dump badging` re-confirmed `org.games.clasicgames`, versionName 1.2, versionCode 1024102, min/target SDK 24/36, launcher `org.kivy.android.PythonActivity`, native-code `arm64-v8a`. The installed `base.apk` was pulled from the device and hashes to the identical `8bc32723…`, so the on-device build is byte-for-byte the final artifact (no installation mix-up).
+
+Coverage table (all on Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`): checkpoints 1-6 on `7d3416aa…e9d3cc91`, checkpoints 7-10 on `be6e6196…9a449c19c1`, and checkpoints 11-12 on the final `8bc32723…71e6848e`. The only input changes between checkpoints 10 and 12 are repair #3 (`game_15puzzle/sample.py` cap) and repair #4 (`snake/gameboard.py` touch handling), each with its regression and its own rebuilt/retested artifact; the other five games and the shell were re-confirmed entry/basic-control on the final artifact this checkpoint to catch any mix-up.
+
+Manual checks: PASS, user on the final artifact `8bc32723…`:
+1. Startup: cold launch to a responsive menu with all seven tiles visible (screenshot `/home/oriol/android-build/evidence/phase4-checkpoint12/menu-final.png`).
+2. Seven game entries: each of Pong, Ahorcado, Memory, 15 puzzle, 2048, Buscaminas, Snake opened from its tile, one basic control exercised (start/move/restart as appropriate), returned via drawer; drawer re-open of Snake does not flip its direction.
+3. Settings persistence: a visible setting changed in a panel, app exited and cold-relaunched, value persists.
+4. Representative audio: a game sound heard and a mute toggle worked.
+5. Rotation/background: portrait->landscape->portrait during a game with a control exercised after each change; Home, wait, return via recents - board/labels redraw and controls work. Landscape layout remains the recorded (deferred) non-responsive limitation, not a new defect.
+
+Automated checks:
+- `uv sync --locked --group dev` PASS then `uv run --locked --group dev pytest` PASS: 112 passed, failed 0, skipped 0, xfailed 0 in 28.82s on the final tree (inputs unchanged since checkpoint 11's 112-test pass; reran as the explicit final-state requirement). Sync also uninstalled the `android` host group packages for the desktop-only run; the lock still pins them and `uv sync --locked --group android` reinstalls them for any later build.
+- Cold startup from the exact artifact: `adb shell am start -W` reported LaunchState COLD, TotalTime 305 ms; log shows Python 3.11.14, Kivy 2.3.1, KivyMD 2.0.0, Image providers `img_tex, img_dds, img_sdl2, img_pil`, Audio `audio_sdl2`, GL ES 3.2 (PowerVR D-Series), and "Start application main loop".
+- Programmatic cold-process persistence: forced-stop then cold-relaunched; the on-device `files/.main.ini` md5 (`4406f79d2f100ebbb2d236057da4521a`) was identical before and after, and the relaunched app (new pid 9368) reached focus.
+- `git diff --check` PASS; `git status --short --untracked-files=all` empty; tracked `source/MDclassic_games/main.ini` SHA-256 remains `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`.
+
+Logcat: full-device capture `/home/oriol/android-build/evidence/phase4-checkpoint12/logcat-full.txt` (104,282 lines, ~15.4 MB), session device-local 16:24:31 -> ~16:57 (start/end timestamps in `session-start.txt` / `session-end.txt`). No Traceback, FATAL EXCEPTION, AndroidRuntime, Fatal Python error, or `python` W/E in the tested interval. The only app-side warning is the known benign `[Base] Unknown <android> provider` (8x, boot-time metadata probing). A single app process (pid 7708) ran the whole interactive exercise; `onPause` (16:55:52, Home) -> `onResume` (16:56:02, recents return) confirms the foreground/background cycle, and `onPause` (16:56:36) marks the closing exit. No process restart/crash occurred. The pre-session `F libc` SIGABRT and the "Error when copying logo directory" traceback are the already-recorded known items from checkpoint 11's archive, not this session.
+
+Failure: no remaining checkpoint failure. Outstanding items are recorded known limits only: landscape layout is not responsive (user-deferred to a separate task) and only `systemBars()` insets are padded (display-cutout safe inset not handled; neither test device exercises a wide-notch cutout).
+
+Decision: close Phase 4. The final input state has a full desktop suite pass (112) and final-artifact device evidence on `8bc32723…`; build provenance, per-checkpoint coverage, and installation identity are all recorded. Continue to Phase 5 handoff. Do not advertise validation on Android versions/ABIs beyond the recorded Pixel 10 (Android 17/API 37) and the earlier Samsung S24 (Android 16/API 36) work.
+
+Next exact action: review this checkpoint 12 record, then execute Phase 5 checkpoint 1 (evidence reconciliation) only. Phase 5 covers README/getting-started reconciliation, a functional `requirements.txt` export (`uv export --locked --no-dev --format requirements-txt --output-file requirements.txt`, Android group excluded), the tested version matrix publication, fresh-environment verification, and final scope/diff review. Do not push or merge without an explicit user request.
+
+Phase / task: Phase 5 - Checkpoint 1: Audit evidence and stale instructions (2026-10-11)
+
+Status: passed (audit and gate complete; per user decision the documentation commit is deferred to the end of Phase 5, so there is no per-checkpoint commit)
+
+Files changed: `docs/assistant/mdclassic_games_phase1_uv_plan.md` (clarify the historical "not executed" header and the superseded 1.2.0 baseline), `docs/assistant/mdclassic_games_phase5_handoff_plan.md` (checkpoint tracker and next action), `docs/assistant/mdclassic_games_upgrade_plan.md` (Phase 5 status and summary row), this record. No code/dependency/spec/test change.
+
+Environment: repository branch `MDclassic_games`, HEAD `c4ae6f7`, `git status --short` clean on entry; host Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10. `.python-version` = `3.11` (minor selector, not a patch pin).
+
+Command and working directory: repository root. Ran `git status --short`, `uv --version` (0.12.10), `uv lock --check` (Resolved 44 packages, exit 0), `git diff --check` (clean), and `sha256sum` on the preserved final artifact. Read `README.md`, `docs/getting-started.md`, `pyproject.toml`, `uv.lock`, `.python-version`, `source/MDclassic_games/buildozer.spec`, `requirements.txt`, the Phase 1-5 runbooks, `.github/workflows/mdclassic-games-tests.yml`, and the test tree. Queried the GitHub Actions API for the final CI run.
+
+Expected / observed result: all prerequisite acceptance evidence exists and matches the final inputs.
+
+1. Phase 2 desktop gate: manual/visual acceptance committed `3efd3cf`, CI-actions cleanup `bfaacd1`/`3d55d2b`; Phase 2 tracker records CI run 38006783012 success at `3d55d2b` (confirmed: workflow run #3, unit 56s, gui 1m44s).
+2. Phase 3 gate: checkpoints 1-6 committed (`8cb288f`, `c29c7b0`, `e247e97`, `4188800`, plus the checkpoint-5/6 records); clean-app-build reproduction (`checkpoint6-clean-build`) exit 0, APK `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` (53,223,301 bytes), ported into Phase 4. Clean-build evidence re-read: `checkpoint6-clean-build-apk.sha256`, `checkpoint6-freeze.txt` (p4a HEAD `58d21141…`), `checkpoint6-desktop-gate.log` (110 passed, exit 0). Checkpoint 7 committed `524e02b`.
+3. Phase 4 gate: all 12 checkpoints passed on Pixel 10 `61190DLCR000VV` (Android 17/API 37); final artifact `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, re-verified on disk at `/home/oriol/android-build/evidence/phase4-checkpoint11/clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk` (matches the recorded hash), byte-identical to the on-device `base.apk`. Final desktop suite 112/112.
+4. CI on the final tested commit: workflow `.github/workflows/mdclassic-games-tests.yml` run [#7 (38151771331)](https://github.com/osso73/classic_games/actions/runs/38151771331), `head_sha` `c4ae6f7…`, conclusion `success`, 2026-10-11T15:33-15:35Z. The workflow filename is exactly `mdclassic-games-tests.yml` (no approved rename). Prior run #6 on `7bc7e47` also `success`.
+5. Final metadata: non-packaged uv project (`[tool.uv] package = false`); `requires-python = ">=3.11,<3.12"`; default groups are `dev` only (`android` is non-default); pytest config restrict s discovery to `tests/mdclassic_games` with `--strict-markers` and a `gui` marker. Tests present: 4 unit modules and 9 integration modules (test_shell, test_pong, test_ahorcado, test_memory, test_15puzzle, test_2048, test_buscaminas, test_snake, test_cross_app).
+
+Final tested matrix (selected / built-inspected / device-tested, with platform differences explicit):
+
+| Area | Value and evidence |
+| --- | --- |
+| Desktop host | Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; `.python-version` = 3.11 (minor only) |
+| Desktop runtime (selected = tested) | Kivy 2.3.1; KivyMD 2.0.0 (PyPI artifact, locked from commit `a1beac1`); Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4; transitives asyncgui 0.6.3, asynckivy 0.6.4, materialshapes 0.3 |
+| Test environment | pytest 9.1.1; desktop run with real display/GL (Mesa) and SDL2 audio (ALSA default, user-selectable driver preserved); CI gui job uses Xvfb + software Mesa GL + `SDL_AUDIODRIVER=dummy` |
+| Test result (2026-10-11, final inputs) | full suite 112 collected / 112 passed / 0 failed / 0 skipped / 0 xfailed in 28.82s; unit display-independent; CI run 38151771331 success |
+| Android host (built) | Manjaro x86_64; host Python from `.venv` 3.11; uv 0.12.10; Buildozer 1.6.0; Cython 0.29.34; Temurin JDK 17.0.20.1+1; SDK cmdline-tools 19.0 (build 13114758); platform-tools 37.0.1; build-tools 36.0.0; Android platform API 36 rev 2; NDK r28c (28.2.13676358) |
+| Android embedded (built) | p4a `v2026.05.09` commit `58d21141f17c889bf8585f5665921d72028f8831`; Python/hostpython 3.11.14; runtime pins as desktop (Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4, asyncgui 0.6.3, asynckivy 0.6.4, materialshapes 0.3) plus docutils 0.23, pygments 2.21.0, filetype 1.2.0, requests 2.34.2, urllib3 2.7.0, idna 3.19, certifi 2026.7.22, charset-normalizer 3.5.1, chardet 5.2.0, kivy-garden 0.1.5, six 1.17.0; target API 36 / min+NDK API 24; NDK 28c; `arm64-v8a`; `harfbuzz` omitted (approved decision) |
+| Artifact (built, inspected, device-tested) | final debug APK `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, `bin/clasicgames-1.2-arm64-v8a-debug.apk` (preserved as `…-SNAKEFIX.apk`), built from `875e136` (repair #4); Phase 3 clean-build predecessor `7d3416aa…` (53,223,301 bytes). Package `org.games.clasicgames`, versionName 1.2 / versionCode 1024102, min/target API 24/36, `arm64-v8a`, debug-signed |
+| Device (device-tested) | Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi; final artifact tested 2026-10-11. Samsung Galaxy S24 `SM-S921B`, Android 16 / API 36, `arm64-v8a` used only for the earlier repair confirmation |
+
+Scope caveats for the final docs (must not be overstated): only the single recorded Manjaro x86_64 host and the observed CPython 3.11.14 patch were tested; only Android API 37/36 devices at `arm64-v8a` were device-tested (the app declares min API 24 but lower APIs and other ABIs are untested); landscape layout is not responsive (deferred known limitation); only `systemBars()` insets are padded (display-cutout inset not handled).
+
+Stale-statement inventory (correct in checkpoint 3, not here):
+
+- `README.md`: "MDclassic_games setup (provisional)" heading; "`requirements.txt` remains unchanged until the final migration phase"; the observed-status paragraph still cites the KivyMD 1.2.0 `label.kv` failure, "UI compatibility migration is pending", and "Android has not yet been validated"; the `buildozer.spec`/`releases` paragraphs should point to `source/MDclassic_games/buildozer.spec` and distinguish historical downloads from the locally validated artifact.
+- `docs/getting-started.md`: "(provisional)" headings and "Phase 3, provisional"; "existing `requirements.txt` remains in place until the final migration phase"; the observed-status paragraph still says spec/packaging work is next and APK builds/Android runtime are unvalidated; the `game.spec` reference must become `buildozer.spec`; the `releases` paragraph needs the historical-vs-validated distinction.
+- Active runbook summaries: Phase 2 runbook "Next exact action" and header still point at "execute Phase 3 checkpoint 1"; Phase 3 header status still says the Phase 4 artifact is `7d3416aa…` and "Android runtime support remains unvalidated until the Phase 4 device gate passes" (Phase 4 has since passed). Phase 1 runbook historical 1.2.0 procedure retained as history with a clarifying header (done here, per checkpoint 1 item 4).
+
+Failure: none. No prerequisite gate is missing; no fabricated result was needed for the audit.
+
+Decision: checkpoint 1 gate passes. Public-doc corrections and the `requirements.txt` export are deferred to checkpoints 2 and 3 respectively; the Phase 2/3 runbook "next action" lines will be reconciled in checkpoint 3. Do not begin checkpoint 2 until the checkpoint 1 documentation diff is reviewed and committed.
+
+Next exact action: checkpoint 1 is complete. Per user decision, Phase 5 does not commit after each documentation checkpoint; all Phase 5 documentation/export changes are committed together at the end of the phase. Execute Phase 5 checkpoint 2 only: confirm the uv group policy, run `uv export --locked --no-dev --format requirements-txt --output-file requirements.txt` from the repository root, review the generated file, and verify it in a fresh temporary Python 3.11 venv with `pip install -r` / `pip check`. Do not begin checkpoint 3 without an explicit user request.

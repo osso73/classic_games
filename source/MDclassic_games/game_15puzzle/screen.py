@@ -14,6 +14,13 @@ from kivy.lang import Builder
 
 from kivymd.uix.screen import MDScreen
 from kivymd.app import MDApp
+from kivymd.uix.appbar import (
+    MDActionTopAppBarButton,
+    MDTopAppBar,
+    MDTopAppBarLeadingButtonContainer,
+    MDTopAppBarTitle,
+    MDTopAppBarTrailingButtonContainer,
+)
 
 # my app imports
 from game_15puzzle.puzzle import Puzzle
@@ -30,19 +37,34 @@ Builder.load_string(
     MDBoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
-        md_bg_color: app.theme_cls.primary_light
+        md_bg_color: app.theme_cls.primaryColor
         on_size: puzzle.initialize_grid()
     
-        MDToolbar:
-            title: '15 Puzzle'
-            elevation: 10
-            left_action_items: [["menu", lambda x: app.root.ids.my_drawer.set_state("open")]]
-            right_action_items: [["play-circle-outline", puzzle.start_game], ["volume-high", root.mute_button], ["help-circle-outline", root.help_button]]
+        MDTopAppBar:
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'menu'
+                    on_release: app.root.ids.my_drawer.set_state('open')
+
+            MDTopAppBarTitle:
+                text: '15 Puzzle'
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    icon: 'play-circle-outline'
+                    on_release: puzzle.start_game()
+                MDActionTopAppBarButton:
+                    icon: 'volume-high'
+                    on_release: root.mute_button(self)
+                MDActionTopAppBarButton:
+                    icon: 'help-circle-outline'
+                    on_release: root.help_button(self)
             
         MDLabel:
             id: score
             text: 'Moves: ' + str(puzzle.moves)
-            font_style: 'H5'
+            font_style: 'Headline'
+            role: 'small'
             halign: 'center'
             size_hint_y: None
             height: self.texture_size[1]
@@ -57,16 +79,16 @@ Builder.load_string(
         
             FloatLayout:
                 MDChip:
-                    text: 'Theme'
                     pos_hint: {'center_x': 0.5, 'center_y': 0.66}
                     on_release: sample.change_theme()
-                    icon: ''
+                    MDChipText:
+                        text: 'Theme'
 
                 MDChip:
-                    text: 'Level: ' + str(sample.board_size - 2)
                     pos_hint: {'center_x': 0.5, 'center_y': 0.33}
                     on_release: sample.change_size()
-                    icon: ''
+                    MDChipText:
+                        text: 'Level: ' + str(sample.board_size - 2)
                     
             Sample:
                 id: sample
