@@ -1244,3 +1244,33 @@ Automated checks: 111 tests still green (no app change). Device-only validation.
 Decision: checkpoint 8 PASS. Proceed to checkpoint 9 (Buscaminas).
 
 Next exact action: checkpoint 8 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 9 (Buscaminas) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `buscaminas/screen.py`/`area.py`/`field.py` first, exercise reveal and flag mode, cycle beginner/intermediate/expert, verify mine counts, win/loss, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 10.
+
+Phase / task: Phase 4 - Checkpoint 9: Buscaminas touch validation (2026-10-11)
+
+Status: passed - all required Buscaminas checks pass on the Pixel 10 (Android 17 / API 37), artifact `be6e6196…`.
+
+Files changed: this record only (no app code changes, no rebuild). Per user instruction, we do not commit at this point; plan was updated in-place earlier when asked to document progress.
+
+Environment: repository branch `MDclassic_games`, HEAD `a81d01c`; device `61190DLCR000VV`; artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `buscaminas/screen.py`, `area.py`, `field.py` read.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint9/`.
+
+Checklist result: PASS for all items.
+
+1. Entry: tile and drawer; re-entry fine.
+2. Start: ▶ builds level 1 (9x9, 10 mines); timer runs.
+3. Reveal: uncovering in covered mode works; 0-mine flood-uncover behaves as expected; hitting a mine shows loss state and reveals mines.
+4. Flag mode: toggle bomb/flag icon; placing/removing flags decreases/increases mine counter; toggle back to covered to reveal.
+5. Chording: open_adjacent works when flagged count equals number on uncovered tile.
+6. Levels: numeric icon cycles 1→2→3; board resizes and counts change (1: 9x9/10, 2: 9x18/25, 3: 18x36/125).
+7. Win/loss: win and loss states, popups/face changes and sounds observed.
+8. Mute: volume toggle silences sounds.
+9. Return/reopen: drawer return/reopen works.
+
+Log scan: `logcat-full.txt` (19,637 lines, 00:18Z-00:20Z) clean apart from pre-session SIGABRT (known).
+
+Automated checks: 111 green.
+
+Decision: checkpoint 9 PASS. Proceed to checkpoint 10 (Snake).
+
+Next exact action: checkpoint 9 is complete pending review. Execute Phase 4 checkpoint 10 (Snake) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `snake/screen.py`, `gameboard.py`, `grid_elements.py` first; exercise turns, eating, growing, collision/wall, pause/resume, speed/size/levels/mode settings, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 11.
