@@ -160,6 +160,36 @@ def test_snake_wall_and_body_collisions_end_the_game(gui_environment, tmp_path):
 
 
 @pytest.mark.gui
+def test_snake_ignores_a_release_without_a_matching_board_touch_down(gui_environment, tmp_path):
+    """A drawer or toolbar release must not steer the snake with stale coordinates."""
+
+    run_snake_script(
+        tmp_path,
+        """
+        class Touch:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+                self.ud = {}
+
+        game.start_game()
+        game.move_x, game.move_y = 1, 0
+
+        swipe = Touch(100, 100)
+        game.on_touch_down(swipe)
+        game.on_touch_up(swipe)
+        assert (game.move_x, game.move_y) == (1, 0)
+
+        # A release that never began on the board must be ignored.
+        game.on_touch_up(Touch(100, 600))
+        assert (game.move_x, game.move_y) == (1, 0), (
+            "a release without a matching board touch down must not steer the snake"
+        )
+        """,
+    )
+
+
+@pytest.mark.gui
 def test_snake_restart_and_settings_update_the_existing_game(gui_environment, tmp_path):
     """Restart resets state and Snake settings update the lazily created board."""
 

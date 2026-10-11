@@ -543,22 +543,23 @@ class GameBoard(Widget):
 
     def on_touch_down(self, touch):
         '''
-        When touch down, store the value of (x, y) in attributes swipe_x
-        and swipe_y. These will be used by method on_touch_up.
+        When touch down, store the value of (x, y) in the touch user data.
+        These will be used by method on_touch_up.
 
         Parameters
         ----------
         touch : touch event
             contains the coordinates of the touch.
         '''
-        self.swipe_x = touch.x
-        self.swipe_y = touch.y
+        touch.ud['snake_swipe'] = touch.x, touch.y
 
 
     def on_touch_up(self, touch):
         '''
-        When touch up, compare coordinates with swipe_x, swipe_y to find
-        the direction of the move, and trigger the move() method.
+        When touch up, compare coordinates with the stored start to find
+        the direction of the move, and trigger the move() method. A touch
+        that did not begin on the board is ignored, so a release from a
+        drawer or toolbar tap cannot steer the snake.
 
         Parameters
         ----------
@@ -571,8 +572,11 @@ class GameBoard(Widget):
             Direction of the move.
 
         '''
-        dif_x = self.swipe_x - touch.x
-        dif_y = self.swipe_y - touch.y
+        start = touch.ud.get('snake_swipe')
+        if start is None:
+            return
+        dif_x = start[0] - touch.x
+        dif_y = start[1] - touch.y
         if abs(dif_x) > SNAKE.MINIMUM_SWIPE or abs(dif_y) > SNAKE.MINIMUM_SWIPE:
             if abs(dif_x) > abs(dif_y):
                 if dif_x > 0:
