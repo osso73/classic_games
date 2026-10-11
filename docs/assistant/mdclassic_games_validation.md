@@ -1214,3 +1214,33 @@ Failure: one required checkpoint-7 row failed on the first artifact and is now f
 Decision: accept checkpoint 7 on artifact `be6e6196…`. The 15-puzzle layout is fixed and its regression is green. Because the artifact changed, checkpoints 1-6 remain valid on `7d3416aa…` and checkpoint 12 must re-confirm the current hash. Proceed to checkpoint 8 (2048).
 
 Next exact action: checkpoint 7 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 8 (2048) only on artifact `be6e6196e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `game_2048/screen.py`/`board.py` first, then exercise the four swipe controls, merges and score, undo, and the target control, return via drawer and reopen via drawer. Record evidence and logcat. Do not begin checkpoint 9.
+
+Phase / task: Phase 4 - Checkpoint 8: 2048 touch validation (2026-10-11)
+
+Status: passed - on artifact `be6e6196…` all required 2048 items pass on the Pixel 10 (Android 17 / API 37).
+
+Files changed: this record, the Phase 4 tracker and the master summary. No app `.py`/`.kv` change; no rebuild.
+
+Environment: repository branch `MDclassic_games`, HEAD `568ec27`; device `61190DLCR000VV`; artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `game_2048/screen.py`/`board.py` read first.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint8/`.
+
+Expected / observed result: PASS.
+
+1. Entry: opens from tile and drawer; re-entry reuses screen.
+2. Start: ▶ builds board with two starting tiles; Score = 0.
+3. Direction controls: on-screen joystick buttons `^ < > v` move tiles and spawn a new tile on valid moves; an invalid move does not add a tile.
+4. Merges: equal adjacent tiles merge into doubled value with animation; Score increases by the merged value.
+5. Undo: `backup-restore` reverts last move and Score.
+6. Target chip: cycles `256 → 512 → 1024 → 2048`.
+7. Win/loss: win popup "You win!" with sound reachable on small target; loss "You lost" reachable in play.
+8. Mute: silences win/game-over sounds.
+9. Return/reopen: drawer return/reopen; another move works.
+
+Log scan: `logcat-full.txt` (46,371 lines, 23:53Z-00:05Z) no session fatal/traceback; only pre-session 17:16 `SDLActivity` SIGABRT.
+
+Automated checks: 111 tests still green (no app change). Device-only validation.
+
+Decision: checkpoint 8 PASS. Proceed to checkpoint 9 (Buscaminas).
+
+Next exact action: checkpoint 8 is complete pending review. On explicit instruction, execute Phase 4 checkpoint 9 (Buscaminas) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `buscaminas/screen.py`/`area.py`/`field.py` first, exercise reveal and flag mode, cycle beginner/intermediate/expert, verify mine counts, win/loss, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 10.
