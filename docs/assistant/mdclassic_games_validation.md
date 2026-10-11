@@ -1274,3 +1274,32 @@ Automated checks: 111 green.
 Decision: checkpoint 9 PASS. Proceed to checkpoint 10 (Snake).
 
 Next exact action: checkpoint 9 is complete pending review. Execute Phase 4 checkpoint 10 (Snake) only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): read `snake/screen.py`, `gameboard.py`, `grid_elements.py` first; exercise turns, eating, growing, collision/wall, pause/resume, speed/size/levels/mode settings, mute, return/reopen. Record evidence and logcat. Do not begin checkpoint 11.
+
+Phase / task: Phase 4 - Checkpoint 10: Snake touch validation (2026-10-11)
+
+Status: passed - all required Snake checks pass on the Pixel 10 (Android 17 / API 37), artifact `be6e6196…`.
+
+Files changed: this record only (no app code changes, no rebuild). No commit made on this checkpoint; the Phase 4 plan tracker was updated in-place.
+
+Environment: repository branch `MDclassic_games`, HEAD `7bc7e47`; device `61190DLCR000VV` (Pixel 10); artifact `be6e619e657ec8308396f35a0d23e3ef6371237d267483895ec3089a449c19c1`. `git status --short` clean on entry. On-device `/data/app/.../base.apk` SHA-256 re-verified as `be6e6196…`, so no reinstall was needed. `snake/screen.py`, `gameboard.py`, `grid_elements.py`, `levels.py`, `constants.py`, and `settings.json` read.
+
+Evidence `/home/oriol/android-build/evidence/phase4-checkpoint10/` (`launch.txt`, `logcat-full.txt`, `session-times.txt`, `screenshot-start.png`, `screenshot-snake.png`, `snake-evidence.txt`).
+
+Checklist result: PASS for all items.
+
+1. Entry: menu tile and drawer entry work; loading snackbar; drawer return and reopen fine, no duplicate screen.
+2. Start + turn: ▶ starts the round; board swipes in all four directions change heading and motion is smooth.
+3. Eat: steering onto food increments the score and grows the snake (fruit +3/+1, junk +1/+2, sweet +1/+3 per constants).
+4. Collision/game-over: wall (level >=2) and self collision produce game-over (head colour flash + sound) and ▶ restarts.
+5. Pause/resume: pause halts motion and switches the icon to play; resume restores one normal update stream and the pause icon.
+6. Settings: speed, size (11/15/19/23), mode (story/single-level), and start level (1-12) apply; board and level progress indicator stay usable.
+7. Return/re-enter: leaving a running round via the drawer and reopening resumes without duplicate/accelerated motion and direction swipes still work.
+8. Mute: volume toggle silences sounds.
+
+Log scan: `logcat-full.txt` (71,780 lines, session 11:16:27Z-11:27:55Z; device-local 13:16-13:27). No `AndroidRuntime`, Python traceback, or app-fatal error. The only `F libc` SIGABRT is dated 10-10 17:16 (pre-session, known). Cold launch `am start -W` TotalTime 269 ms; Kivy 2.3.1 + KivyMD 2.0.0 initialised, Window/GL `sdl2`, `audio_sdl2` provider selected, main loop reached.
+
+Automated checks: `uv run --locked --group dev pytest -q` PASS: 111 passed in 28.34s on the unchanged code (matches the checkpoint 9 count). No rebuild required.
+
+Decision: checkpoint 10 PASS. Proceed to checkpoint 11 (lifecycle/rotation/providers/external Help).
+
+Next exact action: checkpoint 10 is complete pending review. Execute Phase 4 checkpoint 11 only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): with full logcat capture, exercise Android Back from menu/drawer/About/settings/games, portrait<->landscape at menu/settings/games, background/foreground during Pong/Snake/Memory mismatch/2048, screen lock/unlock, external Help URL round trip, normal exit/relaunch, cold force-stop relaunch, repeated re-entry, audio/mute, and image/font providers. Record evidence and logcat. Do not begin checkpoint 12.
