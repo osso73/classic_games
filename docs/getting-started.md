@@ -8,9 +8,9 @@ Once kivy library is installed, you can execute each of the games by going into 
 python main.py
 ```
 
-### MDclassic_games setup (provisional)
+### MDclassic_games setup
 
-The combined KivyMD app uses [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.11. Its root `pyproject.toml` and `uv.lock` are authoritative; the existing `requirements.txt` remains in place until the final migration phase.
+The combined KivyMD app uses [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.11. Its root `pyproject.toml` and `uv.lock` are authoritative. A functional runtime `requirements.txt` is generated from the lockfile for pip-based installations (it excludes dev and Android host tooling).
 
 From the repository root, create the locked environment:
 
@@ -25,9 +25,17 @@ Then change into `source/MDclassic_games` before running the app. The app requir
 uv run --locked python main.py
 ```
 
-Observed status: desktop compatibility and acceptance passed with Kivy 2.3.1 and KivyMD 2.0.0. All 80 desktop tests and the focused visual recheck pass with the common Pillow 11.3.0 / pycairo 1.28.0 supporting pins. Android host setup is validated, including installed zip and accepted SDK licenses; spec/packaging work is next. APK builds and Android runtime support remain unvalidated. See the [validation record](assistant/mdclassic_games_validation.md).
+To use pip instead of uv, from repository root:
 
-#### MDclassic_games Android host setup (Phase 3, provisional)
+```
+uv export --locked --no-dev --format requirements-txt --output-file requirements.txt
+python -m pip install -r requirements.txt
+python source/MDclassic_games/main.py
+```
+
+Observed status: desktop compatibility and acceptance passed with Kivy 2.3.1 and KivyMD 2.0.0. All 112 desktop tests (full suite) pass on the recorded host, with the common Pillow 11.3.0 / pycairo 1.28.0 supporting pins. Android host setup and build/device validation have been completed as documented in the validation record; the tested artifact and device are recorded there. See the [validation record](assistant/mdclassic_games_validation.md) for full details.
+
+#### MDclassic_games Android host setup
 
 The following setup has been exercised on Manjaro Linux x86_64. EndeavourOS is also Arch-based, but has not been tested yet. Python packages belong to the repository's `.venv`; Java and Android tools are installed under `~/.local/share/classic-games-android`. No shell profile or system-default Java change is needed.
 
@@ -62,7 +70,7 @@ env JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1" \
 
 To inspect the installed SDK, repeat that command with `--list_installed` instead of `--licenses`. Buildozer 1.6.0 expects the legacy `sdk/tools/bin/sdkmanager` location and p4a's API check runs `sdk/tools/bin/avdmanager`; the provisioning script creates small launchers for both that point to the canonical `sdk/cmdline-tools/19.0/bin/` binaries, without duplicating SDK package metadata.
 
-The project's `android` dependency group pins host build tools; `uv.lock` does not lock OS packages, Java, SDK/NDK binaries or p4a's cross-compiled Python environment. The APK's selected Python 3.11.14 is separate from the host interpreter. The next spec checkpoint will use the immutable p4a revision, explicit APIs/NDK, isolated SDK paths and disabled SDK auto-updates. Building is still gated by that spec/resource review.
+The project's `android` dependency group pins host build tools; `uv.lock` does not lock OS packages, Java, SDK/NDK binaries or p4a's cross-compiled Python environment. The APK's selected Python 3.11.14 is separate from the host interpreter. Build validation uses the pinned toolchain as documented in the validation record; refer to the tested matrix for explicit versions.
 
 For regression checks with the Android host group retained in `.venv`, run from repository root:
 
@@ -72,6 +80,6 @@ uv run --locked --group dev --group android pytest
 
 After reinstalling the OS, restore the repository including committed metadata, recreate `.venv` with the locked sync above, and rerun the provisioning script. Preserve local app settings separately if wanted. Check graphics/audio providers and rerun desktop tests on the new OS; the clean Android build and device checks remain separate acceptance gates.
 
-If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `game.spec` file that I use to compile it for android. You can adjust the parameters there.
+If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). The MDclassic_games app uses `source/MDclassic_games/buildozer.spec` for Android builds. Individual standalone games keep their own spec files in their respective folders. You can adjust the parameters there.
 
 In the folder `releases` you can find apk files to be installed on your android mobile phone.

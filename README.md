@@ -29,11 +29,11 @@ Then you can execute each of the games by going into their folder, and running:
 python main.py
 ```
 
-The game based on KivyMD is under folder MDclassic_games.
+The game based on KivyMD is under folder `source/MDclassic_games`.
 
-### MDclassic_games setup (provisional)
+### MDclassic_games setup
 
-The combined KivyMD app uses [uv](https://docs.astral.sh/uv/getting-started/installation/) with Python 3.11. The root `pyproject.toml` and `uv.lock` are the authoritative dependency definitions; `requirements.txt` remains unchanged until the final migration phase.
+The combined KivyMD app uses [uv](https://docs.astral.sh/uv/getting-started/installation/) with Python 3.11. The root `pyproject.toml` and `uv.lock` are the authoritative dependency definitions. A functional runtime `requirements.txt` is generated from the lockfile for pip-based installations.
 
 Set up the locked environment from the repository root:
 
@@ -48,7 +48,12 @@ Then change into the app directory before launching, because the app loads KV fi
 uv run --locked python main.py
 ```
 
-Observed status: the locked desktop environment is ready, but UI compatibility migration is pending after the pinned KivyMD 1.2.0 distribution failed to load a required `label.kv` resource. Android has not yet been validated.
+The runtime requirements can be installed with pip in an isolated environment:
+
+```
+uv export --locked --no-dev --format requirements-txt --output-file requirements.txt
+python -m pip install -r requirements.txt
+```
 
 If you want to run them in your mobile phone, you will need to use `buildozer` to compile for android. The detailed instructions are here: [Packaging your application](https://kivy.org/doc/stable/guide/packaging.html). Inside each game folder I have the `buildozer.spec` file that I use to compile it for android. You can adjust the parameters from there to your liking.
 

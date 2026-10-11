@@ -1,6 +1,6 @@
 # MDclassic_games Phase 1 runbook — Adopt uv
 
-Reviewed: 2026-09-13. Status: **not executed**.
+Reviewed: 2026-09-13. Status: **executed and passed** - the desktop environment was established and its gate recorded (committed `763f139`); see the [validation record](mdclassic_games_validation.md). The `kivymd==1.2.0` baseline in section 1 and the "do not fall back to 2.x" guidance below are retained as the original historical procedure; Phase 2 checkpoint 1 superseded that selection with the locked PyPI `kivymd==2.0.0` artifact (commit `a1beac1`) after the 1.2.0 resource-install defect recorded in the validation record. Do not follow the superseded 1.2.0 steps; use the final baseline in the [master plan](mdclassic_games_upgrade_plan.md).
 
 Read [the master plan](mdclassic_games_upgrade_plan.md) first. This runbook creates the desktop environment only. Phase 2 in the revised master plan handles application compatibility; Phase 3 handles Android. Environment installation success and application startup success are separate results.
 

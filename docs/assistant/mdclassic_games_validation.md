@@ -1369,3 +1369,48 @@ Failure: no remaining checkpoint failure. Outstanding items are recorded known l
 Decision: close Phase 4. The final input state has a full desktop suite pass (112) and final-artifact device evidence on `8bc32723…`; build provenance, per-checkpoint coverage, and installation identity are all recorded. Continue to Phase 5 handoff. Do not advertise validation on Android versions/ABIs beyond the recorded Pixel 10 (Android 17/API 37) and the earlier Samsung S24 (Android 16/API 36) work.
 
 Next exact action: review this checkpoint 12 record, then execute Phase 5 checkpoint 1 (evidence reconciliation) only. Phase 5 covers README/getting-started reconciliation, a functional `requirements.txt` export (`uv export --locked --no-dev --format requirements-txt --output-file requirements.txt`, Android group excluded), the tested version matrix publication, fresh-environment verification, and final scope/diff review. Do not push or merge without an explicit user request.
+
+Phase / task: Phase 5 - Checkpoint 1: Audit evidence and stale instructions (2026-10-11)
+
+Status: passed (audit and gate complete; per user decision the documentation commit is deferred to the end of Phase 5, so there is no per-checkpoint commit)
+
+Files changed: `docs/assistant/mdclassic_games_phase1_uv_plan.md` (clarify the historical "not executed" header and the superseded 1.2.0 baseline), `docs/assistant/mdclassic_games_phase5_handoff_plan.md` (checkpoint tracker and next action), `docs/assistant/mdclassic_games_upgrade_plan.md` (Phase 5 status and summary row), this record. No code/dependency/spec/test change.
+
+Environment: repository branch `MDclassic_games`, HEAD `c4ae6f7`, `git status --short` clean on entry; host Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10. `.python-version` = `3.11` (minor selector, not a patch pin).
+
+Command and working directory: repository root. Ran `git status --short`, `uv --version` (0.12.10), `uv lock --check` (Resolved 44 packages, exit 0), `git diff --check` (clean), and `sha256sum` on the preserved final artifact. Read `README.md`, `docs/getting-started.md`, `pyproject.toml`, `uv.lock`, `.python-version`, `source/MDclassic_games/buildozer.spec`, `requirements.txt`, the Phase 1-5 runbooks, `.github/workflows/mdclassic-games-tests.yml`, and the test tree. Queried the GitHub Actions API for the final CI run.
+
+Expected / observed result: all prerequisite acceptance evidence exists and matches the final inputs.
+
+1. Phase 2 desktop gate: manual/visual acceptance committed `3efd3cf`, CI-actions cleanup `bfaacd1`/`3d55d2b`; Phase 2 tracker records CI run 38006783012 success at `3d55d2b` (confirmed: workflow run #3, unit 56s, gui 1m44s).
+2. Phase 3 gate: checkpoints 1-6 committed (`8cb288f`, `c29c7b0`, `e247e97`, `4188800`, plus the checkpoint-5/6 records); clean-app-build reproduction (`checkpoint6-clean-build`) exit 0, APK `7d3416aaa7f882b4ffd54295ae297f452bf4594a2f2410b899d74f55e9d3cc91` (53,223,301 bytes), ported into Phase 4. Clean-build evidence re-read: `checkpoint6-clean-build-apk.sha256`, `checkpoint6-freeze.txt` (p4a HEAD `58d21141…`), `checkpoint6-desktop-gate.log` (110 passed, exit 0). Checkpoint 7 committed `524e02b`.
+3. Phase 4 gate: all 12 checkpoints passed on Pixel 10 `61190DLCR000VV` (Android 17/API 37); final artifact `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, re-verified on disk at `/home/oriol/android-build/evidence/phase4-checkpoint11/clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk` (matches the recorded hash), byte-identical to the on-device `base.apk`. Final desktop suite 112/112.
+4. CI on the final tested commit: workflow `.github/workflows/mdclassic-games-tests.yml` run [#7 (38151771331)](https://github.com/osso73/classic_games/actions/runs/38151771331), `head_sha` `c4ae6f7…`, conclusion `success`, 2026-10-11T15:33-15:35Z. The workflow filename is exactly `mdclassic-games-tests.yml` (no approved rename). Prior run #6 on `7bc7e47` also `success`.
+5. Final metadata: non-packaged uv project (`[tool.uv] package = false`); `requires-python = ">=3.11,<3.12"`; default groups are `dev` only (`android` is non-default); pytest config restrict s discovery to `tests/mdclassic_games` with `--strict-markers` and a `gui` marker. Tests present: 4 unit modules and 9 integration modules (test_shell, test_pong, test_ahorcado, test_memory, test_15puzzle, test_2048, test_buscaminas, test_snake, test_cross_app).
+
+Final tested matrix (selected / built-inspected / device-tested, with platform differences explicit):
+
+| Area | Value and evidence |
+| --- | --- |
+| Desktop host | Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14; uv 0.12.10; `.python-version` = 3.11 (minor only) |
+| Desktop runtime (selected = tested) | Kivy 2.3.1; KivyMD 2.0.0 (PyPI artifact, locked from commit `a1beac1`); Pillow 11.3.0; pycairo 1.28.0; materialyoucolor 3.0.4; transitives asyncgui 0.6.3, asynckivy 0.6.4, materialshapes 0.3 |
+| Test environment | pytest 9.1.1; desktop run with real display/GL (Mesa) and SDL2 audio (ALSA default, user-selectable driver preserved); CI gui job uses Xvfb + software Mesa GL + `SDL_AUDIODRIVER=dummy` |
+| Test result (2026-10-11, final inputs) | full suite 112 collected / 112 passed / 0 failed / 0 skipped / 0 xfailed in 28.82s; unit display-independent; CI run 38151771331 success |
+| Android host (built) | Manjaro x86_64; host Python from `.venv` 3.11; uv 0.12.10; Buildozer 1.6.0; Cython 0.29.34; Temurin JDK 17.0.20.1+1; SDK cmdline-tools 19.0 (build 13114758); platform-tools 37.0.1; build-tools 36.0.0; Android platform API 36 rev 2; NDK r28c (28.2.13676358) |
+| Android embedded (built) | p4a `v2026.05.09` commit `58d21141f17c889bf8585f5665921d72028f8831`; Python/hostpython 3.11.14; runtime pins as desktop (Kivy 2.3.1, KivyMD 2.0.0, Pillow 11.3.0, pycairo 1.28.0, materialyoucolor 3.0.4, asyncgui 0.6.3, asynckivy 0.6.4, materialshapes 0.3) plus docutils 0.23, pygments 2.21.0, filetype 1.2.0, requests 2.34.2, urllib3 2.7.0, idna 3.19, certifi 2026.7.22, charset-normalizer 3.5.1, chardet 5.2.0, kivy-garden 0.1.5, six 1.17.0; target API 36 / min+NDK API 24; NDK 28c; `arm64-v8a`; `harfbuzz` omitted (approved decision) |
+| Artifact (built, inspected, device-tested) | final debug APK `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, `bin/clasicgames-1.2-arm64-v8a-debug.apk` (preserved as `…-SNAKEFIX.apk`), built from `875e136` (repair #4); Phase 3 clean-build predecessor `7d3416aa…` (53,223,301 bytes). Package `org.games.clasicgames`, versionName 1.2 / versionCode 1024102, min/target API 24/36, `arm64-v8a`, debug-signed |
+| Device (device-tested) | Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi; final artifact tested 2026-10-11. Samsung Galaxy S24 `SM-S921B`, Android 16 / API 36, `arm64-v8a` used only for the earlier repair confirmation |
+
+Scope caveats for the final docs (must not be overstated): only the single recorded Manjaro x86_64 host and the observed CPython 3.11.14 patch were tested; only Android API 37/36 devices at `arm64-v8a` were device-tested (the app declares min API 24 but lower APIs and other ABIs are untested); landscape layout is not responsive (deferred known limitation); only `systemBars()` insets are padded (display-cutout inset not handled).
+
+Stale-statement inventory (correct in checkpoint 3, not here):
+
+- `README.md`: "MDclassic_games setup (provisional)" heading; "`requirements.txt` remains unchanged until the final migration phase"; the observed-status paragraph still cites the KivyMD 1.2.0 `label.kv` failure, "UI compatibility migration is pending", and "Android has not yet been validated"; the `buildozer.spec`/`releases` paragraphs should point to `source/MDclassic_games/buildozer.spec` and distinguish historical downloads from the locally validated artifact.
+- `docs/getting-started.md`: "(provisional)" headings and "Phase 3, provisional"; "existing `requirements.txt` remains in place until the final migration phase"; the observed-status paragraph still says spec/packaging work is next and APK builds/Android runtime are unvalidated; the `game.spec` reference must become `buildozer.spec`; the `releases` paragraph needs the historical-vs-validated distinction.
+- Active runbook summaries: Phase 2 runbook "Next exact action" and header still point at "execute Phase 3 checkpoint 1"; Phase 3 header status still says the Phase 4 artifact is `7d3416aa…` and "Android runtime support remains unvalidated until the Phase 4 device gate passes" (Phase 4 has since passed). Phase 1 runbook historical 1.2.0 procedure retained as history with a clarifying header (done here, per checkpoint 1 item 4).
+
+Failure: none. No prerequisite gate is missing; no fabricated result was needed for the audit.
+
+Decision: checkpoint 1 gate passes. Public-doc corrections and the `requirements.txt` export are deferred to checkpoints 2 and 3 respectively; the Phase 2/3 runbook "next action" lines will be reconciled in checkpoint 3. Do not begin checkpoint 2 until the checkpoint 1 documentation diff is reviewed and committed.
+
+Next exact action: checkpoint 1 is complete. Per user decision, Phase 5 does not commit after each documentation checkpoint; all Phase 5 documentation/export changes are committed together at the end of the phase. Execute Phase 5 checkpoint 2 only: confirm the uv group policy, run `uv export --locked --no-dev --format requirements-txt --output-file requirements.txt` from the repository root, review the generated file, and verify it in a fresh temporary Python 3.11 venv with `pip install -r` / `pip check`. Do not begin checkpoint 3 without an explicit user request.

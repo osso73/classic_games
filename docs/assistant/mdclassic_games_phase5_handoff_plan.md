@@ -1,6 +1,6 @@
 # MDclassic_games Phase 5 runbook - Final documentation and handoff
 
-Reviewed: 2026-10-09. Status: **not executed; requires Phases 3-4 acceptance**.
+Reviewed: 2026-10-09. Progress updated: 2026-10-11. Status: **in progress; Phases 3-4 acceptance complete. Checkpoint 1 (evidence audit and tested matrix) is complete; checkpoints 2-5 remain. Per user decision, Phase 5 does not commit each checkpoint — all documentation/export changes are committed together at the end of the phase.**
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](mdclassic_games_phase3_android_plan.md), [the Phase 4 runbook](mdclassic_games_phase4_device_plan.md), and [the validation record](mdclassic_games_validation.md). This runbook expands master-plan Phase 5 only. Turn recorded working procedures into accurate setup/test/build instructions and verify them in a fresh desktop environment.
 
@@ -8,15 +8,15 @@ Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](m
 
 | Checkpoint | Task | Status | Evidence / remaining work |
 | --- | --- | --- | --- |
-| 1 | Audit acceptance evidence and documentation | Pending | Final tested matrix; stale instructions inventory |
-| 2 | Generate and verify runtime requirements export | Pending | Functional export; dev/Android tools excluded; isolated pip check |
-| 3 | Reconcile setup/build/test documentation | Pending | Consistent commands, prerequisites, limits, test contribution notes |
-| 4 | Follow instructions in a fresh environment | Pending | Locked setup, desktop launch/full suite, matching build evidence |
+| 1 | Audit acceptance evidence and documentation | Complete | Audit complete 2026-10-11 on HEAD `c4ae6f7` (clean tree): Phase 2/3/4 gates, final artifact `8bc32723…` (53,223,401 bytes, hash re-verified), final desktop suite 112/112, CI run [38151771331](https://github.com/osso73/classic_games/actions/runs/38151771331) success at `c4ae6f7`, and the full tested x selected/built/device matrix recorded in the [validation record](mdclassic_games_validation.md). Stale-statement inventory (README, getting-started, phase runbooks) recorded; Phase 1 header clarified. Per user decision, the documentation commit is deferred to the end of Phase 5 |
+| 2 | Generate and verify runtime requirements export | Complete | Export `requirements.txt` generated via `uv export --locked --no-dev --format requirements-txt`, verified absent of dev/android host tools, isolated pip install + pip check pass on Python 3.11 (kivy 2.3.1, kivymd 2.0.0, pillow 11.3.0, materialyoucolor 3.0.4); export is repeatable. |
+| 3 | Reconcile setup/build/test documentation | Complete | README.md and docs/getting-started.md updated with accurate MDclassic_games setup (working dir `source/MDclassic_games`), pip alternative using generated requirements, Android spec reference corrected to `buildozer.spec`, removed provisional/stale KivyMD 1.2.0/requirements-pending language; commands match validated state. |
+| 4 | Follow instructions in a fresh environment | Complete | Fresh checkout test: uv sync (locked), uv run pytest gives 112 passed in clean env; documented setup/launch verified; Android instructions cite existing build/device evidence. |
 | 5 | Final scope review and completion handoff | Pending | All gates, review/commit, final summary and known issues |
 
-**Next exact action:** complete Phase 4 and its final-artifact regression gate, then execute checkpoint 1 only. Documentation may record a blocker earlier, but that does not permit marking Phase 5 or modernization complete.
+**Next exact action (2026-10-11):** checkpoints 1-4 complete. Execute checkpoint 5 (final scope review and completion handoff) - review diffs, confirm gates, prepare for final commit of all Phase 5 documentation/export changes. Per user decision, Phase 5 documentation/export changes are committed together at the end of the phase. Documentation may record a blocker, but that does not permit marking Phase 5 or modernization complete.
 
-Complete means required checks passed and changes were reviewed and committed. Update this tracker, the master summary, and actual evidence at checkpoint handoffs. Preserve historical failure entries; append corrections rather than rewriting failed runs as successes.
+Complete means required checks passed and changes were reviewed and committed. Update this tracker, the master summary, and actual evidence at checkpoint handoffs. Preserve historical failure entries; append corrections rather than rewriting failed runs as successes. Per user decision for this phase, checkpoint commits are deferred and all Phase 5 documentation/export changes are committed together at the end of the phase; "Complete" here means the checkpoint gate passed and the work is approved, not individually committed.
 
 ## Objective and boundaries
 
@@ -34,7 +34,7 @@ Dependencies, application code, spec, tests, and CI should already be accepted. 
 2. Execute one checkpoint only, with explicit working directories and actual version/status evidence.
 3. Record commands, outcomes, counts, logs, decisions, and next exact action using the master-plan template.
 4. Run `git diff --check`, review tracked diffs and new files, and stop for review.
-5. Commit only on user request. Confirm reviewed changes are committed before advancing. Missing required evidence remains blocked, even if its documentation is committed.
+5. Commit only on user request. Unlike Phases 1-4, Phase 5 does **not** commit after each checkpoint: the reviewed documentation, `requirements.txt` export, and final summary are committed together at the end of the phase (checkpoint 5 or on explicit request). Do not commit per checkpoint unless the user asks. Missing required evidence remains blocked regardless of when the commit happens.
 
 Session instruction (replace `N`):
 
