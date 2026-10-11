@@ -1336,3 +1336,36 @@ Automated checks: `uv run --locked --group dev pytest -q` PASS: 112 passed in 28
 Decision: checkpoint 11 PASS (landscape layout recorded as a deferred known limitation). Proceed to checkpoint 12 (final artifact regression) on `8bc32723…`.
 
 Next exact action: checkpoint 11 is complete pending review. Execute Phase 4 checkpoint 12 on artifact `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): re-confirm the hash, run the full acceptance set (startup, seven game entries/basic controls, settings persistence, representative audio, one rotation/background cycle), locate/reuse the full desktop suite pass (112 on the current inputs) or rerun it if inputs changed, review logcat across intervals, and check `git diff`/staging. Record evidence and stop for review. Do not begin Phase 5.
+
+Phase / task: Phase 4 - Checkpoint 12: final artifact acceptance and Phase 5 handoff (2026-10-11)
+
+Status: passed - final artifact regression passed on the Pixel 10 (Android 17 / API 37); final desktop suite, logcat review, git scope check and coverage table all recorded. Phase 4 is complete; Phase 5 checkpoint 1 is next.
+
+Files changed: this record, the Phase 4 tracker and the master summary only. No runtime/test/spec/dependency change; no commit made on this checkpoint.
+
+Environment: repository branch `MDclassic_games`, HEAD `bf64579` (checkpoint 11 record), clean tree. Device Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button nav. Host Linux 7.2.3-2-MANJARO x86_64; CPython 3.11.14, uv 0.12.10, Kivy 2.3.1, KivyMD 2.0.0. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint12/`.
+
+Final artifact freeze: `/home/oriol/android-build/evidence/phase4-checkpoint11/clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk`, SHA-256 `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes (repair #4 / Snake phantom swipe). `aapt dump badging` re-confirmed `org.games.clasicgames`, versionName 1.2, versionCode 1024102, min/target SDK 24/36, launcher `org.kivy.android.PythonActivity`, native-code `arm64-v8a`. The installed `base.apk` was pulled from the device and hashes to the identical `8bc32723…`, so the on-device build is byte-for-byte the final artifact (no installation mix-up).
+
+Coverage table (all on Pixel 10 `61190DLCR000VV`, Android 17 / API 37, `arm64-v8a`): checkpoints 1-6 on `7d3416aa…e9d3cc91`, checkpoints 7-10 on `be6e6196…9a449c19c1`, and checkpoints 11-12 on the final `8bc32723…71e6848e`. The only input changes between checkpoints 10 and 12 are repair #3 (`game_15puzzle/sample.py` cap) and repair #4 (`snake/gameboard.py` touch handling), each with its regression and its own rebuilt/retested artifact; the other five games and the shell were re-confirmed entry/basic-control on the final artifact this checkpoint to catch any mix-up.
+
+Manual checks: PASS, user on the final artifact `8bc32723…`:
+1. Startup: cold launch to a responsive menu with all seven tiles visible (screenshot `/home/oriol/android-build/evidence/phase4-checkpoint12/menu-final.png`).
+2. Seven game entries: each of Pong, Ahorcado, Memory, 15 puzzle, 2048, Buscaminas, Snake opened from its tile, one basic control exercised (start/move/restart as appropriate), returned via drawer; drawer re-open of Snake does not flip its direction.
+3. Settings persistence: a visible setting changed in a panel, app exited and cold-relaunched, value persists.
+4. Representative audio: a game sound heard and a mute toggle worked.
+5. Rotation/background: portrait->landscape->portrait during a game with a control exercised after each change; Home, wait, return via recents - board/labels redraw and controls work. Landscape layout remains the recorded (deferred) non-responsive limitation, not a new defect.
+
+Automated checks:
+- `uv sync --locked --group dev` PASS then `uv run --locked --group dev pytest` PASS: 112 passed, failed 0, skipped 0, xfailed 0 in 28.82s on the final tree (inputs unchanged since checkpoint 11's 112-test pass; reran as the explicit final-state requirement). Sync also uninstalled the `android` host group packages for the desktop-only run; the lock still pins them and `uv sync --locked --group android` reinstalls them for any later build.
+- Cold startup from the exact artifact: `adb shell am start -W` reported LaunchState COLD, TotalTime 305 ms; log shows Python 3.11.14, Kivy 2.3.1, KivyMD 2.0.0, Image providers `img_tex, img_dds, img_sdl2, img_pil`, Audio `audio_sdl2`, GL ES 3.2 (PowerVR D-Series), and "Start application main loop".
+- Programmatic cold-process persistence: forced-stop then cold-relaunched; the on-device `files/.main.ini` md5 (`4406f79d2f100ebbb2d236057da4521a`) was identical before and after, and the relaunched app (new pid 9368) reached focus.
+- `git diff --check` PASS; `git status --short --untracked-files=all` empty; tracked `source/MDclassic_games/main.ini` SHA-256 remains `028a0feda857fbffa0656b49844ffdfb9dcc9b89462ec72f0eb98f24eebaf4a2`.
+
+Logcat: full-device capture `/home/oriol/android-build/evidence/phase4-checkpoint12/logcat-full.txt` (104,282 lines, ~15.4 MB), session device-local 16:24:31 -> ~16:57 (start/end timestamps in `session-start.txt` / `session-end.txt`). No Traceback, FATAL EXCEPTION, AndroidRuntime, Fatal Python error, or `python` W/E in the tested interval. The only app-side warning is the known benign `[Base] Unknown <android> provider` (8x, boot-time metadata probing). A single app process (pid 7708) ran the whole interactive exercise; `onPause` (16:55:52, Home) -> `onResume` (16:56:02, recents return) confirms the foreground/background cycle, and `onPause` (16:56:36) marks the closing exit. No process restart/crash occurred. The pre-session `F libc` SIGABRT and the "Error when copying logo directory" traceback are the already-recorded known items from checkpoint 11's archive, not this session.
+
+Failure: no remaining checkpoint failure. Outstanding items are recorded known limits only: landscape layout is not responsive (user-deferred to a separate task) and only `systemBars()` insets are padded (display-cutout safe inset not handled; neither test device exercises a wide-notch cutout).
+
+Decision: close Phase 4. The final input state has a full desktop suite pass (112) and final-artifact device evidence on `8bc32723…`; build provenance, per-checkpoint coverage, and installation identity are all recorded. Continue to Phase 5 handoff. Do not advertise validation on Android versions/ABIs beyond the recorded Pixel 10 (Android 17/API 37) and the earlier Samsung S24 (Android 16/API 36) work.
+
+Next exact action: review this checkpoint 12 record, then execute Phase 5 checkpoint 1 (evidence reconciliation) only. Phase 5 covers README/getting-started reconciliation, a functional `requirements.txt` export (`uv export --locked --no-dev --format requirements-txt --output-file requirements.txt`, Android group excluded), the tested version matrix publication, fresh-environment verification, and final scope/diff review. Do not push or merge without an explicit user request.
