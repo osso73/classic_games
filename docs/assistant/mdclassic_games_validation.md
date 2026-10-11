@@ -1303,3 +1303,36 @@ Automated checks: `uv run --locked --group dev pytest -q` PASS: 111 passed in 28
 Decision: checkpoint 10 PASS. Proceed to checkpoint 11 (lifecycle/rotation/providers/external Help).
 
 Next exact action: checkpoint 10 is complete pending review. Execute Phase 4 checkpoint 11 only on artifact `be6e6196…` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): with full logcat capture, exercise Android Back from menu/drawer/About/settings/games, portrait<->landscape at menu/settings/games, background/foreground during Pong/Snake/Memory mismatch/2048, screen lock/unlock, external Help URL round trip, normal exit/relaunch, cold force-stop relaunch, repeated re-entry, audio/mute, and image/font providers. Record evidence and logcat. Do not begin checkpoint 12.
+
+Phase / task: Phase 4 - Checkpoint 11: lifecycle, rotation, providers, external Help (2026-10-11)
+
+Status: passed - all required lifecycle/provider/Help checks pass on the Pixel 10 (Android 17 / API 37); rotation redraw works and one pre-existing landscape-layout limitation is recorded and deferred by user decision. A Snake defect found here was repaired (repair #4).
+
+Files changed: `source/MDclassic_games/snake/gameboard.py` (touch handling), `tests/mdclassic_games/integration/test_snake.py` (one regression), this record, the Phase 4 tracker and the master summary. No commit made on this checkpoint.
+
+Environment: repository branch `MDclassic_games`, HEAD `875e136`; build worktree `/home/oriol/android-build/mdclassic_games` (source-equivalent except the Snake fix; the Nextcloud checkout is a synced copy, the worktree is the established build tree). Device Google Pixel 10 `61190DLCR000VV`, physical, Android 17 / API 37, `arm64-v8a`, 1080x2424 @ 460 dpi, 3-button nav. Evidence `/home/oriol/android-build/evidence/phase4-checkpoint11/`.
+
+Artifacts: the checkpoint entered on `be6e619e…9a449c19c1` (53,223,341 bytes). Repair #4 rebuilt it to SHA-256 `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e`, 53,223,401 bytes, preserved as `clasicgames-1.2-arm64-v8a-debug-SNAKEFIX.apk`. Built with `run-checkpoint4-build.sh phase4-checkpoint11-snake-fix` (exit 0; `build-snake-fix.log` at the evidence dir is an earlier, abandoned attempt in the synced tree; the authoritative log is `/home/oriol/android-build/evidence/phase4-checkpoint11-snake-fix.log`). Installed as a same-signature update with `adb install -r` (Success); the on-device `base.apk` hash re-verified as `8bc32723…`. Manifest unchanged (`org.games.clasicgames`, 1.2 / 1024102, min/target 24/36, `arm64-v8a`). Packaged `snake/gameboard.pyc` contains `snake_swipe`, no `swipe_x`/`swipe_y`.
+
+Logcat: `logcat-full.txt` (336,939 lines, 49.8 MB), full-device capture 11:48:31Z-13:46:47Z (device-local 13:48-15:46). One Python traceback only: the known non-fatal "Error when copying logo directory" (Permission denied under `files/app/.kivy/icon`). The single `F libc` SIGABRT is dated 10-10 17:16 (pre-session, known). No AndroidRuntime/FATAL EXCEPTION/Fatal Python error in-session. The Snake-fix launch (14:45:08) initialised Kivy 2.3.1, Image providers `img_tex, img_dds, img_sdl2, img_pil` and Audio `audio_sdl2`, reaching "Start application main loop". App warnings only: 8x `[Base] Unknown <android> provider` and a first-run config-version upgrade (benign).
+
+Manual checks: PASS, unless noted.
+
+1. Android Back: menu/drawer/settings Back exits the app; About does not dismiss via Back but its CLOSE button works. Existing behavior documented; no traceback, stuck overlay, or unusable controls.
+2. Rotation: portrait<->landscape redraws without crashing and touch targets follow the layout. The app's pre-existing layout is not responsive, so in landscape the drawer shows only fixed entries, Ahorcado/Memory stretch, and 15-puzzle loses its bottom controls; only Pong is usable. `orientation = all` is pre-existing since the first version. User decision: record as a known limitation and fix separately (not a Phase 4 blocker).
+3. Background/foreground during Pong, Snake, a Memory mismatch and a 2048 move: resumes and works.
+4. Screen lock/unlock during a running game: display/GL/audio recover and inputs respond.
+5. External Help round trip: drawer Help opens the documented URL in the browser; the app stays usable.
+6. Normal exit/relaunch: all five settings panels keep their values and a game starts.
+7. Cold force-stop relaunch: settings persist independently of in-memory screen state and a game starts.
+8. Repeated re-entry x3 of a running round via the drawer: Pong passed. Snake failed first - re-entry flipped the direction to vertical - was fixed (repair #4) and retested PASS; swipes and pause/resume still work.
+9. Audio/mute: representative start/move/win-or-loss sounds audible, mute toggles off/on, still correct after foregrounding.
+10. Image/font providers: cartoons ICOs, GIFs, font/icons and themed images render; revisited after rotation and foreground.
+
+Repair #4 (Snake phantom swipe): `GameBoard.on_touch_up` used instance `swipe_x`/`swipe_y` last set by any earlier `on_touch_down`; a release whose down did not reach the board (drawer/toolbar tap) used stale coordinates and could steer the snake. Fix: store the start point in `touch.ud['snake_swipe']` and ignore a `on_touch_up` with no such record.
+
+Automated checks: `uv run --locked --group dev pytest -q` PASS: 112 passed in 28.52s (was 111; +1 Snake regression). New regression confirmed to fail on the pre-fix `gameboard.py` with "a release without a matching board touch down must not steer the snake" and to pass with the fix. Device retest happened on the rebuilt artifact `8bc32723…`.
+
+Decision: checkpoint 11 PASS (landscape layout recorded as a deferred known limitation). Proceed to checkpoint 12 (final artifact regression) on `8bc32723…`.
+
+Next exact action: checkpoint 11 is complete pending review. Execute Phase 4 checkpoint 12 on artifact `8bc32723de30b90e290e5904338eab561d4968400021c0e167b0578d71e6848e` (Pixel 10 `61190DLCR000VV`, Android 17 / API 37): re-confirm the hash, run the full acceptance set (startup, seven game entries/basic controls, settings persistence, representative audio, one rotation/background cycle), locate/reuse the full desktop suite pass (112 on the current inputs) or rerun it if inputs changed, review logcat across intervals, and check `git diff`/staging. Record evidence and stop for review. Do not begin Phase 5.
