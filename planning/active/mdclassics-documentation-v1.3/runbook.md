@@ -1,8 +1,8 @@
 # MDClassics documentation and v1.3 execution runbook
 
-Created: 2026-10-11. Status: **not executed**.
+Created: 2026-10-11. Status: **all checkpoints executed; awaiting final user review**.
 
-Read the [scope and decisions](mdclassic_games_documentation_release_plan.md)
+Read the [scope and decisions](plan.md)
 before executing. This runbook is intended for a smaller model using bounded,
 explicit checkpoints. It implements the follow-up documentation/release task,
 not the earlier modernization phases.
@@ -11,12 +11,12 @@ not the earlier modernization phases.
 
 | Checkpoint | Status | Evidence / next action |
 | --- | --- | --- |
-| 1 — Audit and changelog draft | Pending | Start here; user must approve the changelog before checkpoint 2 |
-| 2 — Version and MkDocs | Pending | Requires checkpoint 1 approval |
-| 3 — Planning lifecycle and relocation | Pending | Reconcile/archive modernization; move this plan/runbook to active initiative |
-| 4 — README and developer guide | Pending | Include mandatory AI planning/runbook workflow |
-| 5 — Website reconciliation | Pending | Keep existing Help routes/anchors |
-| 6 — Verification and handoff | Pending | No deployment or commit without request |
+| 1 — Audit and changelog draft | Approved | User approved the exact v1.3 entry; release date confirmed as **2026-10-12** |
+| 2 — Version and MkDocs | Passed | `main.py`/`pyproject.toml` = 1.3; MkDocs 1.6.1 pinned in dev; lock/sync/pip-check pass; runtime export excludes MkDocs |
+| 3 — Planning lifecycle and relocation | Passed | Modernization reconciled/archived to `planning/archive/2026-10-mdclassics-modernization/`; this plan/runbook moved to `planning/active/mdclassics-documentation-v1.3/`; tool moved to `tools/`; `planning/README.md` created |
+| 4 — README and developer guide | Passed | `README.md` rewritten (no Android instructions); new `DEVELOPMENT.md` covers environment, tests, Android, release, docs and the AI planning workflow |
+| 5 — Website reconciliation | Passed | index/getting-started/about/combined help updated; Android moved to DEVELOPMENT.md link; changelog copied byte-identical; strict build passes; all 7 Help anchors present; Pages settings unverified (`gh` unavailable) |
+| 6 — Verification and handoff | Passed (awaiting final user review) | `uv lock --check`/`uv pip check` pass; unit 47 passed; full suite 112 passed (display `:1`); versions 1.3; changelog copy byte-identical; diffs clean; no deployment/commit; v1.3 APK build/inspection pending |
 
 ## Operating instructions
 
@@ -60,7 +60,7 @@ Read:
 - `source/MDclassic_games/main.py` version declaration and `buildozer.spec`
   version extraction, requirements, ABIs and package identity.
 - Relevant final modernization validation entries in
-  `docs/assistant/mdclassic_games_validation.md` and commits for the release fixes.
+  `planning/archive/2026-10-mdclassics-modernization/mdclassic_games_validation.md` and commits for the release fixes.
 
 Do not assume an old plan header represents current acceptance. Existing history
 records a 112-test desktop result; the future guide should not hard-code a count
@@ -430,5 +430,250 @@ Decisions:
 Next exact action:
 ```
 
-No checkpoints have been executed. Next action: checkpoint 1, changelog draft
-and mandatory user review.
+```text
+Date / checkpoint: 2026-10-12 / Checkpoint 1 — Audit and changelog draft
+Status: awaiting approval
+Input revision and pre-existing changes: HEAD 2584603; clean tree on entry (no pre-existing changes)
+User approval/date (if applicable): pending; release date not yet agreed (draft uses YYYY-MM-DD)
+Files changed: source/MDclassic_games/CHANGELOG.md; this runbook (tracker + log)
+Commands and working directories:
+  - repository root: git status --short; git log --oneline -30
+  - repository root: git diff --check; git diff --stat -- source/MDclassic_games/CHANGELOG.md
+Observed results / counts / log locations:
+  - git status --short clean before edits; git diff --check clean; diff adds 153 lines, removes 3.
+  - Full v1.2..v0.1 history preserved verbatim from docs/changelogs/classic_games_changelog.md.
+  - Blanket "each version has an apk" claim revised to "Published versions up to v1.2 ...".
+  - Added empty Unreleased heading and drafted v1.3 (date placeholder YYYY-MM-DD).
+  - Verified v1.3 claims against git log and validation record: Python 3.11/Kivy 2.3.1/KivyMD 2.0.0
+    (pyproject.toml, validation master summary), uv lockfile + generated requirements.txt,
+    Android arm64/toolchain (buildozer.spec), audio + system-bar fix (7227e15),
+    15 puzzle fix (92a185f), Snake phantom-swipe fix (5153649), 112-test suite + CI.
+  - Documentation bullet retained as planned work (true only once this release's docs work completes).
+Blocked or not-run checks: checkpoint 2+ not started by design; no version bump, no dependency change,
+  no file relocation, no website copy yet.
+Decisions: Keep app changelog heading "# Classic games changelog" so the later `cp` to the website stays
+  byte-identical and preserves the published page title.
+Next exact action: wait for explicit user approval of the exact v1.3 entry and an agreed release date,
+  then execute checkpoint 2.
+```
+
+```text
+Date / checkpoint: 2026-10-12 / Checkpoint 2 — Version bump and MkDocs dev dependency
+Status: passed
+Input revision and pre-existing changes: HEAD 2584603; working tree carried checkpoint 1 changes
+  (CHANGELOG.md, runbook) plus the approved changelog reflow
+User approval/date (if applicable): changelog approved by user 2026-10-12; release date NOT provided
+  (v1.3 entry still dated YYYY-MM-DD)
+Files changed: source/MDclassic_games/main.py (__version__ = '1.3'); pyproject.toml (project.version "1.3",
+  dev group + "mkdocs==1.6.1"); uv.lock (MkDocs closure); this runbook (tracker + log).
+  requirements.txt re-exported but byte-identical (no diff) since MkDocs is dev-only.
+Commands and working directories:
+  - repository root: uv add --group dev --bounds exact mkdocs
+  - repository root: uv lock --check; uv sync --locked --group dev; uv pip check
+  - repository root: uv run --locked --group dev mkdocs --version
+  - repository root: uv export --locked --no-dev --format requirements-txt --output-file requirements.txt
+  - repository root: regex/tomllib version checks (no GUI import)
+Observed results / counts / log locations:
+  - Selected MkDocs version: 1.6.1 (resolved, exact pin recorded in pyproject dev group).
+  - uv lock --check: "Resolved 57 packages" (lock consistent); uv sync --locked --group dev: 36 packages checked.
+  - uv pip check: "All installed packages are compatible".
+  - mkdocs --version: "mkdocs, version 1.6.1 ... Python 3.11".
+  - Runtime export: no mkdocs entries; runtime pins unchanged, requirements.txt has no diff.
+  - Spec extraction: version.regex against main.py yields 1.3; pyproject project.version = 1.3.
+  - No broad --upgrade; runtime/pytest/android pins preserved.
+Blocked or not-run checks: no APK built/rebuilt (not part of this checkpoint). Release date still pending.
+Decisions: MkDocs added to dev (not runtime, not a new group) as required. Do not hand-edit uv.lock.
+Next exact action: proceed to checkpoint 3 on user instruction; ask user to confirm the v1.3 release date
+  so the changelog placeholder can be finalized before the website copy in checkpoint 5.
+```
+
+```text
+Date / checkpoint: 2026-10-12 / Checkpoint 3 — Planning lifecycle and relocation
+Status: passed
+Input revision and pre-existing changes: HEAD 2584603; working tree carried checkpoints 1-2 changes
+User approval/date (if applicable): continuation instructed by user; release date still not provided
+Files changed:
+  - Moved (git mv, filenames retained) docs/assistant/mdclassic_games_upgrade_plan.md,
+    mdclassic_games_phase1_uv_plan.md, mdclassic_games_phase2_desktop_plan.md,
+    mdclassic_games_phase3_android_plan.md, mdclassic_games_phase4_device_plan.md,
+    mdclassic_games_phase5_handoff_plan.md, mdclassic_games_validation.md
+    -> planning/archive/2026-10-mdclassics-modernization/
+  - Moved docs/assistant/mdclassic_games_documentation_release_plan.md -> planning/active/mdclassics-documentation-v1.3/plan.md
+  - Moved docs/assistant/mdclassic_games_documentation_release_runbook.md -> planning/active/mdclassics-documentation-v1.3/runbook.md
+  - Moved docs/assistant/mdclassic_games_install_android_tools.py -> tools/mdclassic_games_install_android_tools.py
+  - New planning/README.md
+  - Edits: relocation notes in all 7 archived files; completion summary + checked final
+    gate checklists in the archive; mutual plan<->runbook links and current paths updated;
+    tool usage docstring updated to tools/.
+Commands and working directories:
+  - repository root: git mv ... (three moves); git status --short
+  - repository root: uv run --locked --group android python tools/mdclassic_games_install_android_tools.py --help
+  - repository root: git diff --check; git diff --stat
+Observed results / counts / log locations:
+  - docs/assistant/ left empty; all 10 tracked assistant files relocated.
+  - Modernization completion verified against validation record, master plan header and
+    git log (Phase 4 final artifact 8bc32723…, 112/112 desktop, CI run 38151771331);
+    headers were already reconciled in ddca0a1, final gate checklists now checked.
+  - planning/README.md documents the lifecycle and indexes both initiatives.
+Blocked or not-run checks: provisioning NOT run (only --help) by design; no commit/tag/push.
+Decisions: Archive folder uses actual completion month 2026-10; this initiative stays active
+  until final review. Historical docs/assistant paths preserved with relocation notes.
+Next exact action: proceed to checkpoint 4 (README + DEVELOPMENT.md) on user instruction;
+  release date still needed before the checkpoint 5 website copy.
+```
+
+```text
+Date / checkpoint: 2026-10-12 / Checkpoint 4 — README and developer guide
+Status: passed
+Input revision and pre-existing changes: HEAD 2584603; working tree carried checkpoints 1-3 changes
+User approval/date (if applicable): continuation instructed by user; release date still not provided
+Files changed:
+  - README.md rewritten: overview, menu screenshot (docs/img/MD/MD_menu.jpg), seven games,
+    uv/Python 3.11/Kivy 2.3.1/KivyMD 2.0.0 baseline, authoritative pyproject/uv.lock note,
+    desktop quick start with working directory, links to player help / DEVELOPMENT.md / app
+    changelog, background, contribution, license + asset credits. No Android setup/build/install.
+  - New DEVELOPMENT.md: environment/groups, dependency maintenance + runtime export + spec pins,
+    test commands and CI description, Android host setup + licenses + toolchain table, build/
+    deploy/logcat, release checklist, documentation ownership + MkDocs workflow, document-sync
+    checklist, AI-assisted changes section + reusable prompt.
+Commands and working directories:
+  - repository root: git diff --check; file-existence checks for every referenced path
+Observed results / counts / log locations:
+  - All referenced files exist (screenshot, LICENSE, CHANGELOGs, workflow, tool, planning/README).
+  - README Android references are link-only (no setup/build instructions), per plan.
+  - Validation-record pointers use absolute GitHub URLs.
+Blocked or not-run checks: no MkDocs build here (checkpoint 5); no APK build; release date pending.
+Decisions: Keep README concise and desktop-only; all Android procedures consolidated in DEVELOPMENT.md.
+Next exact action: proceed to checkpoint 5 (website reconciliation + changelog copy) on user
+  instruction; the v1.3 release date is still required before the copy.
+```
+
+```text
+Date / checkpoint: 2026-10-13 / Checkpoint 4 follow-up — user review questions + release date
+Status: passed
+Input revision and pre-existing changes: working tree carried checkpoints 1-4 changes
+User approval/date (if applicable): user confirmed the v1.3 release date = 2026-10-12 and raised
+  four DEVELOPMENT.md clarity questions; answers applied
+Files changed:
+  - source/MDclassic_games/CHANGELOG.md: v1.3 heading date finalized YYYY-MM-DD -> 2026-10-12
+  - DEVELOPMENT.md: (1) chapter 1 "basic checks" explained (what each uv command verifies);
+    (2) chapter 3 explains xvfb-run is the Xvfb wrapper (not pytest) and how to run the whole
+    suite (plain pytest, or xvfb-run -a pytest headless); (3) new "Installing on a phone"
+    subsection describing buildozer deploy run and explicit adb install/launch; (4) new
+    ".buildozer/ folder" subsection stating it is the build cache and must be kept, not deleted
+  - this runbook (tracker rows 1-2 date, log)
+Commands and working directories:
+  - repository root: git diff --check; git status --short
+Observed results / counts / log locations:
+  - git diff --check clean. Corrected the earlier use of `uv run ... adb` (adb is a native
+    platform-tools binary, not a Python package) to plain `adb` with a PATH note.
+Decisions: v1.3 approved date is 2026-10-12; the changelog date is no longer a placeholder.
+  Keep .buildozer/ and bin/ (generated, git-ignored) across builds.
+Next exact action: proceed to checkpoint 5 (website reconciliation + changelog copy) on user
+  instruction; the approved date 2026-10-12 is now available for the copy.
+```
+
+```text
+Date / checkpoint: 2026-10-13 / Checkpoint 5 — Website reconciliation and changelog copy
+Status: passed
+Input revision and pre-existing changes: working tree carried checkpoints 1-4 changes plus the
+  checkpoint 4 follow-up, and the later user-requested removal of the xvfb-run command/paragraph
+  from DEVELOPMENT.md (only the CI description of a virtual display remains)
+User approval/date (if applicable): user instructed continuation to checkpoint 5 on 2026-10-13;
+  release date confirmed 2026-10-12
+Files changed:
+  - docs/index.md: rewritten to describe the combined MDClassics app, list the seven games as
+    links to the combined-help anchors, and link the combined help + getting-started.
+  - docs/getting-started.md: restructured desktop setup (uv path with app working directory;
+    pip path in a Python 3.11 venv then change into the app folder); removed the Android host
+    setup/build procedures and replaced them with an absolute link to DEVELOPMENT.md plus a
+    pointer to the releases/ folder; added a Kivy native-dependency pointer.
+  - docs/about.md: added a Background section consistent with README; reworded the license to
+    match README (MIT code vs non-commercial assets); listed third-party sources and noted
+    per-game Credits sections.
+  - docs/games/classic_games.md: version reference 1.2 -> 1.3; side-menu list now includes
+    Help and About; removed the outdated "(to be added in future versions)" about/help block.
+    Preserved all seven game headings that supply the app's Help anchors.
+  - docs/changelogs/classic_games_changelog.md: copied literally from the app changelog.
+  - CHANGELOG.md: rewritten to point to the combined-app changelog (repo + website) and keep
+    the historical standalone changelogs pointer.
+  - mkdocs.yml: unchanged (nav/pages kept; no assistant records remain under docs/).
+  - this runbook (tracker + log).
+Commands and working directories:
+  - repository root: uv run --locked --group dev mkdocs build --strict (baseline before edits,
+    and again after edits)
+  - repository root: cp source/MDclassic_games/CHANGELOG.md docs/changelogs/classic_games_changelog.md
+  - repository root: cmp source/MDclassic_games/CHANGELOG.md docs/changelogs/classic_games_changelog.md
+  - repository root: rg checks for anchors in site/games/classic_games/index.html and rendered
+    links in site/index.html and site/about/index.html
+  - repository root: gh api repos/osso73/classic_games/pages (to read Pages settings)
+Observed results / counts / log locations:
+  - Baseline mkdocs build --strict: exit 0. Post-edit build --strict: exit 0 (no warnings/errors).
+  - cmp byte-identical for the changelog copy.
+  - All seven Help anchor ids present in the built page: game-of-pong, game-of-ahorcado-hanged,
+    game-of-memory, game-of-15-puzzle, game-of-2048, game-of-buscaminas-minesweeper, game-of-snake.
+  - Built index.html links all seven fragments and both combined pages; about.html links the
+    changelog page.
+  - git diff --check clean.
+Blocked or not-run checks: GitHub Pages settings could NOT be read: `gh` is not installed on the
+  host (command not found). No gh-deploy and no settings change performed (by design).
+  App Help URLs were not modified; the drawer's fragment-less help URL and the seven game-module
+  fragments were verified against the built page.
+Decisions: Keep existing site nav/pages; do not move the site or change app URLs. Leave the
+  standalone snake page's "version 1.4" text as-is (it refers to the standalone snake release,
+  not the combined app). No mkdocs.yml edits were necessary.
+Pages configuration for the user to verify manually (unverified here):
+  - Repository Settings -> Pages: source = "Deploy from a branch", branch = gh-pages, folder = / (root).
+  - The published help base URL must remain https://osso73.github.io/classic_games/.
+Next exact action: proceed to checkpoint 6 (final verification + handoff) on user instruction;
+  no commit/tag/push/deploy without an explicit request.
+```
+
+```text
+Date / checkpoint: 2026-10-13 / Checkpoint 6 — Final verification and review handoff
+Status: passed (awaiting final user review)
+Input revision and pre-existing changes: working tree carried checkpoints 1-5 changes
+User approval/date (if applicable): user instructed continuation to checkpoint 6 on 2026-10-13
+Files changed:
+  - tests/mdclassic_games/unit/test_resources.py: the Android identity test hard-coded the
+    expected extracted version as "1.2"; changed it to derive the expected value from
+    pyproject.toml [project].version so the check verifies spec extraction against the canonical
+    project metadata and does not break on future version bumps. This was the cause of the only
+    failing check (the version bump in checkpoint 2 had not updated the test).
+  - this runbook (tracker + log).
+Commands and working directories:
+  - repository root: uv lock --check; uv pip check
+  - repository root: uv run --locked --group dev pytest tests/mdclassic_games/unit -q
+  - repository root: uv run --locked --group dev pytest -q   (full suite; DISPLAY=:1 available)
+  - repository root: git diff --check; git status --short --untracked-files=all; git diff --stat
+  - repository root: verification greps (main.py __version__, pyproject diff, requirements.txt,
+    buildozer.spec / app URL constants, .github workflows)
+Observed results / counts / log locations:
+  - uv lock --check: "Resolved 57 packages" (exit 0). uv pip check: "All installed packages are
+    compatible" (51 packages).
+  - Unit suite after fix: 47 passed (exit 0). Before fix: 1 failed, 46 passed
+    (test_android_identity_and_appearance_are_preserved: extracted "1.3" != hard-coded "1.2").
+  - Full suite: 112 passed in 29.58s (exit 0), run on display :1 (no xvfb needed).
+  - Configuration isolation: source/MDclassic_games/main.ini unchanged; no untracked files;
+    site/ ignored; no APK/SDK/cache additions.
+  - main.py __version__ = '1.3'; pyproject [project].version = "1.3" (only other pyproject
+    change is the dev-group mkdocs==1.6.1 pin). requirements.txt unchanged; buildozer.spec,
+    app URL constants, drawer and game screens untouched; .github workflows untouched.
+  - Spec extraction now verified jointly with project metadata by the updated unit test.
+Blocked or not-run checks: v1.3 APK not built or inspected (no Android build requested/attempted
+  in this initiative) -> record "version metadata updated; v1.3 APK build/inspection pending".
+  Device install/tests, signed release packaging, release uploads and website publishing were not
+  run. GitHub Pages settings remain unverified (`gh` unavailable). No commit/tag/push/gh-deploy.
+Decisions: Fix the stale version test by deriving the expected value from pyproject.toml instead
+  of hard-coding, so releases need no test edit. Do not repeat the passing checks unless inputs
+  change. Leave the working tree uncommitted; initiative stays active pending final review.
+Next exact action: stop for user review. After approval, optionally run the post-review archival
+  step (record completion, move this folder to planning/archive/2026-10-mdclassics-documentation-v1.3/,
+  update index/references). Commit/tag/push/deploy and any APK build only on explicit request.
+```
+
+Prior to checkpoint 1 no checkpoints had been executed. Checkpoints 1 (approved),
+2 (passed), 3 (passed), 4 (passed), 5 (passed) and 6 (passed, awaiting final
+review) are complete. The v1.3 release date is confirmed as 2026-10-12. Next
+action: final user review; then optional post-review archival (no commit, tag,
+push, deploy or APK build without an explicit request).

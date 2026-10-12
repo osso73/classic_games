@@ -1,5 +1,10 @@
 # MDclassic_games Phase 4 runbook - Android device validation
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Reviewed: 2026-10-09. Progress updated: 2026-10-11. Status: **Phase 3 complete and handed off; the full manual checkpoint matrix on a Google Pixel 10 (Android 17 / API 37) is complete. All 12 checkpoints pass. Four Android defects found (audio guard, edge-to-edge system bars, 15-puzzle portrait layout, Snake phantom swipe) were fixed and rebuilt; the third change moved the Phase 4 artifact from `7d3416aa…` to `be6e6196…` and the fourth to `8bc32723…`. Checkpoints 1-6 remain valid on `7d3416aa…`, checkpoints 7-10 on `be6e6196…`, and checkpoints 11-12 on the final artifact `8bc32723…`, re-confirmed by the final-artifact regression (startup, seven game entries/basic controls, settings persistence, representative audio, one rotation/background cycle). Final input state has a full desktop pass (112/112) and logcat review. Phase 4 is complete; Phase 5 checkpoint 1 (evidence reconciliation) is next. Landscape layout is a recorded pre-existing limitation deferred to a separate task by user decision.**
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](mdclassic_games_phase3_android_plan.md), and [the validation record](mdclassic_games_validation.md). This runbook expands master-plan Phase 4 only. Use the final inspected Phase 3 artifact, not an older APK from `releases/`.
@@ -285,13 +290,16 @@ Required lifecycle, touch/layout, provider, audio, and browser round-trip observ
 
 ### Phase 4 completion gate
 
-- [ ] Fresh-default installation/startup passes on at least one named compatible target.
-- [ ] All seven games, touch controls, navigation, and five settings panels pass; settings survive relaunch.
-- [ ] Required ICO/GIF/font/audio, Back, rotation, foreground/background, exit, and Help checks pass.
-- [ ] No required check is hidden by a skip or unreported environmental limitation.
-- [ ] Every fix has appropriate regression evidence and required APK rebuild/inspection/device retest.
-- [ ] Final input state has a full pytest pass and final-artifact device evidence.
-- [ ] Validation record contains device/OS/API/ABI, artifact hash, commands, observations, logs, known issues, and next action.
-- [ ] Changes are reviewed and committed; trackers identify Phase 5 checkpoint 1 as next.
+Reconciled 2026-10-12 against the validation record; all criteria passed within the
+recorded tested scope.
+
+- [x] Fresh-default installation/startup passes on at least one named compatible target.
+- [x] All seven games, touch controls, navigation, and five settings panels pass; settings survive relaunch.
+- [x] Required ICO/GIF/font/audio, Back, rotation, foreground/background, exit, and Help checks pass.
+- [x] No required check is hidden by a skip or unreported environmental limitation.
+- [x] Every fix has appropriate regression evidence and required APK rebuild/inspection/device retest.
+- [x] Final input state has a full pytest pass and final-artifact device evidence.
+- [x] Validation record contains device/OS/API/ABI, artifact hash, commands, observations, logs, known issues, and next action.
+- [x] Changes are reviewed and committed; trackers identify Phase 5 checkpoint 1 as next.
 
 Hand off to [Phase 5](mdclassic_games_phase5_handoff_plan.md) with the actual tested matrix and exact limits of Android validation. If device access or required observations are unavailable, hand off a blocker report instead and leave modernization partial.

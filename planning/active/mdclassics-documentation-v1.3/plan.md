@@ -3,9 +3,11 @@
 Created: 2026-10-11. Status: **planned; implementation has not started**.
 
 This records the user's agreed follow-up to the modernization work. Execute using
-the [detailed runbook](mdclassic_games_documentation_release_runbook.md).
-These two documents are initially stored in `docs/assistant/` at the user's request;
-they move with the other planning documents during implementation.
+the [detailed runbook](runbook.md).
+These two documents were initially stored in `docs/assistant/` at the user's request and
+were relocated to `planning/active/mdclassics-documentation-v1.3/` as `plan.md` and
+`runbook.md` during implementation (checkpoint 3). Historical references to
+`docs/assistant/` in the moved records describe the locations used at the time.
 
 ## Objective
 

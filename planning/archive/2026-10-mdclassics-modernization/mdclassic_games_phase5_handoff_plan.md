@@ -1,5 +1,10 @@
 # MDclassic_games Phase 5 runbook - Final documentation and handoff
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Reviewed: 2026-10-09. Progress updated: 2026-10-12. Status: **all five checkpoints complete; final scope review and completion handoff confirmed by the user. Phase 5 documentation/export changes were committed in `06d9862`; this runbook status correction is ready for the user's final commit.**
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 3 runbook](mdclassic_games_phase3_android_plan.md), [the Phase 4 runbook](mdclassic_games_phase4_device_plan.md), and [the validation record](mdclassic_games_validation.md). This runbook expands master-plan Phase 5 only. Turn recorded working procedures into accurate setup/test/build instructions and verify them in a fresh desktop environment.
@@ -223,7 +228,7 @@ Review the full modernization change range against the recorded pre-modernizatio
 - [x] Root requirements export is functional, generated, runtime-only, and isolated-install verified.
 - [x] Public docs give consistent working directories, prerequisites, setup/build/deploy/test commands, tested matrix, and accurate scope.
 - [x] Fresh desktop setup/launch/full-suite checks pass; matching Android build evidence is cited or rerun.
-- [ ] All phase trackers and master summary reflect actual evidence with no pending required checks hidden.
+- [x] All phase trackers and master summary reflect actual evidence with no pending required checks hidden.
 - [ ] Final changes are reviewed and committed only on user request.
 
 Checkpoint 5 completion is confirmed above. The remaining unchecked entries track documentation-status reconciliation (historical summaries noted in the next action) and the user's final commit, rather than unexecuted runtime acceptance checks.

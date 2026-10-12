@@ -2,7 +2,7 @@
 
 This is the game designed with [KivyMD](https://kivymd.readthedocs.io), consolidating all the other games in a single application, with a nice menu and navigation.
 
-These instructions are for version 1.2. You can find [here](../changelogs/classic_games_changelog.md) a changelog explaining the changes introduced in each version.
+These instructions are for version 1.3. You can find [here](../changelogs/classic_games_changelog.md) a changelog explaining the changes introduced in each version.
 
 ## Application navigation
 
@@ -18,16 +18,17 @@ You can also open the menu on the left, to access some application options, and 
 
 The following options are available from the side menu:
 
-- **main menu**: will bring you again to the main menu screen
+- **Main menu**: will bring you again to the main menu screen
 
-- **settings**: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.
+- **Settings**: will open the settings screen, allowing the configuration of the game parameters. The explanation of these parameters is provided as part of the game description.
+
+- **Help**: opens these instructions in your web browser.
+
+- **About**: displays information about the application, including its version, and a link to the project on GitHub.
 
 - **Exit**: will leave the application.
 
-(to be added in future versions):
-
-- **about**: display information about the application and the author
-- **help**: link to these instructions
+The side menu also lists every game, so you can jump directly to any of them.
 
 
 * * * * * * * * * * * * * * * * * * * * * * * *

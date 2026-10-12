@@ -1,5 +1,10 @@
 # MDclassic_games validation record
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Phase / task: Phase 1 - Reproducible desktop environment
 Status: passed
 Files changed: `.gitignore`, `.python-version`, `pyproject.toml`, `uv.lock`, `README.md`, `docs/getting-started.md`, `docs/assistant/mdclassic_games_validation.md`

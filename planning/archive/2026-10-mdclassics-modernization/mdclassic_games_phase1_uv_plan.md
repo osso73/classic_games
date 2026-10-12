@@ -1,5 +1,10 @@
 # MDclassic_games Phase 1 runbook — Adopt uv
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Reviewed: 2026-09-13. Status: **executed and passed** - the desktop environment was established and its gate recorded (committed `763f139`); see the [validation record](mdclassic_games_validation.md). The `kivymd==1.2.0` baseline in section 1 and the "do not fall back to 2.x" guidance below are retained as the original historical procedure; Phase 2 checkpoint 1 superseded that selection with the locked PyPI `kivymd==2.0.0` artifact (commit `a1beac1`) after the 1.2.0 resource-install defect recorded in the validation record. Do not follow the superseded 1.2.0 steps; use the final baseline in the [master plan](mdclassic_games_upgrade_plan.md).
 
 Read [the master plan](mdclassic_games_upgrade_plan.md) first. This runbook creates the desktop environment only. Phase 2 in the revised master plan handles application compatibility; Phase 3 handles Android. Environment installation success and application startup success are separate results.
@@ -151,15 +156,16 @@ Explain that the reader must change into the stated app directory before the sec
 
 Run `git diff --check` and review tracked diffs **and new files** (ordinary `git diff` does not show untracked file contents). Verify that only allowed files changed.
 
-Complete Phase 1 only when:
+Complete Phase 1 only when (reconciled 2026-10-12 against the validation record; all
+criteria passed):
 
-- [ ] Root metadata, Python selector, ignore exception, and generated lockfile are present.
-- [ ] All direct runtime dependencies have exact, available pins; actual versions and uv/Python patch are recorded.
-- [ ] pytest is pinned in the `dev` group and its version command passes; no test tool was added to runtime requirements.
-- [ ] `uv lock --check`, `uv sync --locked --group dev`, and `uv pip check` pass.
-- [ ] Metadata verification confirms the project interpreter is Python 3.11.
-- [ ] Startup was attempted and honestly classified, or explicitly NOT RUN with an environmental blocker.
-- [ ] MD-app docs use the app-directory launch contract and accurately label partial status.
-- [ ] No app, Android spec, requirements, assets, user config, or standalone-game changes occurred.
+- [x] Root metadata, Python selector, ignore exception, and generated lockfile are present.
+- [x] All direct runtime dependencies have exact, available pins; actual versions and uv/Python patch are recorded.
+- [x] pytest is pinned in the `dev` group and its version command passes; no test tool was added to runtime requirements.
+- [x] `uv lock --check`, `uv sync --locked --group dev`, and `uv pip check` pass.
+- [x] Metadata verification confirms the project interpreter is Python 3.11.
+- [x] Startup was attempted and honestly classified, or explicitly NOT RUN with an environmental blocker.
+- [x] MD-app docs use the app-directory launch contract and accurately label partial status.
+- [x] No app, Android spec, requirements, assets, user config, or standalone-game changes occurred.
 
 Handoff to **Phase 2 — Desktop compatibility** with the first application traceback and remaining checks. A completed environment phase with blocked GUI validation does not mean the app is runnable. Do not start Android build work until the master plan's desktop gate passes.

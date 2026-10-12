@@ -137,7 +137,10 @@ def test_android_identity_and_appearance_are_preserved(app_spec):
     assert app_spec["title"] == "Classic games"
     assert "version" not in app_spec
     assert app_spec["version.filename"] == "%(source.dir)s/main.py"
-    assert re.search(app_spec["version.regex"], (APP_DIR / "main.py").read_text()).group(1) == "1.2"
+    project_version = tomllib.loads(
+        (APP_DIR.parents[1] / "pyproject.toml").read_text()
+    )["project"]["version"]
+    assert re.search(app_spec["version.regex"], (APP_DIR / "main.py").read_text()).group(1) == project_version
     assert app_spec["icon.filename"] == "%(source.dir)s/images/icon.png"
     assert app_spec["presplash.filename"] == "%(source.dir)s/images/splash.png"
     assert app_spec["orientation"] == "all"
