@@ -174,14 +174,31 @@ JDK, SDK/NDK binaries or p4a's cross-compiled environment.
 
 ## 5. Android build, deploy and debug
 
-Run Buildozer from the app directory, not the repository root:
+Run Buildozer from the app directory, not the repository root.
+
+The Gradle APK build must run under the provisioned Temurin JDK 17. On a rolling
+Arch-based host the default Java is newer (for example Java 26) than Gradle
+8.14.3 supports, so the build aborts with `Unsupported class file major version
+70` right after the sources are packaged. Put the provisioned JDK on `JAVA_HOME`
+and `PATH` for the build — either exported once per shell (shown here) or inline
+with `env`, as in section 4:
 
 ```bash
 # Working directory: source/MDclassic_games
+export JAVA_HOME="$HOME/.local/share/classic-games-android/jdk-17.0.20.1+1"
+export PATH="$JAVA_HOME/bin:$PATH"
+
 uv run --locked --group android buildozer -v android debug   # build the debug APK
 uv run --locked --group android buildozer android deploy run # install to device and launch
 uv run --locked --group android buildozer android logcat     # filtered app logs
 ```
+
+Only the commands that run the Gradle APK build (`android debug`, and `android
+release` if it were supported) need this environment. `android deploy`/`run`
+installs and launches an APK already produced by `android debug`, and `android
+logcat` only streams device logs; neither invokes Gradle, so a plain `uv run
+--locked --group android buildozer ...` is enough for them once the APK exists in
+`bin/`.
 
 The debug APK is written to `source/MDclassic_games/bin/`. `buildozer -v android
 debug` produces a debug-signed APK for local testing only. Signed release/AAB
@@ -193,8 +210,9 @@ Buildozer reads the app version from `main.py` using `version.regex` /
 
 ### Installing on a phone
 
-`buildozer android deploy run` does the install for you: it builds the APK if
-needed, installs it over `adb` on a single connected device and starts the app.
+`buildozer android deploy run` does the install for you: it pushes the APK from a
+previous `android debug` build, installs it over `adb` on a single connected
+device and starts the app (it does not run the Gradle build itself).
 It requires exactly one device, USB debugging enabled, and `adb` available (the
 provisioned `platform-tools` provide it). Check the device is seen first:
 
