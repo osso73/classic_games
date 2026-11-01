@@ -9,6 +9,9 @@ Published versions up to v1.2 have their corresponding apk under the folder `rel
 
 ## Unreleased
 
+### Fixed
+- Fixed the overly dark backgrounds introduced by the KivyMD upgrade in 2048, Snake, 15 Puzzle, and Memory by using the theme's lighter Primary Container colour.
+
 
 ## v1.3 - 2026-10-12
 

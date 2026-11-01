@@ -38,7 +38,7 @@ Builder.load_string(
     
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: app.theme_cls.primaryColor
+        md_bg_color: app.theme_cls.primaryContainerColor
         on_size: board.initialize_grid()
     
         MDTopAppBar:

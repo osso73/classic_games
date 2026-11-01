@@ -64,7 +64,7 @@ Builder.load_string(
             padding: '10dp'
             size_hint_y: None
             height: score.texture_size[1] + dp(10)*2
-            md_bg_color: app.theme_cls.primaryColor
+            md_bg_color: app.theme_cls.primaryContainerColor
             
             BoxLayout:
                 orientation: 'horizontal'

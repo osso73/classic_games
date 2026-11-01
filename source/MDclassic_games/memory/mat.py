@@ -34,7 +34,7 @@ Builder.load_string(
 
 <Mat>:
     cols: self.columns
-    md_bg_color: app.theme_cls.primaryColor
+    md_bg_color: app.theme_cls.primaryContainerColor
     padding: '5dp'
     spacing: '5dp'
 
