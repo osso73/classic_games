@@ -1,5 +1,10 @@
 # MDclassic_games Phase 3 runbook - Android toolchain and debug APK
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Reviewed: 2026-10-09. Progress updated: 2026-10-10. Status: **complete - checkpoints 1-6 committed and checkpoint 7 passed (awaiting the user's commit request); the clean-build debug APK `7d3416aa…e9d3cc91` is the final Phase 4 artifact**. Android runtime support remains unvalidated until the Phase 4 device gate passes.
 
 Read [the master plan](mdclassic_games_upgrade_plan.md), [the Phase 2 runbook](mdclassic_games_phase2_desktop_plan.md), and [the validation record](mdclassic_games_validation.md) before editing. This runbook expands master-plan Phase 3 only. Build one combined debug APK containing all seven games. Installation and interactive Android acceptance belong to [Phase 4](mdclassic_games_phase4_device_plan.md).
@@ -279,13 +284,15 @@ Review new files as well as tracked diffs. Restore only known test-generated con
 
 ### Phase 3 completion gate
 
-- [ ] Version/source matrix is complete with immutable p4a and exact host/runtime selections.
-- [ ] Locked host setup and documented OS/JDK prerequisites work.
-- [ ] Spec preserves identity/version and includes arm64 plus required runtime assets, including ICOs.
-- [ ] First build and clean-app-build reproduction pass with logs showing actual selected versions.
-- [ ] Final APK manifest, ABI, dependencies, nested assets, and exclusions pass inspection.
-- [ ] Full desktop pytest suite passes on the final input state; affected desktop manual checks pass after relevant changes.
-- [ ] Validation record identifies final artifact path, SHA-256, size, input state, tool versions, logs, and inspection evidence.
-- [ ] Changes are reviewed and committed; trackers identify Phase 4 checkpoint 1 as next.
+Reconciled 2026-10-12 against the validation record; all criteria passed.
+
+- [x] Version/source matrix is complete with immutable p4a and exact host/runtime selections.
+- [x] Locked host setup and documented OS/JDK prerequisites work.
+- [x] Spec preserves identity/version and includes arm64 plus required runtime assets, including ICOs.
+- [x] First build and clean-app-build reproduction pass with logs showing actual selected versions.
+- [x] Final APK manifest, ABI, dependencies, nested assets, and exclusions pass inspection.
+- [x] Full desktop pytest suite passes on the final input state; affected desktop manual checks pass after relevant changes.
+- [x] Validation record identifies final artifact path, SHA-256, size, input state, tool versions, logs, and inspection evidence.
+- [x] Changes are reviewed and committed; trackers identify Phase 4 checkpoint 1 as next.
 
 Pass Phase 4 the final artifact/hash, package ID and launcher component, minimum/target APIs, supported ABIs, build/inspection logs, desktop/CI evidence, and any unrelated known issues. **Android runtime support remains unvalidated** until the Phase 4 device gate passes.

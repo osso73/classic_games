@@ -1,5 +1,10 @@
 # MDclassic_games Phase 2 runbook - Desktop compatibility
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
 Progress updated: 2026-10-10. Status: **checkpoints 1-12 complete; Phase 2 acceptance passed; Phase 3 checkpoint 1 is next**.
 
 ## Progress tracker

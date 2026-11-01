@@ -1,5 +1,40 @@
 # MDclassic_games modernization execution plan
 
+> **Relocation note (2026-10-12):** Archived from `docs/assistant/` to
+> `planning/archive/2026-10-mdclassics-modernization/` after the modernization was
+> completed and reviewed. Paths recorded as `docs/assistant/...` below describe the
+> locations used at the time; current operating instructions live in `DEVELOPMENT.md`.
+
+## Modernization completion summary
+
+**Status: Completed 2026-10-12**, accepted by the user at Phase 5 checkpoint 5.
+
+- **Delivered work:** reproducible uv/CPython 3.11 environment with a locked
+  dependency graph; Kivy 2.3.1 / KivyMD 2.0.0 compatibility migration of the
+  combined app; all seven games plus shell, touch, settings and lifecycle
+  validated on desktop and on a physical Android target; four Android defects
+  fixed (audio guard, edge-to-edge system bars, 15-puzzle portrait layout, Snake
+  phantom swipe); maintained unit/GUI regression suite with focused CI; pinned
+  Android toolchain and inspected debug APK; runtime-only `requirements.txt`
+  export; reconciled setup/build/test documentation.
+- **Implementation commits:** Phase 1 `763f139`; Phase 2 repairs and tests
+  `f1d0148`, `0f5642d`, `b5e27b1`, `b4406c4`, `e7662c9`, `511cd0a`, acceptance
+  `3efd3cf`, CI `3d55d2b`; Phase 3 toolchain/spec/build `8cb288f`, `c29c7b0`,
+  `e247e97`, `4188800`, clean build `f11a0e3`, handoff `524e02b`; Phase 4 fixes
+  `7227e15`, `92a185f`, `5153649`; Phase 5 documentation/export `06d9862`, final
+  status reconciliation `ddca0a1`.
+- **Validation evidence:** [validation record](mdclassic_games_validation.md),
+  including the tested matrix, artifact hashes, device passes and focused CI run
+  [38151771331](https://github.com/osso73/classic_games/actions/runs/38151771331).
+- **Known limitations / deferred work:** landscape layout is not responsive
+  (deferred to a separate task by user decision); only `systemBars()` insets are
+  padded, so a wide-notch display cutout is unhandled; only the recorded Manjaro
+  x86_64 host, CPython 3.11.14, and arm64-v8a Android API 37/36 devices were
+  tested.
+- **Follow-up:** the version bump to 1.3, documentation consolidation and
+  planning/tool relocation are handled by the
+  [MDClassics documentation/v1.3 initiative](../../active/mdclassics-documentation-v1.3/plan.md).
+
 Original review: 2026-09-13. Progress updated: 2026-10-12. Status: **Phases 1-5 complete; modernization acceptance passed within the recorded tested scope. Phase 3 checkpoint 7 passed and was committed in `524e02b`. All 12 Phase 4 checkpoints passed on a Google Pixel 10 `61190DLCR000VV` (Android 17 / API 37): checkpoints 1-6 on artifact `7d3416aa…e9d3cc91`, checkpoints 7-10 on `be6e6196…9a449c19c1`, and checkpoints 11-12 on final artifact `8bc32723…71e6848e`, re-confirmed by the final-artifact regression (startup, seven games, settings persistence, audio, one rotation/background cycle). Four Android defects were fixed (audio guard, edge-to-edge system bars, 15-puzzle layout, Snake phantom swipe); the final input state has a 112/112 desktop pass and clean session logcat. All five Phase 5 checkpoints are complete, including the runtime requirements export, public-doc reconciliation, fresh-environment verification (112/112 tests), and final scope review/handoff. Phase 5 documentation/export changes are committed in `06d9862`; these status corrections await the user's final commit. Landscape layout remains a recorded pre-existing limitation deferred to a separate task.**
 
 ## Progress summary

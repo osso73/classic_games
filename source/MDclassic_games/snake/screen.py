@@ -38,7 +38,7 @@ Builder.load_string(
     MDBoxLayout:
         orientation: 'vertical'
         spacing: '10dp'
-        md_bg_color: app.theme_cls.primaryColor
+        md_bg_color: app.theme_cls.primaryContainerColor
     
         MDTopAppBar:
             MDTopAppBarLeadingButtonContainer:
