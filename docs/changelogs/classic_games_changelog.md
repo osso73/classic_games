@@ -4,7 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). For the version numbers, I just use a simple 2-digit, for major and minor changes. I add a letter in the case I create a new version fixing only bugs.
 
-Each version has its corresponding apk under the folder `releases`.
+Published versions up to v1.2 have their corresponding apk under the folder `releases`. A drafted version is not a published artifact until its apk is built and added there.
+
+
+## Unreleased
+
+
+## v1.3 - 2026-10-12
+
+Internal modernization of the combined app, with compatibility updates and a few fixes for current Android devices. The same seven games remain available.
+
+### Changed
+- Updated to Python 3.11, Kivy 2.3.1, and KivyMD 2.0.0, adapting the application to the updated framework APIs.
+- Introduced a reproducible uv development environment with locked dependencies and generated pip requirements.
+- Updated the Android build configuration and toolchain, including arm64 support.
+- Reorganized and updated project documentation, development instructions, and the MkDocs help website.
+
+### Added
+- Automated unit and GUI regression tests for the combined app.
+- Continuous integration checks for the test suite.
+
+### Fixed
+- Android audio initialization and layout around system bars.
+- The 15 puzzle reference picture covering controls in portrait orientation.
+- Snake reacting to a phantom swipe when returning through the navigation drawer.
 
 
 ## v1.2 -  2021-08-01

@@ -1,7 +1,7 @@
 """Install the reviewed Linux x64 Android tools in a user-owned directory.
 
 Run from repository root with:
-    uv run --locked --group android python docs/assistant/mdclassic_games_install_android_tools.py
+    uv run --locked --group android python tools/mdclassic_games_install_android_tools.py
 
 This provisions archives only. SDK license acceptance and OS prerequisites are
 separate steps. It does not change shell profiles or the system Java selection.
